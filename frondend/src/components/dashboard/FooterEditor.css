@@ -1,0 +1,128 @@
+/* ── Footer Color Grid ── */
+.footer-colors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.footer-color-card {
+  padding: 14px;
+  background: #f9fafb;
+  border: 1px solid #f0f0f0;
+  border-radius: 12px;
+  transition: all 200ms ease;
+}
+
+.footer-color-card:hover {
+  background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.footer-color-card__info {
+  margin-bottom: 10px;
+}
+
+.footer-color-card__label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 2px;
+}
+
+.footer-color-card__desc {
+  display: block;
+  font-size: 0.7rem;
+  color: #9ca3af;
+}
+
+.footer-color-card__controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.footer-color-card__swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 2px solid #e5e7eb;
+  cursor: pointer;
+  transition: all 200ms ease;
+  flex-shrink: 0;
+}
+
+.footer-color-card__swatch:hover {
+  border-color: #d1d5db;
+  transform: scale(1.08);
+}
+
+.footer-color-card__hex {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-family: monospace;
+  color: #374151;
+  background: white;
+  min-width: 0;
+}
+
+.footer-color-card__hex:focus {
+  outline: none;
+  border-color: #006B3F;
+  box-shadow: 0 0 0 2px rgba(0, 107, 63, 0.08);
+}
+
+.footer-color-card__picker {
+  margin-top: 10px;
+}
+
+.footer-color-card__picker .react-colorful {
+  width: 100% !important;
+  height: 140px !important;
+}
+
+/* ── Footer Color Preview ── */
+.footer-color-preview {
+  padding: 20px;
+  border-radius: 12px;
+  border: 2px solid;
+  margin-top: 4px;
+}
+
+/* ── Footer Column Editor ── */
+.footer-col-editor {
+  padding: 16px;
+  background: #f9fafb;
+  border: 1px solid #f0f0f0;
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+
+.footer-col-editor__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.footer-links-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.footer-link-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.footer-link-row .dash-field__input {
+  margin-bottom: 0;
+  font-size: 0.82rem;
+  padding: 7px 10px;
+}

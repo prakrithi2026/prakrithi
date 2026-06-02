@@ -1,0 +1,72 @@
+from django.db import models
+from django.core.validators import MinValueValidator
+
+class SiteConfig(models.Model):
+    # We will use a singleton pattern, where id=1 is the active config.
+    # This stores theme, navbar, footer, sections, etc.
+    config_data = models.JSONField(default=dict)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Site Configuration (Last updated: {self.updated_at})"
+
+class Category(models.Model):
+    category_id = models.CharField(max_length=50, unique=True, primary_key=True)
+    label = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.label
+
+class Product(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    salePrice = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    image = models.TextField(blank=True, null=True)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='products')
+    
+    # Store arrays as JSON
+    tags = models.JSONField(default=list, blank=True)
+    variants = models.JSONField(default=list, blank=True)
+    
+    badge = models.CharField(max_length=50, blank=True, null=True)
+    badgeColor = models.CharField(max_length=20, blank=True, null=True)
+    badgeTextColor = models.CharField(max_length=20, blank=True, null=True)
+    
+    rating = models.DecimalField(max_digits=3, decimal_places=1, default=0.0)
+    reviews = models.IntegerField(default=0)
+    couponNote = models.CharField(max_length=255, blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+class Order(models.Model):
+    STATUS_CHOICES = (
+        ('pending', 'Pending'),
+        ('processing', 'Processing'),
+        ('shipped', 'Shipped'),
+        ('delivered', 'Delivered'),
+        ('cancelled', 'Cancelled')
+    )
+    
+    customer_name = models.CharField(max_length=255)
+    customer_email = models.EmailField()
+    customer_phone = models.CharField(max_length=20)
+    shipping_address = models.TextField()
+    payment_method = models.CharField(max_length=50, default='cod')
+    
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Order #{self.id} - {self.customer_name}"
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+    quantity = models.PositiveIntegerField(validators=[MinValueValidator(1)])
+    price = models.DecimalField(max_digits=10, decimal_places=2) # Price at time of purchase
+
+    def __str__(self):
+        return f"{self.quantity} x {self.product.name if self.product else 'Deleted Product'}"

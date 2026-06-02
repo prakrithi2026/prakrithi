@@ -1,0 +1,136 @@
+.shop-section {
+  max-width: 1194px;
+  width: 100%;
+  margin: 58px auto 0;
+  padding: 0 20px;
+  overflow: hidden;
+}
+
+.section-container {
+  width: 100%;
+}
+
+/* Filter tabs */
+.filter-tabs {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 0;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  border-radius: 12px;
+  border: 1px solid #00472A;
+  background: #fff;
+  display: inline-flex;
+  padding: 12px 25px;
+  justify-content: center;
+  align-items: center;
+  color: #00472A;
+  text-align: center;
+  font-family: 'Jost', sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 96%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-btn.active {
+  background-color: #00472A;
+  color: #fff;
+  border-color: #00472A;
+}
+
+.filter-btn:hover:not(.active) {
+  background: rgba(0, 71, 42, 0.05);
+}
+
+/* Horizontal scroll wrapper */
+.products-scroll-wrapper {
+  width: 100%;
+  margin-top: 32px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.products-scroll-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.products-row {
+  display: flex;
+  gap: 20px;
+  width: max-content;
+  padding-bottom: 4px;
+}
+
+/* Progress + View All row */
+.progress-viewall-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+  width: 100%;
+  gap: 16px;
+}
+
+.scroll-progress {
+  flex: 1;
+  height: 7px;
+  border-radius: 61px;
+  background: #E7EAF0;
+  overflow: hidden;
+}
+
+.scroll-progress-bar {
+  height: 100%;
+  width: 30%;
+  border-radius: 61px;
+  transition: width 0.15s ease;
+}
+
+.view-all-row {
+  display: inline-flex;
+  padding: 4px 12px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  border: 1px solid #00472A;
+  flex-shrink: 0;
+}
+
+.btn-view-all {
+  color: #00472A;
+  text-align: right;
+  font-family: 'Jost', sans-serif;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .shop-section {
+    margin-top: 30px;
+    padding: 0 12px;
+  }
+
+  .filter-tabs {
+    gap: 8px;
+  }
+
+  .filter-btn {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+
+  .products-row {
+    gap: 12px;
+  }
+}

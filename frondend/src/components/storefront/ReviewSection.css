@@ -1,0 +1,147 @@
+.review-section {
+  max-width: 1170px;
+  margin: 58px auto 0;
+  padding: 40px 60px;
+  border-radius: 16px;
+}
+
+.review-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  width: 100%;
+  min-height: 167px;
+  gap: 300px;
+}
+
+/* Left image */
+.review-left {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.review-left__img {
+  width: auto;
+  max-width: 220px;
+  height: 150px;
+  object-fit: contain;
+  display: block;
+}
+
+/* Google rating card */
+.review-right {
+  flex: 0 0 auto;
+}
+
+.review-right--full {
+  flex: 1 1 auto;
+  max-width: 540px;
+  margin: 0 auto;
+}
+
+.google-rating-card {
+  background: #fff;
+  color: #1c1c1c;
+  padding: 22px 28px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.google-label {
+  font-family: 'Jost', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #1c1c1c;
+}
+
+.google-score-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.google-score {
+  font-family: 'Jost', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #00472A;
+}
+
+.google-stars {
+  color: #00472A;
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+.google-count {
+  font-family: 'Jost', sans-serif;
+  font-size: 12px;
+  color: #6c757d;
+  margin-left: 4px;
+}
+
+.btn-write-review {
+  color: #fff;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 6px;
+  font-family: 'Jost', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s ease;
+}
+
+.btn-write-review:hover {
+  opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+  .review-section {
+    padding: 30px 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+
+  .review-container {
+    flex-direction: column;
+    min-height: auto;
+    gap: 20px;
+    width: 100%;
+    padding: 20px;
+  }
+
+  .review-left {
+    flex: none;
+    width: 100%;
+  }
+
+  .review-left__img {
+    width: auto;
+    max-width: 280px;
+    height: 200px;
+    object-fit: contain;
+  }
+
+  .review-right {
+    flex: none;
+    width: 100%;
+  }
+
+  .review-right--full {
+    max-width: 100%;
+  }
+
+  .google-rating-card {
+    flex-direction: column;
+    text-align: center;
+  }
+}

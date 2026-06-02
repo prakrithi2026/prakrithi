@@ -1,0 +1,157 @@
+.site-footer {
+  width: 100%;
+  padding: 40px 0 24px;
+  color: #fff;
+  margin-top: 58px;
+}
+
+.footer-container {
+  max-width: 1194px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Title */
+.footer-title {
+  font-family: 'Jost', sans-serif;
+  font-size: 32px;
+  font-weight: 500;
+  margin-bottom: 12px;
+  color: #fff;
+}
+
+.footer-title sup {
+  font-size: 14px;
+  margin-left: 4px;
+}
+
+/* Description */
+.footer-desc {
+  font-family: 'Jost', sans-serif;
+  font-size: 18px;
+  font-weight: 300;
+  line-height: 1.6;
+  color: #E3E9E8;
+  max-width: 1050px;
+  margin-bottom: 20px;
+}
+
+/* Section headings */
+.site-footer h6 {
+  font-family: 'Jost', sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  margin-bottom: 12px;
+  color: #fff;
+}
+
+/* Shop links */
+.footer-shop-for {
+  margin-bottom: 20px;
+}
+
+.shop-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.shop-links a {
+  font-family: 'Jost', sans-serif;
+  font-size: 18px;
+  font-weight: 300;
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.shop-links a:hover {
+  opacity: 0.8;
+}
+
+/* Contact row */
+.footer-contact-row {
+  display: flex;
+  gap: 120px;
+  margin-bottom: 20px;
+}
+
+.footer-contact-item p,
+.footer-contact-item a {
+  font-family: 'Jost', sans-serif;
+  font-size: 18px;
+  font-weight: 300;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  color: #fff;
+}
+
+/* Address */
+.footer-address {
+  margin-bottom: 16px;
+}
+
+.footer-address p {
+  font-family: 'Jost', sans-serif;
+  font-size: 18px;
+  font-weight: 300;
+  color: #E3E9E8;
+}
+
+/* Social */
+.footer-social {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.footer-social a {
+  color: #fff;
+  transition: opacity 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.footer-social a:hover {
+  opacity: 0.7;
+}
+
+/* Bottom */
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  padding-top: 20px;
+}
+
+.footer-bottom p {
+  font-family: 'Jost', sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  color: #fff;
+}
+
+@media (max-width: 768px) {
+  .site-footer {
+    padding: 40px 0 30px;
+  }
+
+  .footer-title {
+    font-size: 28px;
+  }
+
+  .footer-desc {
+    font-size: 15px;
+  }
+
+  .footer-contact-row {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .shop-links {
+    gap: 12px;
+  }
+
+  .shop-links a {
+    font-size: 15px;
+  }
+}

@@ -1,0 +1,8 @@
+/* App-level minimal styles */
+
+/* Ensure storefront takes full width */
+.storefront {
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+}

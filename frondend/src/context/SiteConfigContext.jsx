@@ -1,0 +1,248 @@
+import { createContext, useContext, useCallback, useMemo, useState, useEffect, useRef } from 'react';
+import defaultConfig from '../data/defaultConfig';
+import API_BASE_URL from '../utils/api';
+
+const SiteConfigContext = createContext(null);
+
+export function SiteConfigProvider({ children }) {
+  const [config, setConfig] = useState(defaultConfig);
+  const [savedConfig, setSavedConfig] = useState(defaultConfig);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const channelRef = useRef(null);
+  const sourceRef = useRef('init');
+  const configRef = useRef(config);
+  const hasUnsavedChangesRef = useRef(false);
+
+  useEffect(() => {
+    configRef.current = config;
+  }, [config]);
+
+  useEffect(() => {
+    hasUnsavedChangesRef.current = hasUnsavedChanges;
+  }, [hasUnsavedChanges]);
+
+  // Setup BroadcastChannel for cross-context (iframe/tabs) live preview sync
+  useEffect(() => {
+    channelRef.current = new BroadcastChannel('siteconfig-sync');
+    
+    channelRef.current.onmessage = (e) => {
+      if (e.data && e.data.type === 'SYNC_CONFIG') {
+        sourceRef.current = 'sync';
+        setConfig(prev => {
+          // Prevent infinite loop
+          if (JSON.stringify(prev) !== JSON.stringify(e.data.payload)) {
+            return e.data.payload;
+          }
+          return prev;
+        });
+      } else if (e.data && e.data.type === 'REQUEST_CONFIG') {
+        // Broadcast unsaved changes to new tabs that just opened
+        if (hasUnsavedChangesRef.current && channelRef.current) {
+          channelRef.current.postMessage({ type: 'SYNC_CONFIG', payload: configRef.current });
+        }
+      }
+    };
+
+    // Ask other tabs for their unsaved config
+    channelRef.current.postMessage({ type: 'REQUEST_CONFIG' });
+
+    return () => {
+      channelRef.current?.close();
+    };
+  }, []);
+
+  // Broadcast config changes
+  useEffect(() => {
+    if (!isLoading && channelRef.current && sourceRef.current === 'user') {
+      channelRef.current.postMessage({ type: 'SYNC_CONFIG', payload: config });
+    }
+  }, [config, isLoading]);
+
+  // Load data from API
+  useEffect(() => {
+    // Deep-merge defaults so new config keys always have fallback values
+    function deepMerge(defaults, overrides) {
+      const result = { ...defaults };
+      for (const key of Object.keys(overrides)) {
+        if (
+          overrides[key] !== null &&
+          typeof overrides[key] === 'object' &&
+          !Array.isArray(overrides[key]) &&
+          typeof defaults[key] === 'object' &&
+          defaults[key] !== null &&
+          !Array.isArray(defaults[key])
+        ) {
+          result[key] = deepMerge(defaults[key], overrides[key]);
+        } else {
+          result[key] = overrides[key];
+        }
+      }
+      return result;
+    }
+
+    async function loadData() {
+      try {
+        const configRes = await fetch(`${API_BASE_URL}/config/`);
+        const configData = await configRes.json();
+        
+        const productsRes = await fetch(`${API_BASE_URL}/products/`);
+        const productsData = await productsRes.json();
+        
+        const categoriesRes = await fetch(`${API_BASE_URL}/categories/`);
+        const categoriesData = await categoriesRes.json();
+
+        const mergedConfig = deepMerge(defaultConfig, configData);
+        
+        // Ensure new sections added to defaultConfig are present even if backend has an older sections array
+        if (configData.sections && Array.isArray(configData.sections)) {
+          const existingIds = new Set(configData.sections.map(s => s.id));
+          const newSections = defaultConfig.sections.filter(s => !existingIds.has(s.id));
+          if (newSections.length > 0) {
+            mergedConfig.sections = [...configData.sections, ...newSections];
+          }
+        }
+
+        const fullConfig = {
+          ...mergedConfig,
+          products: productsData,
+          categories: categoriesData.map(c => ({ id: c.category_id, label: c.label }))
+        };
+
+        setSavedConfig(fullConfig);
+
+        // Only set config if we haven't already received unsaved changes from sync
+        if (sourceRef.current === 'init' || sourceRef.current === 'api') {
+          sourceRef.current = 'api';
+          setConfig(fullConfig);
+        }
+      } catch (error) {
+        console.error("Failed to load config from API, using default", error);
+        if (sourceRef.current === 'init' || sourceRef.current === 'api') {
+          sourceRef.current = 'api';
+          setConfig(defaultConfig);
+        }
+        setSavedConfig(defaultConfig);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadData();
+  }, []);
+
+  // Track unsaved changes
+  useEffect(() => {
+    if (isLoading) return;
+    const isDifferent = JSON.stringify(config) !== JSON.stringify(savedConfig);
+    setHasUnsavedChanges(isDifferent);
+  }, [config, savedConfig, isLoading]);
+
+  const updateConfig = useCallback(
+    (path, value) => {
+      sourceRef.current = 'user';
+      setConfig((prev) => {
+        const keys = path.split('.');
+        const next = JSON.parse(JSON.stringify(prev));
+        let obj = next;
+        for (let i = 0; i < keys.length - 1; i++) {
+          obj = obj[keys[i]];
+        }
+        obj[keys[keys.length - 1]] = value;
+        return next;
+      });
+    },
+    []
+  );
+
+  const updateProduct = useCallback(
+    (productId, updates) => {
+      sourceRef.current = 'user';
+      setConfig((prev) => {
+        const next = { ...prev, products: prev.products.map((p) => (p.id === productId ? { ...p, ...updates } : p)) };
+        return next;
+      });
+    },
+    []
+  );
+
+  const addProduct = useCallback(
+    (product) => {
+      sourceRef.current = 'user';
+      setConfig((prev) => {
+        const maxId = prev.products.reduce((max, p) => Math.max(max, p.id || 0), 0);
+        return { ...prev, products: [...prev.products, { ...product, id: maxId + 1 }] };
+      });
+    },
+    []
+  );
+
+  const deleteProduct = useCallback(
+    (productId) => {
+      sourceRef.current = 'user';
+      setConfig((prev) => ({
+        ...prev,
+        products: prev.products.filter((p) => p.id !== productId),
+      }));
+    },
+    []
+  );
+
+  const saveConfig = useCallback(async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/config/`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(config)
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to save configuration');
+      }
+      
+      setSavedConfig(config);
+    } catch (error) {
+      console.error("Error saving config:", error);
+      alert("Failed to save configuration to the server.");
+    }
+  }, [config]);
+
+  const resetConfig = useCallback(() => {
+    sourceRef.current = 'user';
+    setConfig(savedConfig);
+  }, [savedConfig]);
+
+  const resetToDefaults = useCallback(() => {
+    sourceRef.current = 'user';
+    setConfig(defaultConfig);
+    setSavedConfig(defaultConfig);
+  }, []);
+
+  const value = useMemo(
+    () => ({
+      config,
+      setConfig,
+      updateConfig,
+      updateProduct,
+      addProduct,
+      deleteProduct,
+      saveConfig,
+      resetConfig,
+      resetToDefaults,
+      hasUnsavedChanges,
+      isLoading
+    }),
+    [config, updateConfig, updateProduct, addProduct, deleteProduct, saveConfig, resetConfig, resetToDefaults, hasUnsavedChanges, isLoading]
+  );
+
+  return <SiteConfigContext.Provider value={value}>{children}</SiteConfigContext.Provider>;
+}
+
+export function useSiteConfig() {
+  const context = useContext(SiteConfigContext);
+  if (!context) {
+    throw new Error('useSiteConfig must be used within a SiteConfigProvider');
+  }
+  return context;
+}
