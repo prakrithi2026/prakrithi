@@ -184,32 +184,34 @@ products = [
   }
 ]
 
-# Create Config
-SiteConfig.objects.create(id=1, config_data=config_data)
+# Create or Update Config
+SiteConfig.objects.update_or_create(id=1, defaults={"config_data": config_data})
 
-# Create Categories
+# Create or Update Categories
 for cat in categories:
-    Category.objects.create(category_id=cat["id"], label=cat["label"])
+    Category.objects.update_or_create(category_id=cat["id"], defaults={"label": cat["label"]})
 
-# Create Products
+# Create or Update Products
 for prod in products:
     category_obj = Category.objects.filter(category_id=prod["category"]).first()
-    Product.objects.create(
+    Product.objects.update_or_create(
         id=prod["id"],
-        name=prod["name"],
-        description=prod["description"],
-        price=Decimal(str(prod["price"])),
-        salePrice=Decimal(str(prod["salePrice"])) if prod["salePrice"] else None,
-        image=prod["image"],
-        category=category_obj,
-        tags=prod["tags"],
-        variants=prod["variants"],
-        badge=prod.get("badge"),
-        badgeColor=prod.get("badgeColor"),
-        badgeTextColor=prod.get("badgeTextColor"),
-        rating=Decimal(str(prod["rating"])),
-        reviews=prod["reviews"],
-        couponNote=prod.get("couponNote")
+        defaults={
+            "name": prod["name"],
+            "description": prod["description"],
+            "price": Decimal(str(prod["price"])),
+            "salePrice": Decimal(str(prod["salePrice"])) if prod["salePrice"] else None,
+            "image": prod["image"],
+            "category": category_obj,
+            "tags": prod["tags"],
+            "variants": prod["variants"],
+            "badge": prod.get("badge"),
+            "badgeColor": prod.get("badgeColor"),
+            "badgeTextColor": prod.get("badgeTextColor"),
+            "rating": Decimal(str(prod["rating"])),
+            "reviews": prod["reviews"],
+            "couponNote": prod.get("couponNote")
+        }
     )
 
 print("Database populated successfully!")
