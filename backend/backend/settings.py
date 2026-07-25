@@ -31,9 +31,11 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-fl07b40tsgm00gm^1-6#s
 DEBUG = 'RENDER' not in os.environ
 
 ALLOWED_HOSTS = ['*']
+CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com']
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+    CSRF_TRUSTED_ORIGINS.append(f'https://{RENDER_EXTERNAL_HOSTNAME}')
 
 
 # Application definition
@@ -141,6 +143,6 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Razorpay Configuration (Test Keys)
-RAZORPAY_KEY_ID = 'rzp_test_dummykey123456789'
-RAZORPAY_KEY_SECRET = 'dummysecret9876543210'
+# Razorpay Configuration (Read from Env in Prod)
+RAZORPAY_KEY_ID = os.environ.get('RAZORPAY_KEY_ID', 'rzp_test_dummykey123456789')
+RAZORPAY_KEY_SECRET = os.environ.get('RAZORPAY_KEY_SECRET', 'dummysecret9876543210')
