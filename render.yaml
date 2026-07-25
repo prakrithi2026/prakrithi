@@ -29,7 +29,7 @@ services:
     publishPath: dist
     envVars:
       - key: VITE_API_URL
-        value: https://prakrithi-backend.onrender.com/api
+        value: https://prakrithi.onrender.com/api
         placeholder: "Enter Backend URL + /api (e.g., https://prakrithi-backend.onrender.com/api)"
 
 databases:
