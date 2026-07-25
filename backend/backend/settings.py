@@ -138,9 +138,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-CORS_ALLOWED_ORIGINS = [
-    "https://prakrithi-bpz8.vercel.app",
-]
+CORS_ALLOW_ALL_ORIGINS = True
 
 # Allow large JSON payloads (needed for base64 image uploads in config)
 DATA_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024   # 20 MB
