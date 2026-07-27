@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { SiteConfigProvider } from './context/SiteConfigContext';
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
@@ -43,6 +43,7 @@ function App() {
 
                 {/* Dashboard */}
                 <Route path="/dashboard" element={<DashboardLayout />} />
+                <Route path="/dashbord" element={<Navigate to="/dashboard" replace />} />
 
                 {/* 404 */}
                 <Route path="*" element={<NotFoundPage />} />
