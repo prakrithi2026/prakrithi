@@ -3,6 +3,7 @@ import { useSiteConfig } from '../../context/SiteConfigContext';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
 import { useAuth } from '../../context/AuthContext';
+import OptimizedImage from './OptimizedImage';
 import './ProductCard.css';
 
 export default function ProductCard({ product }) {
@@ -51,7 +52,7 @@ export default function ProductCard({ product }) {
       <Link to={`/product/${product.id}`} className="card-image-link">
         <div className="card-image">
           {product.image ? (
-            <img src={product.image} alt={product.name} />
+            <OptimizedImage src={product.image} alt={product.name} />
           ) : (
             <div className="card-image__placeholder">
               <span className="card-image__emoji">

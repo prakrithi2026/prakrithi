@@ -4,6 +4,7 @@ import { useSiteConfig } from '../../context/SiteConfigContext';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
 import { useAuth } from '../../context/AuthContext';
+import OptimizedImage from './OptimizedImage';
 import './Navbar.css';
 
 /**
@@ -150,10 +151,11 @@ export default function Navbar() {
         {/* ── Logo ── */}
         <Link to="/" className="navbar-brand">
           {navbar.logo ? (
-            <img
+            <OptimizedImage
               src={navbar.logo}
               alt={navbar.brandName}
               style={{ width: `${navbar.logoSize || 125}px`, height: 'auto' }}
+              loading="eager"
             />
           ) : (
             <div className="navbar-brand__text">
@@ -286,7 +288,7 @@ export default function Navbar() {
                         onClick={() => { setSearchOpen(false); setSearchQuery(''); }}
                       >
                         {p.image
-                          ? <img src={p.image} alt="" />
+                          ? <OptimizedImage src={p.image} alt="" style={{ width: '40px', height: '40px', borderRadius: '4px' }} />
                           : <span className="nav-search-result-emoji">🌿</span>
                         }
                         <div>

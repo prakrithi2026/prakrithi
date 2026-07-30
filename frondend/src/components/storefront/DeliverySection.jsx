@@ -1,4 +1,5 @@
 import { useSiteConfig } from '../../context/SiteConfigContext';
+import OptimizedImage from './OptimizedImage';
 import './DeliverySection.css';
 
 // iconMap commented out — icons are now uploaded images or pasted URLs
@@ -29,7 +30,7 @@ export default function DeliverySection() {
                 <span className="step-label">{step.label}</span>
                 <div className="step-icon">
                   {step.image
-                    ? <img src={step.image} alt={step.label} className="step-icon-img" />
+                    ? <OptimizedImage src={step.image} alt={step.label} className="step-icon-img" />
                     : <span className="step-icon-placeholder">●</span>}
                 </div>
               </div>

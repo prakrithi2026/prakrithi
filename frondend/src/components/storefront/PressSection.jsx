@@ -1,4 +1,5 @@
 import { useSiteConfig } from '../../context/SiteConfigContext';
+import OptimizedImage from './OptimizedImage';
 import './PressSection.css';
 
 export default function PressSection() {
@@ -11,7 +12,7 @@ export default function PressSection() {
         {press.logos.map((logo, i) => (
           <div key={i} className="press-logo">
             {logo.image ? (
-              <img src={logo.image} alt={logo.name} className="press-logo-img" />
+              <OptimizedImage src={logo.image} alt={logo.name} className="press-logo-img" />
             ) : (
               <span className={`press-text press-${logo.style || 'default'}`}>
                 {logo.name}
