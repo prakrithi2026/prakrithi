@@ -87,16 +87,17 @@
 .nav-item--active > a,
 .nav-item--active > * {
   font-weight: 500;
+  color: var(--primary) !important;
 }
 
 .nav-item--active::after {
   content: '';
   display: block;
   height: 2px;
-  background: currentColor;
+  background: var(--primary);
   border-radius: 2px;
-  margin-top: 2px;
-  opacity: 0.6;
+  margin-top: 4px;
+  opacity: 1;
 }
 
 /* Badge above nav item */
