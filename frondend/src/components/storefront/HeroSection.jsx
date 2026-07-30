@@ -1,5 +1,4 @@
 import { useSiteConfig } from '../../context/SiteConfigContext';
-import OptimizedImage from './OptimizedImage';
 import './HeroSection.css';
 
 export default function HeroSection() {
@@ -40,11 +39,10 @@ export default function HeroSection() {
                     animationDelay: `${index * 0.8}s`
                   }}
                 >
-                  <OptimizedImage
+                  <img
                     src={item.image}
                     alt="Product"
                     className="hero-product-bag__img"
-                    loading="eager"
                   />
                 </div>
               ))}

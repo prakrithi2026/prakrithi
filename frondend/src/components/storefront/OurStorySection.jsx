@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import { useSiteConfig } from '../../context/SiteConfigContext';
-import OptimizedImage from './OptimizedImage';
 import './OurStorySection.css';
 
 export default function OurStorySection() {
@@ -46,7 +45,7 @@ export default function OurStorySection() {
         </div>
         {ourStory.image && (
           <div className="our-story-image-container">
-            <OptimizedImage src={ourStory.image} alt={ourStory.title} className="our-story-image" />
+            <img src={ourStory.image} alt={ourStory.title} className="our-story-image" />
           </div>
         )}
       </div>

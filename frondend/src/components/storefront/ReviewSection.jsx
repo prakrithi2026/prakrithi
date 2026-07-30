@@ -1,5 +1,4 @@
 import { useSiteConfig } from '../../context/SiteConfigContext';
-import OptimizedImage from './OptimizedImage';
 import './ReviewSection.css';
 
 export default function ReviewSection() {
@@ -13,7 +12,7 @@ export default function ReviewSection() {
         {/* Left image (optional) */}
         {image && (
           <div className="review-left">
-            <OptimizedImage
+            <img
               src={image}
               alt="Reviews"
               className="review-left__img"
