@@ -211,7 +211,7 @@ export default function Navbar() {
                   className={[
                     item.badge          ? 'nav-item-badge'        : '',
                     item.hasDropdown    ? 'nav-item-has-dropdown' : '',
-                    active              ? 'nav-item--active'      : '',
+                    (active && item.id === 'best') ? 'nav-item--active' : '',
                   ].filter(Boolean).join(' ')}
                   onMouseEnter={() => item.hasDropdown && setOpenDropdown(item.id)}
                   onMouseLeave={() => item.hasDropdown && setOpenDropdown(null)}
