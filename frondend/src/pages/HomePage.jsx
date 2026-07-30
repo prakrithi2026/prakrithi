@@ -14,7 +14,7 @@ import OurStorySection from '../components/storefront/OurStorySection';
 import Footer from '../components/storefront/Footer';
 import CartModal from '../components/storefront/CartModal';
 import CustomSection from '../components/storefront/CustomSection';
-import LoadingScreen from '../components/storefront/LoadingScreen';
+
 
 const coreSectionComponents = {
   shopByProduct: ShopByProduct,
@@ -35,7 +35,7 @@ export default function HomePage() {
     document.title = `${config.navbar?.brandName || 'Prakrithi'} — 100% Natural Products`;
   }, [config.navbar?.brandName]);
 
-  if (isLoading) return <LoadingScreen />;
+
 
   // Apply theme CSS variables dynamically
   const themeStyle = {
