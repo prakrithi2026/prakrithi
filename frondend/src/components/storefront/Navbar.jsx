@@ -135,9 +135,39 @@ export default function Navbar() {
   // Active link check
   const isActive = (href) => {
     if (!href) return false;
-    const path = href.split('?')[0];
-    if (path === '/') return location.pathname === '/';
-    return location.pathname.startsWith(path);
+    
+    const origin = window.location.origin;
+    const itemUrl = new URL(href, origin);
+    const currentUrl = new URL(location.pathname + location.search, origin);
+    
+    if (itemUrl.pathname !== currentUrl.pathname) return false;
+    
+    const itemParams = Array.from(itemUrl.searchParams.entries());
+    if (itemParams.length > 0) {
+      return itemParams.every(([key, value]) => currentUrl.searchParams.get(key) === value);
+    }
+    
+    if (currentUrl.search) {
+      const otherHrefs = [];
+      if (navbar && navbar.items) {
+        navbar.items.forEach(otherItem => {
+          const h = resolveHref(otherItem);
+          if (h && h !== href) otherHrefs.push(h);
+        });
+      }
+      
+      const matchedOther = otherHrefs.some(otherHref => {
+        const otherUrl = new URL(otherHref, origin);
+        if (otherUrl.pathname !== currentUrl.pathname) return false;
+        const otherParams = Array.from(otherUrl.searchParams.entries());
+        if (otherParams.length === 0) return false;
+        return otherParams.every(([key, value]) => currentUrl.searchParams.get(key) === value);
+      });
+      
+      if (matchedOther) return false;
+    }
+    
+    return true;
   };
 
   return (
