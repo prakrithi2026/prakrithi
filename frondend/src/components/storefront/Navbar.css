@@ -84,8 +84,7 @@
 }
 
 /* Active nav item indicator */
-.nav-item--active > a,
-.nav-item--active > * {
+.nav-item--active > a {
   font-weight: 500;
   color: var(--primary) !important;
 }
