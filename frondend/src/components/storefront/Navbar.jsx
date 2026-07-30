@@ -140,7 +140,15 @@ export default function Navbar() {
     const itemUrl = new URL(href, origin);
     const currentUrl = new URL(location.pathname + location.search, origin);
     
-    if (itemUrl.pathname !== currentUrl.pathname) return false;
+    let isPathMatch = (itemUrl.pathname === currentUrl.pathname);
+    if (!isPathMatch) {
+      if ((itemUrl.pathname === '/profile' || itemUrl.pathname === '/orders') &&
+          (currentUrl.pathname === '/profile' || currentUrl.pathname === '/orders')) {
+        isPathMatch = true;
+      }
+    }
+    
+    if (!isPathMatch) return false;
     
     const itemParams = Array.from(itemUrl.searchParams.entries());
     if (itemParams.length > 0) {
