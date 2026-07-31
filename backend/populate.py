@@ -194,6 +194,13 @@ for cat in categories:
 # Create or Update Products
 for prod in products:
     category_obj = Category.objects.filter(category_id=prod["category"]).first()
+    
+    # Retrieve existing image if it exists to prevent overwriting with an empty string
+    existing_product = Product.objects.filter(id=prod["id"]).first()
+    image_val = prod["image"]
+    if existing_product and existing_product.image:
+        image_val = existing_product.image
+        
     Product.objects.update_or_create(
         id=prod["id"],
         defaults={
@@ -201,7 +208,7 @@ for prod in products:
             "description": prod["description"],
             "price": Decimal(str(prod["price"])),
             "salePrice": Decimal(str(prod["salePrice"])) if prod["salePrice"] else None,
-            "image": prod["image"],
+            "image": image_val,
             "category": category_obj,
             "tags": prod["tags"],
             "variants": prod["variants"],

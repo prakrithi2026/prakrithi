@@ -81,7 +81,6 @@
 .step-arrow {
   color: rgba(255, 255, 255, 0.3);
   font-size: 32px;
-  margin-top: 20px;
 }
 
 @media (max-width: 768px) {

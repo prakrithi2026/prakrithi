@@ -530,13 +530,15 @@
 .delivery-step-card__header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
   margin-bottom: 10px;
 }
 
-.delivery-step-card__header .dash-field__input {
-  margin-bottom: 0;
+.delivery-step-card__title {
+  font-size: 0.85rem;
   font-weight: 600;
+  color: #374151;
 }
 
 /* Image preview */

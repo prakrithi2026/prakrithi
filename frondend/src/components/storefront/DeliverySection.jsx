@@ -26,10 +26,9 @@ export default function DeliverySection() {
           {delivery.steps.map((step, i) => (
             <div key={i} className="delivery-step-group">
               <div className="delivery-step">
-                <span className="step-label">{step.label}</span>
                 <div className="step-icon">
                   {step.image
-                    ? <img src={step.image} alt={step.label} className="step-icon-img" />
+                    ? <img src={step.image} alt={`Delivery Step ${i + 1}`} className="step-icon-img" />
                     : <span className="step-icon-placeholder">●</span>}
                 </div>
               </div>

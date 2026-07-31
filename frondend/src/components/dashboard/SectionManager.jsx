@@ -71,7 +71,7 @@ export default function SectionManager() {
 
   /* ── Delivery step helpers ── */
   const addDeliveryStep = () => {
-    const steps = [...config.delivery.steps, { image: '', label: 'New Step' }];
+    const steps = [...config.delivery.steps, { image: '', label: '' }];
     updateConfig('delivery.steps', steps);
   };
   const updateDeliveryStep = (idx, field, value) => {
@@ -293,8 +293,7 @@ export default function SectionManager() {
             <div key={i} className="delivery-step-card">
               {/* Step label + delete */}
               <div className="delivery-step-card__header">
-                <input className="dash-field__input" value={step.label}
-                  onChange={(e) => updateDeliveryStep(i, 'label', e.target.value)} placeholder="Step label" />
+                <span className="delivery-step-card__title">Step {i + 1}</span>
                 <button className="crud-list__delete" onClick={() => removeDeliveryStep(i)} title="Delete step">
                   <FiTrash2 size={13} />
                 </button>
