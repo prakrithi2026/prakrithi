@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { FiPlus, FiTrash2, FiUpload, FiCopy, FiCheck, FiX, FiImage } from 'react-icons/fi';
 import { useSiteConfig } from '../../context/SiteConfigContext';
+import { compressImage } from '../../utils/imageOptimizer';
 import './SectionManager.css';
 
 export default function SectionManager() {
@@ -41,14 +42,15 @@ export default function SectionManager() {
     setDeleteConfirm(null);
   };
 
-  const handleBgImageUpload = (sectionId, file) => {
+  const handleBgImageUpload = async (sectionId, file) => {
     if (!file || !file.type.startsWith('image/')) return;
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const updated = sections.map((s) => s.id === sectionId ? { ...s, bgImage: reader.result } : s);
+    try {
+      const compressed = await compressImage(file, 1000, 1000, 0.7);
+      const updated = sections.map((s) => s.id === sectionId ? { ...s, bgImage: compressed } : s);
       updateConfig('sections', updated);
-    };
-    reader.readAsDataURL(file);
+    } catch (err) {
+      console.error('Error compressing background image:', err);
+    }
   };
 
   const handleBgImageUrl = (sectionId, url) => {
@@ -82,13 +84,14 @@ export default function SectionManager() {
   const removeDeliveryStep = (idx) => {
     updateConfig('delivery.steps', config.delivery.steps.filter((_, i) => i !== idx));
   };
-  const handleDeliveryStepImageUpload = (idx, file) => {
+  const handleDeliveryStepImageUpload = async (idx, file) => {
     if (!file || !file.type.startsWith('image/')) return;
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      updateDeliveryStep(idx, 'image', reader.result);
-    };
-    reader.readAsDataURL(file);
+    try {
+      const compressed = await compressImage(file, 200, 200, 0.85);
+      updateDeliveryStep(idx, 'image', compressed);
+    } catch (err) {
+      console.error('Error compressing delivery step image:', err);
+    }
   };
 
   /* ── Press logos helpers ── */
@@ -104,13 +107,14 @@ export default function SectionManager() {
   const removePressLogo = (idx) => {
     updateConfig('press.logos', config.press.logos.filter((_, i) => i !== idx));
   };
-  const handlePressLogoImageUpload = (idx, file) => {
+  const handlePressLogoImageUpload = async (idx, file) => {
     if (!file || !file.type.startsWith('image/')) return;
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      updatePressLogo(idx, 'image', reader.result);
-    };
-    reader.readAsDataURL(file);
+    try {
+      const compressed = await compressImage(file, 300, 300, 0.85);
+      updatePressLogo(idx, 'image', compressed);
+    } catch (err) {
+      console.error('Error compressing press logo image:', err);
+    }
   };
 
   /* ── Category helpers ── */
@@ -495,12 +499,15 @@ export default function SectionManager() {
                 const input = document.createElement('input');
                 input.type = 'file';
                 input.accept = 'image/*';
-                input.onchange = (e) => {
+                input.onchange = async (e) => {
                   const file = e.target.files?.[0];
                   if (!file || !file.type.startsWith('image/')) return;
-                  const reader = new FileReader();
-                  reader.onloadend = () => updateConfig('reviewsSection.image', reader.result);
-                  reader.readAsDataURL(file);
+                  try {
+                    const compressed = await compressImage(file, 600, 600, 0.75);
+                    updateConfig('reviewsSection.image', compressed);
+                  } catch (err) {
+                    console.error('Error compressing review image:', err);
+                  }
                 };
                 input.click();
               }}>
@@ -569,12 +576,15 @@ export default function SectionManager() {
                 const input = document.createElement('input');
                 input.type = 'file';
                 input.accept = 'image/*';
-                input.onchange = (e) => {
+                input.onchange = async (e) => {
                   const file = e.target.files?.[0];
                   if (!file || !file.type.startsWith('image/')) return;
-                  const reader = new FileReader();
-                  reader.onloadend = () => updateConfig('ourStory.image', reader.result);
-                  reader.readAsDataURL(file);
+                  try {
+                    const compressed = await compressImage(file, 800, 800, 0.75);
+                    updateConfig('ourStory.image', compressed);
+                  } catch (err) {
+                    console.error('Error compressing story image:', err);
+                  }
                 };
                 input.click();
               }}>

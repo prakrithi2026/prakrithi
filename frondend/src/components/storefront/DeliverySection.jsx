@@ -28,7 +28,7 @@ export default function DeliverySection() {
               <div className="delivery-step">
                 <div className="step-icon">
                   {step.image
-                    ? <img src={step.image} alt={`Delivery Step ${i + 1}`} className="step-icon-img" />
+                    ? <img src={step.image} alt={`Delivery Step ${i + 1}`} className="step-icon-img" loading="lazy" />
                     : <span className="step-icon-placeholder">●</span>}
                 </div>
               </div>

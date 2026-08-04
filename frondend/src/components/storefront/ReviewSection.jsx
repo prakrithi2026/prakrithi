@@ -16,6 +16,7 @@ export default function ReviewSection() {
               src={image}
               alt="Reviews"
               className="review-left__img"
+              loading="lazy"
             />
           </div>
         )}

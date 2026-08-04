@@ -45,7 +45,7 @@ export default function OurStorySection() {
         </div>
         {ourStory.image && (
           <div className="our-story-image-container">
-            <img src={ourStory.image} alt={ourStory.title} className="our-story-image" />
+            <img src={ourStory.image} alt={ourStory.title} className="our-story-image" loading="lazy" />
           </div>
         )}
       </div>

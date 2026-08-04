@@ -83,14 +83,17 @@ export function SiteConfigProvider({ children }) {
 
     async function loadData() {
       try {
-        const configRes = await fetch(`${API_BASE_URL}/config/`);
-        const configData = await configRes.json();
+        const [configRes, productsRes, categoriesRes] = await Promise.all([
+          fetch(`${API_BASE_URL}/config/`),
+          fetch(`${API_BASE_URL}/products/`),
+          fetch(`${API_BASE_URL}/categories/`)
+        ]);
         
-        const productsRes = await fetch(`${API_BASE_URL}/products/`);
-        const productsData = await productsRes.json();
-        
-        const categoriesRes = await fetch(`${API_BASE_URL}/categories/`);
-        const categoriesData = await categoriesRes.json();
+        const [configData, productsData, categoriesData] = await Promise.all([
+          configRes.json(),
+          productsRes.json(),
+          categoriesRes.json()
+        ]);
 
         const mergedConfig = deepMerge(defaultConfig, configData);
         

@@ -210,7 +210,7 @@ export default function ShopPage() {
                     <Link to={`/product/${product.id}`} className="shop-card__image-link">
                       <div className="shop-card__img-wrap">
                         {product.image ? (
-                          <img src={product.image} alt={product.name} />
+                          <img src={product.image} alt={product.name} loading="lazy" />
                         ) : (
                           <div className="shop-card__img-placeholder">🌿</div>
                         )}

@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { FiPlus, FiTrash2, FiMove, FiUpload, FiImage, FiX } from 'react-icons/fi';
 import { useSiteConfig } from '../../context/SiteConfigContext';
+import { compressImage } from '../../utils/imageOptimizer';
 import './NavbarEditor.css';
 
 export default function NavbarEditor() {
@@ -9,13 +10,14 @@ export default function NavbarEditor() {
   const [logoDragActive, setLogoDragActive] = useState(false);
   const logoFileInputRef = useRef(null);
 
-  const handleLogoFile = (file) => {
+  const handleLogoFile = async (file) => {
     if (!file || !file.type.startsWith('image/')) return;
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      updateConfig('navbar.logo', reader.result);
-    };
-    reader.readAsDataURL(file);
+    try {
+      const compressed = await compressImage(file, 300, 300, 0.8);
+      updateConfig('navbar.logo', compressed);
+    } catch (err) {
+      console.error('Error compressing logo image:', err);
+    }
   };
 
   const handleLogoFileChange = (e) => {

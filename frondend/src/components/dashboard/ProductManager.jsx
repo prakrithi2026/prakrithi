@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { FiPlus, FiEdit2, FiTrash2, FiX, FiSave, FiUpload, FiImage } from 'react-icons/fi';
 import { useSiteConfig } from '../../context/SiteConfigContext';
+import { compressImage } from '../../utils/imageOptimizer';
 import './ProductManager.css';
 
 const emptyProduct = {
@@ -28,13 +29,14 @@ export default function ProductManager() {
   const [imgDragActive, setImgDragActive] = useState(false);
   const imgFileInputRef = useRef(null);
 
-  const handleProductImageFile = (file) => {
+  const handleProductImageFile = async (file) => {
     if (!file || !file.type.startsWith('image/')) return;
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setEditing((prev) => prev ? { ...prev, image: reader.result } : prev);
-    };
-    reader.readAsDataURL(file);
+    try {
+      const compressed = await compressImage(file, 600, 600, 0.75);
+      setEditing((prev) => prev ? { ...prev, image: compressed } : prev);
+    } catch (err) {
+      console.error('Error compressing product image:', err);
+    }
   };
 
   const handleImgFileChange = (e) => {

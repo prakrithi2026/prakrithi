@@ -10,6 +10,54 @@ class SiteConfig(models.Model):
     def __str__(self):
         return f"Site Configuration (Last updated: {self.updated_at})"
 
+    def save(self, *args, **kwargs):
+        if self.config_data:
+            from .utils import compress_base64_image
+            config = self.config_data
+            
+            # 1. Navbar logo
+            if 'navbar' in config and 'logo' in config['navbar']:
+                config['navbar']['logo'] = compress_base64_image(config['navbar']['logo'], max_width=300, max_height=300, quality=80)
+                
+            # 2. Hero background
+            if 'hero' in config and 'bgImage' in config['hero']:
+                config['hero']['bgImage'] = compress_base64_image(config['hero']['bgImage'], max_width=1200, max_height=1200, quality=70)
+                
+            # 3. Hero product images
+            if 'hero' in config and 'productImages' in config['hero']:
+                for item in config['hero']['productImages']:
+                    if 'image' in item:
+                        item['image'] = compress_base64_image(item['image'], max_width=600, max_height=600, quality=75)
+                        
+            # 4. Delivery step images
+            if 'delivery' in config and 'steps' in config['delivery']:
+                for step in config['delivery']['steps']:
+                    if 'image' in step:
+                        step['image'] = compress_base64_image(step['image'], max_width=200, max_height=200, quality=85)
+                        
+            # 5. Press logo images
+            if 'press' in config and 'logos' in config['press']:
+                for logo in config['press']['logos']:
+                    if 'image' in logo:
+                        logo['image'] = compress_base64_image(logo['image'], max_width=300, max_height=300, quality=85)
+                        
+            # 6. Reviews section image
+            if 'reviewsSection' in config and 'image' in config['reviewsSection']:
+                config['reviewsSection']['image'] = compress_base64_image(config['reviewsSection']['image'], max_width=600, max_height=600, quality=75)
+                
+            # 7. Our Story image
+            if 'ourStory' in config and 'image' in config['ourStory']:
+                config['ourStory']['image'] = compress_base64_image(config['ourStory']['image'], max_width=800, max_height=800, quality=75)
+
+            # 8. Sections backgrounds
+            if 'sections' in config:
+                for sec in config['sections']:
+                    if 'bgImage' in sec:
+                        sec['bgImage'] = compress_base64_image(sec['bgImage'], max_width=1000, max_height=1000, quality=70)
+                        
+            self.config_data = config
+        super().save(*args, **kwargs)
+
 class Category(models.Model):
     category_id = models.CharField(max_length=50, unique=True, primary_key=True)
     label = models.CharField(max_length=100)
@@ -39,6 +87,12 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if self.image:
+            from .utils import compress_base64_image
+            self.image = compress_base64_image(self.image, max_width=600, max_height=600, quality=75)
+        super().save(*args, **kwargs)
 
 class Order(models.Model):
     STATUS_CHOICES = (

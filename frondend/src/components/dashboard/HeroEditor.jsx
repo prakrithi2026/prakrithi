@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { FiUpload, FiCopy, FiCheck, FiX, FiImage, FiPlus, FiTrash2 } from 'react-icons/fi';
 import { useSiteConfig } from '../../context/SiteConfigContext';
+import { compressImage } from '../../utils/imageOptimizer';
 import './HeroEditor.css';
 
 export default function HeroEditor() {
@@ -12,13 +13,14 @@ export default function HeroEditor() {
 
   const productImages = hero.productImages || [];
 
-  const handleFileUpload = (file) => {
+  const handleFileUpload = async (file) => {
     if (!file || !file.type.startsWith('image/')) return;
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      updateConfig('hero.bgImage', reader.result);
-    };
-    reader.readAsDataURL(file);
+    try {
+      const compressed = await compressImage(file, 1200, 1200, 0.7);
+      updateConfig('hero.bgImage', compressed);
+    } catch (err) {
+      console.error('Error compressing hero background image:', err);
+    }
   };
 
   const handleFileChange = (e) => {
@@ -74,13 +76,14 @@ export default function HeroEditor() {
     updateConfig('hero.productImages', updated);
   };
 
-  const handleProductImageUpload = (id, file) => {
+  const handleProductImageUpload = async (id, file) => {
     if (!file || !file.type.startsWith('image/')) return;
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      updateProductImage(id, 'image', reader.result);
-    };
-    reader.readAsDataURL(file);
+    try {
+      const compressed = await compressImage(file, 600, 600, 0.75);
+      updateProductImage(id, 'image', compressed);
+    } catch (err) {
+      console.error('Error compressing hero product image:', err);
+    }
   };
 
   return (

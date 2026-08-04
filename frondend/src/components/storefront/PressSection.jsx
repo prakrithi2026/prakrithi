@@ -11,7 +11,7 @@ export default function PressSection() {
         {press.logos.map((logo, i) => (
           <div key={i} className="press-logo">
             {logo.image ? (
-              <img src={logo.image} alt={logo.name} className="press-logo-img" />
+              <img src={logo.image} alt={logo.name} className="press-logo-img" loading="lazy" />
             ) : (
               <span className={`press-text press-${logo.style || 'default'}`}>
                 {logo.name}
