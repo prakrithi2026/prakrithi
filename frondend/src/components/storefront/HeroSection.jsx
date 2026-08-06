@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { useSiteConfig } from '../../context/SiteConfigContext';
 import './HeroSection.css';
 
 export default function HeroSection() {
   const { config } = useSiteConfig();
   const { hero, theme } = config;
+  const [copied, setCopied] = useState(false);
 
   // If the hero section is disabled, render nothing
   if (hero.enabled === false) return null;
@@ -21,6 +23,33 @@ export default function HeroSection() {
 
   const productImages = hero.productImages || [];
   const showImages = hero.showProductImages !== false && productImages.length > 0;
+
+  // Parse ctaText into "USE CODE" and the actual code (e.g. "PR10")
+  const ctaText = hero.ctaText || "";
+  let labelText = "USE CODE";
+  let codeText = "";
+
+  if (ctaText.includes(":")) {
+    const parts = ctaText.split(":");
+    labelText = parts[0].trim().toUpperCase();
+    codeText = parts[1].trim().toUpperCase();
+  } else if (ctaText.toLowerCase().startsWith("use code")) {
+    labelText = "USE CODE";
+    codeText = ctaText.substring(8).trim().toUpperCase();
+  } else {
+    labelText = "USE CODE";
+    codeText = ctaText.trim().toUpperCase();
+  }
+
+  const handleCopy = () => {
+    if (codeText) {
+      navigator.clipboard.writeText(codeText);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const textColorStyle = hero.textColor ? { color: hero.textColor } : {};
 
   return (
     <section className="hero-section" style={sectionStyle}>
@@ -52,20 +81,31 @@ export default function HeroSection() {
 
         {/* Content */}
         <div className={`hero-content ${!showImages ? 'hero-content--full' : ''}`}>
-          {hero.tagline && <p className="hero-tagline">{hero.tagline}</p>}
-          <h1 className="hero-title">{hero.title}</h1>
-          {hero.subtitle && <p className="hero-subtitle">{hero.subtitle}</p>}
+          {hero.tagline && <p className="hero-tagline" style={textColorStyle}>{hero.tagline}</p>}
+          <h1 className="hero-title" style={textColorStyle}>{hero.title}</h1>
+          {hero.subtitle && <p className="hero-subtitle" style={textColorStyle}>{hero.subtitle}</p>}
           {hero.ctaText && (
-            <a
-              href={hero.ctaLink}
-              className="btn-promo"
+            <div 
+              className="hero-coupon-badge"
+              onClick={handleCopy}
+              title="Click to copy coupon code"
               style={{
-                backgroundColor: hero.ctaBgColor || theme.primaryColor,
-                color: hero.ctaTextColor || '#fff',
+                borderColor: hero.ctaBgColor || theme.primaryColor,
+                color: hero.ctaBgColor || theme.primaryColor,
               }}
             >
-              {hero.ctaText}
-            </a>
+              <div className="hero-coupon-left">
+                {labelText}
+              </div>
+              <div 
+                className="hero-coupon-divider" 
+                style={{ borderLeftStyle: 'dashed', borderLeftWidth: '1px', borderLeftColor: hero.ctaBgColor || theme.primaryColor }}
+              />
+              <div className="hero-coupon-right">
+                {codeText}
+              </div>
+              {copied && <span className="hero-coupon-tooltip">Copied!</span>}
+            </div>
           )}
         </div>
 
@@ -74,3 +114,4 @@ export default function HeroSection() {
     </section>
   );
 }
+

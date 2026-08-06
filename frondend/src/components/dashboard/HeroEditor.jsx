@@ -191,6 +191,32 @@ export default function HeroEditor() {
             />
             <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>{hero.overlayOpacity}</span>
           </div>
+          <div className="dash-field">
+            <label className="dash-field__label">Text Color</label>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <input
+                type="color"
+                value={hero.textColor || '#00472a'}
+                onChange={(e) => updateConfig('hero.textColor', e.target.value)}
+                style={{
+                  border: '1px solid #cbd5e1',
+                  borderRadius: '6px',
+                  width: '40px',
+                  height: '38px',
+                  padding: '2px',
+                  cursor: 'pointer',
+                }}
+              />
+              <input
+                type="text"
+                className="dash-field__input"
+                value={hero.textColor || '#00472a'}
+                onChange={(e) => updateConfig('hero.textColor', e.target.value)}
+                placeholder="#00472a"
+                style={{ flex: 1 }}
+              />
+            </div>
+          </div>
         </div>
 
         <div className="dash-field">
@@ -235,17 +261,19 @@ export default function HeroEditor() {
           <div style={{
             background: hero.bgImage
               ? `linear-gradient(rgba(0,0,0,${hero.overlayOpacity}), rgba(0,0,0,${hero.overlayOpacity})), url(${hero.bgImage}) center/cover`
-              : `linear-gradient(135deg, ${hero.bgColor}, ${hero.bgColor}dd)`,
-            padding: '40px 30px', color: 'white', textAlign: hero.textAlign,
+              : `linear-gradient(135deg, ${hero.bgColor || '#a8d5ba'}, ${hero.bgColor || '#a8d5ba'}dd)`,
+            padding: '40px 30px', color: hero.textColor || '#00472a', textAlign: hero.textAlign,
             minHeight: '160px', display: 'flex', flexDirection: 'column', justifyContent: 'center',
           }}>
-            <p style={{ fontSize: '0.75rem', opacity: 0.85, marginBottom: '4px' }}>{hero.tagline}</p>
-            <h3 style={{ fontSize: '1.6rem', fontWeight: 800, margin: '0 0 6px', color: 'white' }}>{hero.title}</h3>
-            <p style={{ fontSize: '0.85rem', opacity: 0.9, marginBottom: '12px' }}>{hero.subtitle}</p>
+            <p style={{ fontSize: '0.75rem', opacity: 0.85, marginBottom: '4px', color: hero.textColor || '#00472a' }}>{hero.tagline}</p>
+            <h3 style={{ fontSize: '1.6rem', fontWeight: 800, margin: '0 0 6px', color: hero.textColor || '#00472a' }}>{hero.title}</h3>
+            <p style={{ fontSize: '0.85rem', opacity: 0.9, marginBottom: '12px', color: hero.textColor || '#00472a' }}>{hero.subtitle}</p>
             <div>
               <span style={{
-                background: hero.ctaBgColor, color: hero.ctaTextColor,
-                padding: '8px 20px', borderRadius: '20px', fontSize: '0.78rem', fontWeight: 700,
+                border: `1px solid ${hero.ctaBgColor || theme.primaryColor}`,
+                color: hero.ctaBgColor || theme.primaryColor,
+                background: '#ffffff',
+                padding: '6px 16px', borderRadius: '4px', fontSize: '0.78rem', fontWeight: 700,
               }}>{hero.ctaText}</span>
             </div>
           </div>
