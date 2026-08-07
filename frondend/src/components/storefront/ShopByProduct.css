@@ -50,7 +50,8 @@
 /* Horizontal scroll wrapper */
 .products-scroll-wrapper {
   width: 100%;
-  margin-top: 32px;
+  margin-top: 24px;
+  padding-top: 8px;
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: none;
@@ -133,4 +134,9 @@
   .products-row {
     gap: 12px;
   }
+}
+
+.shop-section .section-container {
+  padding-left: 0;
+  padding-right: 0;
 }
