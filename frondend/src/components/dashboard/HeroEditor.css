@@ -7,62 +7,6 @@
   border: 1px solid #e8ede9;
 }
 
-/* ── Current Image Preview ── */
-.hero-editor-preview {
-  margin-bottom: 16px;
-  border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid #e5e7eb;
-  background: white;
-}
-
-.hero-editor-preview__image {
-  width: 100%;
-  height: 160px;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-.hero-editor-preview__actions {
-  display: flex;
-  gap: 8px;
-  padding: 10px 14px;
-  background: white;
-  border-top: 1px solid #f0f0f0;
-}
-
-.hero-editor-preview__btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  border-radius: 8px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  transition: all 200ms ease;
-}
-
-.hero-editor-preview__btn--copy {
-  background: #EFF6FF;
-  color: #2563EB;
-}
-
-.hero-editor-preview__btn--copy:hover {
-  background: #DBEAFE;
-}
-
-.hero-editor-preview__btn--remove {
-  background: #FEF2F2;
-  color: #DC2626;
-}
-
-.hero-editor-preview__btn--remove:hover {
-  background: #FEE2E2;
-}
-
 /* ── Upload Area ── */
 .hero-editor-upload {
   border: 2px dashed #d1d5db;
@@ -156,141 +100,96 @@
 
 .hero-editor-url__input {
   padding-left: 38px !important;
-  padding-right: 44px !important;
 }
 
-.hero-editor-url__copy-btn {
-  position: absolute;
-  right: 6px;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  border: none;
-  background: #f3f4f6;
-  color: #6b7280;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 200ms ease;
-}
-
-.hero-editor-url__copy-btn:hover {
-  background: #e5e7eb;
-  color: #374151;
-}
-
-/* ── Hero Product Images Editor ── */
-.hero-product-images-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.hero-pi-card {
-  display: flex;
+/* ── Previews Grid ── */
+.hero-slides-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 16px;
-  padding: 16px;
-  background: #f9fafb;
-  border: 1px solid #f0f0f0;
+  margin-top: 12px;
+}
+
+.hero-slide-card {
+  border: 1px solid #e2e8f0;
   border-radius: 12px;
-  align-items: flex-start;
-  position: relative;
-  transition: all 200ms ease;
-}
-
-.hero-pi-card:hover {
-  background: white;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
-
-.hero-pi-card__preview {
-  width: 72px;
-  height: 96px;
-  border-radius: 10px;
   overflow: hidden;
-  background: linear-gradient(135deg, #ecfdf5, #d1fae5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  border: 1px solid #e5e7eb;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
 }
 
-.hero-pi-card__img {
+.hero-slide-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.hero-slide-card__preview {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: 125px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  border-bottom: 1px solid #e2e8f0;
+  background-color: #f8fafc;
 }
 
-.hero-pi-card__emoji {
-  font-size: 2rem;
-}
-
-.hero-pi-card__fields {
-  flex: 1;
-  min-width: 0;
-}
-
-.hero-pi-card__delete {
+.hero-slide-card__badge {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  border: 1px solid #fecaca;
-  background: #FEF2F2;
-  color: #DC2626;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 200ms ease;
+  top: 8px;
+  left: 8px;
+  background: rgba(15, 23, 42, 0.75);
+  color: white;
+  padding: 3px 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border-radius: 4px;
+  backdrop-filter: blur(4px);
 }
 
-.hero-pi-card__delete:hover {
-  background: #FEE2E2;
+.hero-slide-card__actions {
+  padding: 8px 12px;
+  background: #fafafb;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.hero-slide-card__delete-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  justify-content: center;
+}
+
+.hero-slide-card__delete-btn:hover {
+  background: #fee2e2;
   border-color: #f87171;
 }
 
-.hero-pi-upload-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
-  background: white;
-  color: #6b7280;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 200ms ease;
-  flex-shrink: 0;
-}
-
-.hero-pi-upload-btn:hover {
-  border-color: #006B3F;
-  color: #006B3F;
-  background: #f0fdf4;
-}
-
-.hero-pi-remove-img-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  border: 1px solid #fecaca;
+.hero-editor-preview__btn--remove {
   background: #FEF2F2;
   color: #DC2626;
+  border: 1px solid #fecaca;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 200ms ease;
-  flex-shrink: 0;
+  transition: all 0.2s ease;
 }
 
-.hero-pi-remove-img-btn:hover {
+.hero-editor-preview__btn--remove:hover {
   background: #FEE2E2;
 }
 

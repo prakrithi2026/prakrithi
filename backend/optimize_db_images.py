@@ -112,6 +112,23 @@ def optimize_site_config():
                 changed = True
                 print("Hero BG updated")
                 
+    # 2b. Hero slideshow images
+    if 'hero' in config and 'images' in config['hero'] and isinstance(config['hero']['images'], list):
+        new_images = []
+        for idx, img in enumerate(config['hero']['images']):
+            if img and img.startswith("data:image/"):
+                print(f"Optimizing Hero Slideshow Image {idx + 1}")
+                optimized = compress_base64_image(img, max_width=1200, max_height=1200, quality=70)
+                if optimized != img:
+                    new_images.append(optimized)
+                    changed = True
+                    print(f"Hero slideshow image {idx + 1} updated")
+                else:
+                    new_images.append(img)
+            else:
+                new_images.append(img)
+        config['hero']['images'] = new_images
+                
     # 3. Hero product images
     if 'hero' in config and 'productImages' in config['hero']:
         for item in config['hero']['productImages']:

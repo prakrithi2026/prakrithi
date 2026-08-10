@@ -120,6 +120,17 @@ def restore_from_dump():
                         print("Optimizing Hero Background")
                         config['hero']['bgImage'] = compress_to_webp(bg, max_width=1200, max_height=1200, quality=70)
                         
+                # Hero slideshow images
+                if 'hero' in config and 'images' in config['hero'] and isinstance(config['hero']['images'], list):
+                    new_images = []
+                    for idx, img in enumerate(config['hero']['images']):
+                        if img and img.startswith("data:image/"):
+                            print(f"Optimizing Hero Slideshow Image {idx + 1}")
+                            new_images.append(compress_to_webp(img, max_width=1200, max_height=1200, quality=70))
+                        else:
+                            new_images.append(img)
+                    config['hero']['images'] = new_images
+                        
                 # Hero product images
                 if 'hero' in config and 'productImages' in config['hero']:
                     for item in config['hero']['productImages']:

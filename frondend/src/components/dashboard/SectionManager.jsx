@@ -460,78 +460,6 @@ export default function SectionManager() {
         </button>
       </div>
 
-      {/* ── Review Section Settings ── */}
-      <div className="dash-panel">
-        <h3 className="dash-panel__title">⭐ Reviews Section Settings</h3>
-        <p className="dash-panel__subtitle">Edit the reviews and ratings display</p>
-
-        <div className="dash-row">
-          <div className="dash-field">
-            <label className="dash-field__label">Google Rating</label>
-            <input className="dash-field__input" type="number" min="0" max="5" step="0.1"
-              value={config.reviewsSection.googleRating}
-              onChange={(e) => updateConfig('reviewsSection.googleRating', Number(e.target.value))} />
-          </div>
-          <div className="dash-field">
-            <label className="dash-field__label">Total Reviews</label>
-            <input className="dash-field__input" type="number" value={config.reviewsSection.totalReviews}
-              onChange={(e) => updateConfig('reviewsSection.totalReviews', Number(e.target.value))} />
-          </div>
-        </div>
-
-        {/* Image upload */}
-        <h4 style={{ marginTop: '16px', marginBottom: '10px', fontSize: '0.88rem', fontWeight: 600 }}>Section Image (optional)</h4>
-        <div className="delivery-step-card">
-          {config.reviewsSection.image ? (
-            <div className="delivery-step-card__preview">
-              <img src={config.reviewsSection.image} alt="Review section" className="delivery-step-card__preview-img" />
-              <button
-                className="delivery-step-card__preview-remove"
-                onClick={() => updateConfig('reviewsSection.image', '')}
-                title="Remove image"
-              >
-                <FiX size={14} /> Remove
-              </button>
-            </div>
-          ) : (
-            <>
-              <div className="delivery-step-card__upload" onClick={() => {
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = 'image/*';
-                input.onchange = async (e) => {
-                  const file = e.target.files?.[0];
-                  if (!file || !file.type.startsWith('image/')) return;
-                  try {
-                    const compressed = await compressImage(file, 600, 600, 0.75);
-                    updateConfig('reviewsSection.image', compressed);
-                  } catch (err) {
-                    console.error('Error compressing review image:', err);
-                  }
-                };
-                input.click();
-              }}>
-                <FiUpload size={18} className="delivery-step-card__upload-icon" />
-                <p className="delivery-step-card__upload-text"><strong>Click to upload</strong> image</p>
-                <p className="delivery-step-card__upload-hint">PNG, JPG, SVG, WEBP</p>
-              </div>
-              <div className="delivery-step-card__url">
-                <div className="delivery-step-card__url-divider"><span>or paste image URL</span></div>
-                <div className="delivery-step-card__url-row">
-                  <FiImage size={14} className="delivery-step-card__url-icon" />
-                  <input
-                    className="dash-field__input delivery-step-card__url-input"
-                    value={config.reviewsSection.image || ''}
-                    onChange={(e) => updateConfig('reviewsSection.image', e.target.value)}
-                    placeholder="https://example.com/image.jpg"
-                  />
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-
       {/* ── Our Story Settings ── */}
       <div className="dash-panel">
         <h3 className="dash-panel__title">📖 Our Story Settings</h3>
@@ -600,6 +528,78 @@ export default function SectionManager() {
                     className="dash-field__input delivery-step-card__url-input"
                     value={config.ourStory?.image || ''}
                     onChange={(e) => updateConfig('ourStory.image', e.target.value)}
+                    placeholder="https://example.com/image.jpg"
+                  />
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* ── Review Section Settings ── */}
+      <div className="dash-panel">
+        <h3 className="dash-panel__title">⭐ Reviews Section Settings</h3>
+        <p className="dash-panel__subtitle">Edit the reviews and ratings display</p>
+
+        <div className="dash-row">
+          <div className="dash-field">
+            <label className="dash-field__label">Google Rating</label>
+            <input className="dash-field__input" type="number" min="0" max="5" step="0.1"
+              value={config.reviewsSection.googleRating}
+              onChange={(e) => updateConfig('reviewsSection.googleRating', Number(e.target.value))} />
+          </div>
+          <div className="dash-field">
+            <label className="dash-field__label">Total Reviews</label>
+            <input className="dash-field__input" type="number" value={config.reviewsSection.totalReviews}
+              onChange={(e) => updateConfig('reviewsSection.totalReviews', Number(e.target.value))} />
+          </div>
+        </div>
+
+        {/* Image upload */}
+        <h4 style={{ marginTop: '16px', marginBottom: '10px', fontSize: '0.88rem', fontWeight: 600 }}>Section Image (optional)</h4>
+        <div className="delivery-step-card">
+          {config.reviewsSection.image ? (
+            <div className="delivery-step-card__preview">
+              <img src={config.reviewsSection.image} alt="Review section" className="delivery-step-card__preview-img" />
+              <button
+                className="delivery-step-card__preview-remove"
+                onClick={() => updateConfig('reviewsSection.image', '')}
+                title="Remove image"
+              >
+                <FiX size={14} /> Remove
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="delivery-step-card__upload" onClick={() => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.onchange = async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file || !file.type.startsWith('image/')) return;
+                  try {
+                    const compressed = await compressImage(file, 600, 600, 0.75);
+                    updateConfig('reviewsSection.image', compressed);
+                  } catch (err) {
+                    console.error('Error compressing review image:', err);
+                  }
+                };
+                input.click();
+              }}>
+                <FiUpload size={18} className="delivery-step-card__upload-icon" />
+                <p className="delivery-step-card__upload-text"><strong>Click to upload</strong> image</p>
+                <p className="delivery-step-card__upload-hint">PNG, JPG, SVG, WEBP</p>
+              </div>
+              <div className="delivery-step-card__url">
+                <div className="delivery-step-card__url-divider"><span>or paste image URL</span></div>
+                <div className="delivery-step-card__url-row">
+                  <FiImage size={14} className="delivery-step-card__url-icon" />
+                  <input
+                    className="dash-field__input delivery-step-card__url-input"
+                    value={config.reviewsSection.image || ''}
+                    onChange={(e) => updateConfig('reviewsSection.image', e.target.value)}
                     placeholder="https://example.com/image.jpg"
                   />
                 </div>

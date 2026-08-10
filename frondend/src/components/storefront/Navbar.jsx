@@ -191,7 +191,7 @@ export default function Navbar() {
             <img
               src={navbar.logo}
               alt={navbar.brandName}
-              style={{ width: `${navbar.logoSize || 125}px`, height: 'auto' }}
+              style={{ height: '48px', width: 'auto' }}
             />
           ) : (
             <div className="navbar-brand__text">

@@ -28,6 +28,8 @@ def run_db_image_optimization():
                         has_jpeg = True
                     elif 'hero' in config and config['hero'].get('bgImage', '').startswith("data:image/jpeg;base64,"):
                         has_jpeg = True
+                    elif 'hero' in config and 'images' in config['hero'] and isinstance(config['hero']['images'], list) and any(img and img.startswith("data:image/jpeg;base64,") for img in config['hero']['images']):
+                        has_jpeg = True
                     elif 'reviewsSection' in config and config['reviewsSection'].get('image', '').startswith("data:image/jpeg;base64,"):
                         has_jpeg = True
             
@@ -69,6 +71,12 @@ def run_db_image_optimization():
                                 bg = config['hero']['bgImage']
                                 if bg and bg.startswith("data:image/"):
                                     config['hero']['bgImage'] = compress_base64_image(bg, max_width=1200, max_height=1200, quality=70)
+                            # hero images
+                            if 'hero' in config and 'images' in config['hero'] and isinstance(config['hero']['images'], list):
+                                config['hero']['images'] = [
+                                    compress_base64_image(img, max_width=1200, max_height=1200, quality=70) if (img and img.startswith("data:image/")) else img
+                                    for img in config['hero']['images']
+                                ]
                             # hero productImages
                             if 'hero' in config and 'productImages' in config['hero']:
                                 for item in config['hero']['productImages']:
@@ -143,6 +151,20 @@ def run_db_image_optimization():
                             if len(optimized) < len(bg):
                                 config['hero']['bgImage'] = optimized
                                 changed = True
+                    # hero images
+                    if 'hero' in config and 'images' in config['hero'] and isinstance(config['hero']['images'], list):
+                        new_images = []
+                        for img in config['hero']['images']:
+                            if img and img.startswith("data:image/") and len(img) > 60000:
+                                optimized = compress_base64_image(img, max_width=1200, max_height=1200, quality=70)
+                                if len(optimized) < len(img):
+                                    new_images.append(optimized)
+                                    changed = True
+                                else:
+                                    new_images.append(img)
+                            else:
+                                new_images.append(img)
+                        config['hero']['images'] = new_images
                     # hero productImages
                     if 'hero' in config and 'productImages' in config['hero']:
                         for item in config['hero']['productImages']:

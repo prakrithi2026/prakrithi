@@ -200,25 +200,7 @@ export default function NavbarEditor() {
           )}
         </div>
 
-        {/* Logo Size */}
-        <div className="dash-field">
-          <label className="dash-field__label">
-            Logo Size <span style={{ fontWeight: 400, color: '#9ca3af' }}>— {navbar.logoSize || 125}px</span>
-          </label>
-          <div className="nb-logo-size-control">
-            <span className="nb-logo-size-control__label">40px</span>
-            <input
-              type="range"
-              min="40"
-              max="250"
-              step="5"
-              value={navbar.logoSize || 125}
-              onChange={(e) => updateConfig('navbar.logoSize', Number(e.target.value))}
-              className="theme-slider nb-logo-size-slider"
-            />
-            <span className="nb-logo-size-control__label">250px</span>
-          </div>
-        </div>
+
 
         {/* Nav Items */}
         <h4 style={{ marginTop: '20px', marginBottom: '12px', fontSize: '0.92rem', fontWeight: 600 }}>
