@@ -75,7 +75,8 @@ config_data = {
     { "id": "delivery", "label": "Delivery Process", "enabled": True, "order": 1 },
     { "id": "shopByConcern", "label": "Shop by Concern", "enabled": True, "order": 2 },
     { "id": "press", "label": "Press / Media", "enabled": True, "order": 3 },
-    { "id": "reviews", "label": "Reviews & Ratings", "enabled": True, "order": 4 }
+    { "id": "ourStory", "label": "Our Story", "enabled": True, "order": 4 },
+    { "id": "reviews", "label": "Reviews & Ratings", "enabled": True, "order": 5 }
   ],
   "delivery": {
     "title": "How we deliver",
@@ -89,6 +90,14 @@ config_data = {
       { "icon": "truck", "label": "SHIPPING" },
       { "icon": "location", "label": "DELIVER" }
     ]
+  },
+  "ourStory": {
+    "title": "Its Online, Not a Physicalstore",
+    "subtitle": "",
+    "content": "From the lush hills of kerala to your kitchen, every product is selected with care. we work closely with trusted farmers and producers to source authentic spices and natural products at their finest. each batch is carefully checked for purity, freshness, and quality, then hygienically packed to preserve its natural aroma and flavor until it reaches your home",
+    "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&q=80&w=2340&ixlib=rb-4.0.3",
+    "founderName": "Anjana KA",
+    "founderTitle": "Founder Prakrithi India"
   },
   "press": {
     "bgColor": "#BDD681",
