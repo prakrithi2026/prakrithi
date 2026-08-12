@@ -186,26 +186,15 @@ export default function Navbar() {
       <div className="nav-container">
 
         {/* ── Logo ── */}
-        <Link to="/" className="navbar-brand">
-          {navbar.logo ? (
+        {navbar.logo ? (
+          <Link to="/" className="navbar-brand">
             <img
               src={navbar.logo}
-              alt={navbar.brandName}
+              alt={navbar.brandName || "Logo"}
               style={{ height: '48px', width: 'auto' }}
             />
-          ) : (
-            <div className="navbar-brand__text">
-              <span className="navbar-brand__name" style={{ color: navbar.textColor }}>
-                {navbar.brandName}
-              </span>
-              {navbar.brandSubtitle && (
-                <span className="navbar-brand__sub" style={{ color: navbar.textColor }}>
-                  {navbar.brandSubtitle}
-                </span>
-              )}
-            </div>
-          )}
-        </Link>
+          </Link>
+        ) : null}
 
         {/* ── Nav Links ── */}
         <div className={`nav-links ${mobileOpen ? 'nav-links--open' : ''}`}>
