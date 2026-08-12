@@ -10,13 +10,12 @@
   justify-content: center;
   align-items: center;
   box-sizing: border-box;
-  background-color: var(--accent, #BDD681) !important;
 }
 
 .our-story-card {
   width: 100%;
   max-width: 1154px;
-  border-radius: 12px;
+  border-radius: 24px;
   padding: 40px 48px;
   display: flex;
   flex-direction: column;
@@ -151,8 +150,8 @@
 @media (min-width: 768px) {
   .our-story-card {
     flex-direction: row;
-    gap: 54px;
-    padding: 56px;
+    gap: 48px;
+    padding: 16px 48px 16px 16px;
     align-items: center;
     justify-content: space-between;
   }
@@ -170,9 +169,9 @@
   }
   
   .our-story-card {
-    padding: 32px 24px;
-    gap: 32px;
-    border-radius: 12px;
+    padding: 16px 16px 32px 16px;
+    gap: 24px;
+    border-radius: 20px;
   }
   
   .our-story-heading {

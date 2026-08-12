@@ -19,7 +19,7 @@ export default function OurStorySection() {
     <section 
       className="our-story-section" 
       style={{ 
-        backgroundColor: theme.accentColor || '#BDD681',
+        background: `linear-gradient(to bottom, ${theme.accentColor || '#BDD681'} 50%, ${theme.backgroundColor || '#fdfdfd'} 50%)`,
         width: '100%',
         maxWidth: 'none',
         margin: 0

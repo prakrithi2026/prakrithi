@@ -1,7 +1,7 @@
 .press-section {
   width: 100%;
   margin-top: 60px;
-  padding: 60px 20px 0 20px;
+  padding: 60px 20px 50px 20px;
   box-sizing: border-box;
   background-color: var(--accent, #BDD681) !important;
 }
@@ -24,9 +24,10 @@
 }
 
 .press-logo-img {
-  max-height: 90px;
-  max-width: 180px;
+  max-height: 40px;
+  max-width: 150px;
   object-fit: contain;
+  filter: invert(16%) sepia(87%) saturate(671%) hue-rotate(114deg) brightness(91%) contrast(101%);
 }
 
 .press-text {
@@ -57,9 +58,11 @@
 }
 
 .press-mint {
-  font-size: 36px;
-  font-weight: 400;
-  letter-spacing: -0.5px;
+  font-size: 38px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  font-family: var(--font-serif), Georgia, serif;
+  text-transform: lowercase;
 }
 
 .press-thehindu {
@@ -67,6 +70,18 @@
   letter-spacing: 1.5px;
   font-weight: 700;
   text-transform: uppercase;
+  font-family: var(--font-serif), Georgia, serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.thehindu-emblem {
+  width: 54px;
+  height: 24px;
+  display: block;
+  margin-bottom: 2px;
 }
 
 .press-default {
