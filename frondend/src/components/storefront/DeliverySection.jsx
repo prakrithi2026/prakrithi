@@ -29,7 +29,6 @@ export default function DeliverySection() {
             return (
               <div key={i} className="delivery-step-group">
                 <div className="delivery-step">
-                  <span className="step-label">{step.label}</span>
                   <div className="step-icon">
                     {stepImage ? (
                       <img src={stepImage} alt="" className="step-icon-img" loading="lazy" />
