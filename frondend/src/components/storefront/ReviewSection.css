@@ -176,7 +176,9 @@
     margin: 40px auto 0;
     padding: 30px 20px;
     border-radius: 12px;
-    background-size: 12px 12px;
+    background: url('/images/element.bg.png') no-repeat -20px top / contain, 
+                linear-gradient(90deg, #0D5130 0%, #9FBD58 100%) !important;
+    background-origin: border-box !important;
   }
   
   .review-container {
@@ -194,4 +196,11 @@
     flex-direction: column;
     gap: 4px;
   }
+}
+
+.review-left-uploaded-img {
+  max-width: 100%;
+  max-height: 150px;
+  object-fit: contain;
+  border-radius: 8px;
 }

@@ -18,7 +18,7 @@ export default function DeliverySection() {
 
   return (
     <section className="delivery-section">
-      <div className="delivery-banner" style={{ backgroundColor: theme.primaryColor }}>
+      <div className="delivery-banner">
         <div className="delivery-left">
           <h3>{delivery.title}<br/>{delivery.subtitle}</h3>
           {delivery.tcNote && <p className="tc-note">{delivery.tcNote}</p>}
@@ -29,6 +29,7 @@ export default function DeliverySection() {
             return (
               <div key={i} className="delivery-step-group">
                 <div className="delivery-step">
+                  <span className="step-label">{step.label}</span>
                   <div className="step-icon">
                     {stepImage ? (
                       <img src={stepImage} alt="" className="step-icon-img" loading="lazy" />
