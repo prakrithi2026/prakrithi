@@ -1,4 +1,5 @@
 import { useSiteConfig } from '../../context/SiteConfigContext';
+import defaultConfig from '../../data/defaultConfig';
 import './DeliverySection.css';
 
 // iconMap commented out — icons are now uploaded images or pasted URLs
@@ -23,20 +24,25 @@ export default function DeliverySection() {
           {delivery.tcNote && <p className="tc-note">{delivery.tcNote}</p>}
         </div>
         <div className="delivery-steps">
-          {delivery.steps.map((step, i) => (
-            <div key={i} className="delivery-step-group">
-              <div className="delivery-step">
-                <div className="step-icon">
-                  {step.image
-                    ? <img src={step.image} alt={`Delivery Step ${i + 1}`} className="step-icon-img" loading="lazy" />
-                    : <span className="step-icon-placeholder">●</span>}
+          {delivery.steps.map((step, i) => {
+            const stepImage = step.image || defaultConfig.delivery.steps[i]?.image;
+            return (
+              <div key={i} className="delivery-step-group">
+                <div className="delivery-step">
+                  <div className="step-icon">
+                    {stepImage ? (
+                      <img src={stepImage} alt="" className="step-icon-img" loading="lazy" />
+                    ) : (
+                      <span className="step-icon-placeholder">●</span>
+                    )}
+                  </div>
                 </div>
+                {i < delivery.steps.length - 1 && (
+                  <div className="step-arrow">→</div>
+                )}
               </div>
-              {i < delivery.steps.length - 1 && (
-                <div className="step-arrow">→</div>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

@@ -372,32 +372,32 @@ const defaultConfig = {
       {
         "icon": "bag",
         "label": "ORDER",
-        "image": "data:image/webp;base64,UklGRgIBAABXRUJQVlA4WAoAAAAQAAAAPwAAPwAAQUxQSJMAAAABcJBta9wgAQmREAlIiINVQhw0EuZgdbA6IA4qgTmoBHZvkN3H80TEBMCHI8aIDWEvqqqyCo3QrDUnyqNKamKhNcDRwJobCLqGMwclfyx4Dgq7i9rB2aTkrSieB/PS2zDBhdPojeslXO8GlaMi5UKRcjSZsZoz2vTqsNhMHsRm8/eJPVSb5KGzgSJWcwZzso0IH4cAVlA4IEgAAAAQBQCdASpAAEAAPkEYiUQioaEc/1wAKAQEtIALb6LwloMwB/lD+C9d+iTVdclwcAmAAP79tcZj///jHaP7qPdf//8Y4AAAAAA="
+        "image": ""
       },
       {
         "icon": "seedling",
         "label": "SOURCE",
-        "image": "data:image/webp;base64,UklGRkgBAABXRUJQVlA4WAoAAAAQAAAAPwAAPwAAQUxQSM8AAAABgFTbVh3pSkACUpBQEpAQB4kEHFAOEgfggHLw4gAJt7+8hjfrmkTEBOC98BIp5xEMFf4o2Rsjmb2Na4ASTTxHyN3CNsbdQFBw17iQziaSZ6Ar+BgKufPHOiVpuvvNF/4+J2h4/LJ1LoKi6e6byxzOc4KGBwDXOL7NQdI0ACeVYRKagh47lYLZXhTRU5unwctYEpWfB/cc6tRmLBllQN39GkB8/dWGdX286n2rEpYvigZj1RlLsDhSAyz1GmC09Pt1pYeD2VJh/P0jJWv/oAEAVlA4IFIAAADwBQCdASpAAEAAPkUaiUQioaEb9AAoBES0gAttAkUSY2Uao/fXEHAbWcgQYByn4c8E45ZK6WfYAAD+/+e9P//+vgtf354H///+wMSfwTdIAAAA"
+        "image": ""
       },
       {
         "icon": "check",
         "label": "INSPECT",
-        "image": "data:image/webp;base64,UklGRrgBAABXRUJQVlA4WAoAAAAQAAAAPwAAPwAAQUxQSFIBAAABkFVtayZJSEACEpAQCe2gx8m0g4kD2sFIqHaQcYAEJHz7mwBzN1cRMQH0s5FFh/A34TFX4J9xzdFuzMBhmHSSC6kmXfgD6e/cQhyFLg1GoDRuZXeU34tuaHgvkegQWuFo6Zz3jqYfaYK2I+vZ50oSNB45z04zx8v8Fv8LzhiodqHP/2FkzCoXMmzOjKvIhQy7KyNqXMiwHQmM0hAyHPKZlISS4VTOxlachJLhWM9051N8L5QM5+NMdhaL74SSIVHOeAeLxf8XSoZMPqPYwWLxf4WSITMocW1hsfhfoWRIfWXMPSwWB0LJkDszxgEWi4eSIXlkcBxgsSgZkp1S5wkWkyHbcvQIy5AuOXQdFRolSx/JokeXB+WvHk6FEh1CKkijwY1q36LsjarVa2JQvXiFC7V85E2mpvLMeSk1lqefxBzUfcxX/Cu+5mD6nixDhelnI1ZQOCBAAAAAEAUAnQEqQABAAD5FGolEIqGhG/QAKAREtIAARHMpbvbJazZu8533NjnlNOaF0cZpQAD+/1ZL7//r4AAAAAAAAA=="
+        "image": ""
       },
       {
         "icon": "box",
         "label": "PACKING",
-        "image": "data:image/webp;base64,UklGRnIBAABXRUJQVlA4WAoAAAAQAAAAPwAAPwAAQUxQSP4AAAABgFXbVl1nS0DCkRAJSEACEnBwkYCDxEHjABxEAtcBEk4f0MGGfvUrIiYA/45tykwvvFdLPhSdX4X1qgIAcZ5WwxEVdK956jihoO8IiZPOgRBOzvV3WMLN8X6QCIXzy0x41jBKrGvY9t4sljxP18jh3kztRZAVbMNmsSASjhVypNgVmoUnuAWsguIXCAVwW+UIWEJYoFlACJF3qOEkXigADOHk3QkAdmr2R5tXaIeaH+99QgGp0u7UyftU17nnNdahpnPNU5Z/sNmdepEgpOo2E5WeJxwc/4BnOdc5cATHqW5gCZ4iKgPZxD1YIFKuc2Q2eT78mJAYpiwZGP9yAVZQOCBOAAAAkAUAnQEqQABAAD49FohEIiEhHfQAIAPEtIALboOVKoEERyqZYuo0QBDUZFflC1MaRBfK9AAA/vjZ///Mtf/8ySf//MCA+///7zQAAAAA"
+        "image": ""
       },
       {
         "icon": "truck",
         "label": "SHIPPING",
-        "image": "data:image/webp;base64,UklGRt4BAABXRUJQVlA4WAoAAAAQAAAAPwAAPwAAQUxQSGMBAAABkJVte942L4QPwgshEAQhEARBDCwGDQOJQcfAZmAI3xh8EN79JJYtn/UoIiYAP1vtFdF4H1siXj203CW5mgHs8nyHx6ot4S137ZzNvuQJB7OrcaoSUQ3Hq3yZJ7lCjQNgl+c5uMoTu2IZAB6ub15ni6IAADd5HgCyq/GiEnoZ3mdX4wCsyvMVXLURR2tosWMAu5yn0ZUxyC7PA8BTbmdlycsAQNfOYyUiyllVkvw5AGRX46e0auPveonUOACr8vyGq/YEXCYtAwC7/AFbIgowhTwPAMnVQi/DLNLOAaTQ9sD7OaTGI9blCZ9nkedPS0Q1zCf587/kasThiaRGrtoSBqeSIgqGJ9sNN9vwAyFOK7NQ+SzzOZI7zwJ9gseqjbgw+0X2pci41uolJaIaLmc/Le3aiCmTn8JVnjBt9iFbIgpmZh/IoZdhcv46kFZtCTfM/sa6/ImbVpciohpuyx7RiJ+tAFZQOCBUAAAAcAUAnQEqQABAAD49FohEIiEhHf9sACADxLSEOAAAu0EqVWUK5ql4bD+Od0WJdwRT8EC+AAD+5C3aH///NUqe/L5//7zQAAof/+9VB08kyILxDoAA"
+        "image": ""
       },
       {
         "icon": "location",
         "label": "DELIVER",
-        "image": "data:image/webp;base64,UklGRswBAABXRUJQVlA4WAoAAAAQAAAAPwAAPwAAQUxQSB0BAAABgFVtb95GEARBEAzBEArBEMwgghAGCYOFgcsgY+AxMAT1v9Lnu11FxATQP0dJWebhpQ17blVmkGYfbwJX7esFi5s5ngLEp7l2xtnNucFUc68g0v2GYOwWuEGIhTJCiakIR8yBMGIGAFswx0mUxOWoFJemkyiJoxFEgC3miqAxK0KOSQjUIk6CzBEFg5pfJ9Dsd0Gh1WsjWO4+nXFIhosQcvGohK3fKaHrN0r4+pnSjPqJ0pz6TmnW8qrQvKmb9UT4vPT1BUk/hZ65nUVg6hjKrz6VvfcKstjK5Cq7LRBiSu5qCSFZ9auWEajZ4sSLdYKU3fqW+RvO67CrYBDl3czOH63lknMpdd262bhmQs56/Nr78XesmWlGecn0rxEAVlA4IIgAAAAQBgCdASpAAEAAPk0gjEQioiEb+VwAKATEtIAPYzIIDSAP0AP1Mxndur9tAUJYY0rX1nY5NWphegAA/v21xmP//+Mdo/unbL/4X+mOxeX7p0FXNBmI8/vd41jqyxe7m2X9JY0h4QkTMvApnYi5+Rhg9TLgJ43oZez+QpAdWnCL32Zp3OyAAAAA"
+        "image": ""
       }
     ]
   },
