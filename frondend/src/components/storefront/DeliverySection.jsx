@@ -39,7 +39,9 @@ export default function DeliverySection() {
                   </div>
                 </div>
                 {i < delivery.steps.length - 1 && (
-                  <div className="step-arrow">→</div>
+                  <div className="step-arrow">
+                    <img src="/images/Arrow.png" alt="→" className="step-arrow-img" />
+                  </div>
                 )}
               </div>
             );
