@@ -28,7 +28,7 @@ export default function HeroEditor() {
       const file = files[i];
       if (file && file.type.startsWith('image/')) {
         try {
-          const compressed = await compressImage(file, 1200, 1200, 0.7);
+          const compressed = await compressImage(file, 1000, 800, 0.65);
           currentImages.push(compressed);
           updated = true;
         } catch (err) {

@@ -13,7 +13,7 @@ export default function NavbarEditor() {
   const handleLogoFile = async (file) => {
     if (!file || !file.type.startsWith('image/')) return;
     try {
-      const compressed = await compressImage(file, 300, 300, 0.8);
+      const compressed = await compressImage(file, 240, 240, 0.75);
       updateConfig('navbar.logo', compressed);
     } catch (err) {
       console.error('Error compressing logo image:', err);

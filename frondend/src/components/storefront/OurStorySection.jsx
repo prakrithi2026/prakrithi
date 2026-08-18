@@ -31,7 +31,15 @@ export default function OurStorySection() {
         <div className="our-story-media-col">
           {ourStory.image && (
             <div className="our-story-image-wrapper">
-              <img src={ourStory.image} alt={ourStory.title} className="our-story-img" loading="lazy" />
+              <img
+                src={ourStory.image}
+                alt={ourStory.title}
+                className="our-story-img"
+                loading="lazy"
+                decoding="async"
+                width="600"
+                height="400"
+              />
               <div className="our-story-play-overlay">
                 <svg width="50" height="50" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <circle cx="30" cy="30" r="30" fill="#EF1C1C" />

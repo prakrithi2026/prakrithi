@@ -45,7 +45,7 @@ export default function SectionManager() {
   const handleBgImageUpload = async (sectionId, file) => {
     if (!file || !file.type.startsWith('image/')) return;
     try {
-      const compressed = await compressImage(file, 1000, 1000, 0.7);
+      const compressed = await compressImage(file, 800, 800, 0.65);
       const updated = sections.map((s) => s.id === sectionId ? { ...s, bgImage: compressed } : s);
       updateConfig('sections', updated);
     } catch (err) {
@@ -87,7 +87,7 @@ export default function SectionManager() {
   const handleDeliveryStepImageUpload = async (idx, file) => {
     if (!file || !file.type.startsWith('image/')) return;
     try {
-      const compressed = await compressImage(file, 200, 200, 0.85);
+      const compressed = await compressImage(file, 96, 96, 0.75);
       updateDeliveryStep(idx, 'image', compressed);
     } catch (err) {
       console.error('Error compressing delivery step image:', err);
@@ -110,7 +110,7 @@ export default function SectionManager() {
   const handlePressLogoImageUpload = async (idx, file) => {
     if (!file || !file.type.startsWith('image/')) return;
     try {
-      const compressed = await compressImage(file, 300, 300, 0.85);
+      const compressed = await compressImage(file, 200, 200, 0.75);
       updatePressLogo(idx, 'image', compressed);
     } catch (err) {
       console.error('Error compressing press logo image:', err);
@@ -508,7 +508,7 @@ export default function SectionManager() {
                   const file = e.target.files?.[0];
                   if (!file || !file.type.startsWith('image/')) return;
                   try {
-                    const compressed = await compressImage(file, 800, 800, 0.75);
+                    const compressed = await compressImage(file, 700, 700, 0.65);
                     updateConfig('ourStory.image', compressed);
                   } catch (err) {
                     console.error('Error compressing story image:', err);
@@ -580,7 +580,7 @@ export default function SectionManager() {
                   const file = e.target.files?.[0];
                   if (!file || !file.type.startsWith('image/')) return;
                   try {
-                    const compressed = await compressImage(file, 600, 600, 0.75);
+                    const compressed = await compressImage(file, 500, 500, 0.65);
                     updateConfig('reviewsSection.image', compressed);
                   } catch (err) {
                     console.error('Error compressing review image:', err);

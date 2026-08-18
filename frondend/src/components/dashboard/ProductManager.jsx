@@ -32,7 +32,7 @@ export default function ProductManager() {
   const handleProductImageFile = async (file) => {
     if (!file || !file.type.startsWith('image/')) return;
     try {
-      const compressed = await compressImage(file, 600, 600, 0.75);
+      const compressed = await compressImage(file, 500, 500, 0.65);
       setEditing((prev) => prev ? { ...prev, image: compressed } : prev);
     } catch (err) {
       console.error('Error compressing product image:', err);

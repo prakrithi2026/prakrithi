@@ -51,7 +51,14 @@ export default function ProductCard({ product }) {
       <Link to={`/product/${product.id}`} className="card-image-link">
         <div className="card-image">
           {product.image ? (
-            <img src={product.image} alt={product.name} loading="lazy" />
+            <img
+              src={product.image}
+              alt={product.name}
+              loading="lazy"
+              decoding="async"
+              width="300"
+              height="300"
+            />
           ) : (
             <div className="card-image__placeholder">
               <span className="card-image__emoji">

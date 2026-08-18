@@ -1,8 +1,12 @@
 import os
+import sys
 import django
 import base64
 import re
 from io import BytesIO
+
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
 
 # Setup Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
@@ -61,8 +65,12 @@ def compress_base64_image(base64_str, max_width=800, max_height=800, quality=75)
         compressed_bytes = output.getvalue()
         compressed_b64 = base64.b64encode(compressed_bytes).decode('utf-8')
         new_base64_str = f"data:image/webp;base64,{compressed_b64}"
-        print(f"Compressed size: {len(new_base64_str)} chars (Saved: {(original_size - len(new_base64_str)) / original_size * 100:.1f}%)")
-        return new_base64_str
+        if len(new_base64_str) < original_size:
+            print(f"Compressed size: {len(new_base64_str)} chars (Saved: {(original_size - len(new_base64_str)) / original_size * 100:.1f}%)")
+            return new_base64_str
+        else:
+            print(f"Kept original: compressed was larger ({len(new_base64_str)} vs {original_size})")
+            return base64_str
     except Exception as e:
         print(f"Failed to compress/save image: {e}")
         return base64_str
@@ -73,7 +81,7 @@ def optimize_products():
     for p in products:
         if p.image and p.image.startswith("data:image/"):
             print(f"Optimizing Product {p.id}: {p.name}")
-            optimized_img = compress_base64_image(p.image, max_width=600, max_height=600, quality=75)
+            optimized_img = compress_base64_image(p.image, max_width=500, max_height=500, quality=65)
             if optimized_img != p.image:
                 p.image = optimized_img
                 p.save()
@@ -95,7 +103,7 @@ def optimize_site_config():
         logo = config['navbar']['logo']
         if logo and logo.startswith("data:image/"):
             print("Optimizing Navbar Logo")
-            optimized = compress_base64_image(logo, max_width=300, max_height=300, quality=80)
+            optimized = compress_base64_image(logo, max_width=240, max_height=240, quality=75)
             if optimized != logo:
                 config['navbar']['logo'] = optimized
                 changed = True
@@ -106,7 +114,7 @@ def optimize_site_config():
         bg = config['hero']['bgImage']
         if bg and bg.startswith("data:image/"):
             print("Optimizing Hero Background")
-            optimized = compress_base64_image(bg, max_width=1200, max_height=1200, quality=70)
+            optimized = compress_base64_image(bg, max_width=1000, max_height=800, quality=65)
             if optimized != bg:
                 config['hero']['bgImage'] = optimized
                 changed = True
@@ -118,7 +126,7 @@ def optimize_site_config():
         for idx, img in enumerate(config['hero']['images']):
             if img and img.startswith("data:image/"):
                 print(f"Optimizing Hero Slideshow Image {idx + 1}")
-                optimized = compress_base64_image(img, max_width=1200, max_height=1200, quality=70)
+                optimized = compress_base64_image(img, max_width=1000, max_height=800, quality=65)
                 if optimized != img:
                     new_images.append(optimized)
                     changed = True
@@ -135,7 +143,7 @@ def optimize_site_config():
             img = item.get('image', '')
             if img and img.startswith("data:image/"):
                 print(f"Optimizing Hero Product Image: {item.get('label')}")
-                optimized = compress_base64_image(img, max_width=600, max_height=600, quality=75)
+                optimized = compress_base64_image(img, max_width=500, max_height=500, quality=65)
                 if optimized != img:
                     item['image'] = optimized
                     changed = True
@@ -147,7 +155,7 @@ def optimize_site_config():
             img = step.get('image', '')
             if img and img.startswith("data:image/"):
                 print(f"Optimizing Delivery Step {idx + 1}")
-                optimized = compress_base64_image(img, max_width=200, max_height=200, quality=85)
+                optimized = compress_base64_image(img, max_width=96, max_height=96, quality=75)
                 if optimized != img:
                     step['image'] = optimized
                     changed = True
@@ -159,7 +167,7 @@ def optimize_site_config():
             img = logo.get('image', '')
             if img and img.startswith("data:image/"):
                 print(f"Optimizing Press Logo {logo.get('name')}")
-                optimized = compress_base64_image(img, max_width=300, max_height=300, quality=85)
+                optimized = compress_base64_image(img, max_width=200, max_height=200, quality=75)
                 if optimized != img:
                     logo['image'] = optimized
                     changed = True
@@ -170,7 +178,7 @@ def optimize_site_config():
         img = config['reviewsSection']['image']
         if img and img.startswith("data:image/"):
             print("Optimizing Reviews Section Image")
-            optimized = compress_base64_image(img, max_width=600, max_height=600, quality=75)
+            optimized = compress_base64_image(img, max_width=500, max_height=500, quality=65)
             if optimized != img:
                 config['reviewsSection']['image'] = optimized
                 changed = True
@@ -181,11 +189,15 @@ def optimize_site_config():
         img = config['ourStory']['image']
         if img and img.startswith("data:image/"):
             print("Optimizing Our Story Image")
-            optimized = compress_base64_image(img, max_width=800, max_height=800, quality=75)
+            optimized = compress_base64_image(img, max_width=700, max_height=700, quality=65)
             if optimized != img:
                 config['ourStory']['image'] = optimized
                 changed = True
                 print("Our Story image updated")
+        elif img and 'unsplash.com' in img and 'w=2340' in img:
+            print("Optimizing Our Story Unsplash URL")
+            config['ourStory']['image'] = "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&q=70&w=800&fm=webp"
+            changed = True
 
     # 8. Sections (background images if any)
     if 'sections' in config:
@@ -193,7 +205,7 @@ def optimize_site_config():
             img = sec.get('bgImage', '')
             if img and img.startswith("data:image/"):
                 print(f"Optimizing Section Background for {sec.get('id')}")
-                optimized = compress_base64_image(img, max_width=1000, max_height=1000, quality=70)
+                optimized = compress_base64_image(img, max_width=800, max_height=800, quality=65)
                 if optimized != img:
                     sec['bgImage'] = optimized
                     changed = True

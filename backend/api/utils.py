@@ -52,6 +52,9 @@ def compress_base64_image(base64_str, max_width=800, max_height=800, quality=75)
         img.save(output, format='WEBP', quality=quality)
         compressed_bytes = output.getvalue()
         compressed_b64 = base64.b64encode(compressed_bytes).decode('utf-8')
-        return f"data:image/webp;base64,{compressed_b64}"
+        new_base64_str = f"data:image/webp;base64,{compressed_b64}"
+        if len(new_base64_str) < len(base64_str):
+            return new_base64_str
+        return base64_str
     except Exception:
         return base64_str
