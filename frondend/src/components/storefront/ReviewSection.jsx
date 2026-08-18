@@ -7,8 +7,7 @@ export default function ReviewSection() {
   const { image = '', googleRating = 0, totalReviews = 0 } = reviewsSection;
 
   const dynamicStyle = {
-    background: `url('/images/element.bg.png') no-repeat -20px center / auto 100%, linear-gradient(90deg, #0D5130 0%, #9FBD58 100%)`,
-    backgroundOrigin: 'border-box'
+    background: `linear-gradient(90deg, #0D5130 0%, #9FBD58 100%)`
   };
 
   return (

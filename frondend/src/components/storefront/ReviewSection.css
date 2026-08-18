@@ -176,9 +176,7 @@
     margin: 40px auto 0;
     padding: 30px 20px;
     border-radius: 12px;
-    background: url('/images/element.bg.png') no-repeat -20px top / contain, 
-                linear-gradient(90deg, #0D5130 0%, #9FBD58 100%) !important;
-    background-origin: border-box !important;
+    background: linear-gradient(90deg, #0D5130 0%, #9FBD58 100%) !important;
   }
   
   .review-container {
