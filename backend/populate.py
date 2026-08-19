@@ -193,41 +193,44 @@ products = [
   }
 ]
 
-# Create or Update Config
-SiteConfig.objects.update_or_create(id=1, defaults={"config_data": config_data})
+# Only seed SiteConfig if it does not already exist
+if not SiteConfig.objects.exists():
+    print("No SiteConfig found. Seeding initial configuration...")
+    SiteConfig.objects.create(id=1, config_data=config_data)
+else:
+    print("SiteConfig already exists. Preserving admin custom configuration and images.")
 
-# Create or Update Categories
-for cat in categories:
-    Category.objects.update_or_create(category_id=cat["id"], defaults={"label": cat["label"]})
+# Seed categories if none exist
+if not Category.objects.exists():
+    print("Seeding initial Categories...")
+    for cat in categories:
+        Category.objects.update_or_create(category_id=cat["id"], defaults={"label": cat["label"]})
+else:
+    print("Categories already exist. Preserving existing categories.")
 
-# Create or Update Products
-for prod in products:
-    category_obj = Category.objects.filter(category_id=prod["category"]).first()
-    
-    # Retrieve existing image if it exists to prevent overwriting with an empty string
-    existing_product = Product.objects.filter(id=prod["id"]).first()
-    image_val = prod["image"]
-    if existing_product and existing_product.image:
-        image_val = existing_product.image
-        
-    Product.objects.update_or_create(
-        id=prod["id"],
-        defaults={
-            "name": prod["name"],
-            "description": prod["description"],
-            "price": Decimal(str(prod["price"])),
-            "salePrice": Decimal(str(prod["salePrice"])) if prod["salePrice"] else None,
-            "image": image_val,
-            "category": category_obj,
-            "tags": prod["tags"],
-            "variants": prod["variants"],
-            "badge": prod.get("badge"),
-            "badgeColor": prod.get("badgeColor"),
-            "badgeTextColor": prod.get("badgeTextColor"),
-            "rating": Decimal(str(prod["rating"])),
-            "reviews": prod["reviews"],
-            "couponNote": prod.get("couponNote")
-        }
-    )
+# Seed initial products only if no products exist
+if not Product.objects.exists():
+    print("Seeding initial Products...")
+    for prod in products:
+        category_obj = Category.objects.filter(category_id=prod["category"]).first()
+        Product.objects.create(
+            id=prod["id"],
+            name=prod["name"],
+            description=prod["description"],
+            price=Decimal(str(prod["price"])),
+            salePrice=Decimal(str(prod["salePrice"])) if prod["salePrice"] else None,
+            image=prod.get("image", ""),
+            category=category_obj,
+            tags=prod["tags"],
+            variants=prod["variants"],
+            badge=prod.get("badge"),
+            badgeColor=prod.get("badgeColor"),
+            badgeTextColor=prod.get("badgeTextColor"),
+            rating=Decimal(str(prod["rating"])),
+            reviews=prod["reviews"],
+            couponNote=prod.get("couponNote")
+        )
+else:
+    print("Products already exist in database. Preserving admin products.")
 
-print("Database populated successfully!")
+print("Database check completed successfully!")
