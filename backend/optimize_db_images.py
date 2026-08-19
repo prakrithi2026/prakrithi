@@ -114,7 +114,7 @@ def optimize_site_config():
         bg = config['hero']['bgImage']
         if bg and bg.startswith("data:image/"):
             print("Optimizing Hero Background")
-            optimized = compress_base64_image(bg, max_width=1000, max_height=800, quality=65)
+            optimized = compress_base64_image(bg, max_width=2560, max_height=1440, quality=90)
             if optimized != bg:
                 config['hero']['bgImage'] = optimized
                 changed = True
@@ -126,7 +126,7 @@ def optimize_site_config():
         for idx, img in enumerate(config['hero']['images']):
             if img and img.startswith("data:image/"):
                 print(f"Optimizing Hero Slideshow Image {idx + 1}")
-                optimized = compress_base64_image(img, max_width=1000, max_height=800, quality=65)
+                optimized = compress_base64_image(img, max_width=2560, max_height=1440, quality=90)
                 if optimized != img:
                     new_images.append(optimized)
                     changed = True

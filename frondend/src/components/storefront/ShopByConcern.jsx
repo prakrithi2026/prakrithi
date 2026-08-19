@@ -6,7 +6,9 @@ import './ShopByConcern.css';
 
 export default function ShopByConcern() {
   const { config } = useSiteConfig();
-  const { products, categories, theme } = config;
+  const products = Array.isArray(config.products) ? config.products : [];
+  const categories = Array.isArray(config.categories) ? config.categories : [];
+  const theme = config.theme || {};
   const [activeCategory, setActiveCategory] = useState('all');
   const [scrollProgress, setScrollProgress] = useState(30);
   const scrollRef = useRef(null);

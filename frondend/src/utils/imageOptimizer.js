@@ -4,12 +4,12 @@
  */
 
 export const COMPRESSION_PRESETS = {
-  product: { maxWidth: 500, maxHeight: 500, quality: 0.65 },
-  hero: { maxWidth: 1000, maxHeight: 800, quality: 0.65 },
-  logo: { maxWidth: 240, maxHeight: 240, quality: 0.75 },
-  icon: { maxWidth: 96, maxHeight: 96, quality: 0.75 },
-  section: { maxWidth: 800, maxHeight: 800, quality: 0.65 },
-  general: { maxWidth: 600, maxHeight: 600, quality: 0.70 },
+  product: { maxWidth: 600, maxHeight: 600, quality: 0.75 },
+  hero: { maxWidth: 2560, maxHeight: 1440, quality: 0.90 },
+  logo: { maxWidth: 400, maxHeight: 400, quality: 0.85 },
+  icon: { maxWidth: 120, maxHeight: 120, quality: 0.85 },
+  section: { maxWidth: 1200, maxHeight: 1200, quality: 0.75 },
+  general: { maxWidth: 800, maxHeight: 800, quality: 0.75 },
 };
 
 /**

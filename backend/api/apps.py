@@ -146,8 +146,8 @@ def run_db_image_optimization():
                     # background
                     if 'hero' in config and 'bgImage' in config['hero']:
                         bg = config['hero']['bgImage']
-                        if bg and bg.startswith("data:image/") and len(bg) > 60000:
-                            optimized = compress_base64_image(bg, max_width=1200, max_height=1200, quality=70)
+                        if bg and bg.startswith("data:image/") and len(bg) > 600000:
+                            optimized = compress_base64_image(bg, max_width=2560, max_height=1440, quality=90)
                             if len(optimized) < len(bg):
                                 config['hero']['bgImage'] = optimized
                                 changed = True
@@ -155,8 +155,8 @@ def run_db_image_optimization():
                     if 'hero' in config and 'images' in config['hero'] and isinstance(config['hero']['images'], list):
                         new_images = []
                         for img in config['hero']['images']:
-                            if img and img.startswith("data:image/") and len(img) > 60000:
-                                optimized = compress_base64_image(img, max_width=1200, max_height=1200, quality=70)
+                            if img and img.startswith("data:image/") and len(img) > 600000:
+                                optimized = compress_base64_image(img, max_width=2560, max_height=1440, quality=90)
                                 if len(optimized) < len(img):
                                     new_images.append(optimized)
                                     changed = True

@@ -14,6 +14,14 @@ export default function HeroSection() {
 
   const enabled = hero.enabled !== false;
 
+  // Preload first hero image immediately for instant LCP render
+  useEffect(() => {
+    if (images.length > 0 && images[0]) {
+      const img = new Image();
+      img.src = images[0];
+    }
+  }, [images]);
+
   // Set up automatic scrolling interval if there are 2 or more images
   useEffect(() => {
     if (!enabled || images.length < 2) return;
@@ -32,8 +40,8 @@ export default function HeroSection() {
     }
   }, [images.length, currentSlide]);
 
-  // If the hero section is disabled, render nothing
-  if (!enabled) return null;
+  // If the hero section is disabled or has no images, render nothing (no empty blank space)
+  if (!enabled || images.length === 0) return null;
 
   return (
     <section className="hero-section">

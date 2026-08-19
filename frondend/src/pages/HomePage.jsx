@@ -27,7 +27,8 @@ const coreSectionComponents = {
 
 export default function HomePage() {
   const { config, isLoading } = useSiteConfig();
-  const { sections, theme } = config;
+  const sections = Array.isArray(config.sections) ? config.sections : [];
+  const theme = config.theme || {};
   const [searchParams] = useSearchParams();
   const isPreviewMode = searchParams.get('mode') === 'preview';
 

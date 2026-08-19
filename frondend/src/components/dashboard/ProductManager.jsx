@@ -21,7 +21,8 @@ const emptyProduct = {
 
 export default function ProductManager() {
   const { config, addProduct, updateProduct, deleteProduct } = useSiteConfig();
-  const { products, categories } = config;
+  const products = Array.isArray(config.products) ? config.products : [];
+  const categories = Array.isArray(config.categories) ? config.categories : [];
   const [editing, setEditing] = useState(null); // null or product object
   const [isNew, setIsNew] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -32,7 +33,7 @@ export default function ProductManager() {
   const handleProductImageFile = async (file) => {
     if (!file || !file.type.startsWith('image/')) return;
     try {
-      const compressed = await compressImage(file, 500, 500, 0.65);
+      const compressed = await compressImage(file, 600, 600, 0.75);
       setEditing((prev) => prev ? { ...prev, image: compressed } : prev);
     } catch (err) {
       console.error('Error compressing product image:', err);

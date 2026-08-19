@@ -26,7 +26,8 @@ const StarRating = ({ rating = 0, max = 5 }) => {
 export default function ProductPage() {
   const { id } = useParams();
   const { config } = useSiteConfig();
-  const { products, theme } = config;
+  const products = Array.isArray(config.products) ? config.products : [];
+  const theme = config.theme || {};
   const { addToCart } = useCart();
   const { toggleWishlist, isWishlisted } = useWishlist();
   const { isLoggedIn } = useAuth();

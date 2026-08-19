@@ -17,16 +17,16 @@ class SiteConfig(models.Model):
             
             # 1. Navbar logo
             if 'navbar' in config and 'logo' in config['navbar']:
-                config['navbar']['logo'] = compress_base64_image(config['navbar']['logo'], max_width=240, max_height=240, quality=75)
+                config['navbar']['logo'] = compress_base64_image(config['navbar']['logo'], max_width=400, max_height=400, quality=85)
                 
-            # 2. Hero background
+            # 2. Hero background (High-res 2560x1440 support)
             if 'hero' in config and 'bgImage' in config['hero']:
-                config['hero']['bgImage'] = compress_base64_image(config['hero']['bgImage'], max_width=1000, max_height=800, quality=65)
+                config['hero']['bgImage'] = compress_base64_image(config['hero']['bgImage'], max_width=2560, max_height=1440, quality=90)
                 
-            # 2b. Hero slideshow images
+            # 2b. Hero slideshow images (High-res 2560x1440 at 90% quality)
             if 'hero' in config and 'images' in config['hero'] and isinstance(config['hero']['images'], list):
                 config['hero']['images'] = [
-                    compress_base64_image(img, max_width=1000, max_height=800, quality=65) if img else img
+                    compress_base64_image(img, max_width=2560, max_height=1440, quality=90) if img else img
                     for img in config['hero']['images']
                 ]
                 
@@ -34,33 +34,33 @@ class SiteConfig(models.Model):
             if 'hero' in config and 'productImages' in config['hero']:
                 for item in config['hero']['productImages']:
                     if 'image' in item:
-                        item['image'] = compress_base64_image(item['image'], max_width=500, max_height=500, quality=65)
+                        item['image'] = compress_base64_image(item['image'], max_width=600, max_height=600, quality=80)
                         
             # 4. Delivery step images
             if 'delivery' in config and 'steps' in config['delivery']:
                 for step in config['delivery']['steps']:
                     if 'image' in step:
-                        step['image'] = compress_base64_image(step['image'], max_width=96, max_height=96, quality=75)
+                        step['image'] = compress_base64_image(step['image'], max_width=120, max_height=120, quality=85)
                         
             # 5. Press logo images
             if 'press' in config and 'logos' in config['press']:
                 for logo in config['press']['logos']:
                     if 'image' in logo:
-                        logo['image'] = compress_base64_image(logo['image'], max_width=200, max_height=200, quality=75)
+                        logo['image'] = compress_base64_image(logo['image'], max_width=300, max_height=300, quality=85)
                         
             # 6. Reviews section image
             if 'reviewsSection' in config and 'image' in config['reviewsSection']:
-                config['reviewsSection']['image'] = compress_base64_image(config['reviewsSection']['image'], max_width=500, max_height=500, quality=65)
+                config['reviewsSection']['image'] = compress_base64_image(config['reviewsSection']['image'], max_width=800, max_height=800, quality=80)
                 
             # 7. Our Story image
             if 'ourStory' in config and 'image' in config['ourStory']:
-                config['ourStory']['image'] = compress_base64_image(config['ourStory']['image'], max_width=700, max_height=700, quality=65)
+                config['ourStory']['image'] = compress_base64_image(config['ourStory']['image'], max_width=1200, max_height=1200, quality=85)
 
             # 8. Sections backgrounds
             if 'sections' in config:
                 for sec in config['sections']:
                     if 'bgImage' in sec:
-                        sec['bgImage'] = compress_base64_image(sec['bgImage'], max_width=800, max_height=800, quality=65)
+                        sec['bgImage'] = compress_base64_image(sec['bgImage'], max_width=1600, max_height=1600, quality=85)
                         
             self.config_data = config
         super().save(*args, **kwargs)
@@ -98,7 +98,7 @@ class Product(models.Model):
     def save(self, *args, **kwargs):
         if self.image:
             from .utils import compress_base64_image
-            self.image = compress_base64_image(self.image, max_width=500, max_height=500, quality=65)
+            self.image = compress_base64_image(self.image, max_width=800, max_height=800, quality=80)
         super().save(*args, **kwargs)
 
 class Order(models.Model):

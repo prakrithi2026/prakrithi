@@ -4,11 +4,63 @@ import API_BASE_URL from '../utils/api';
 
 const SiteConfigContext = createContext(null);
 
+const CACHE_KEY = 'prakrithi_siteconfig_cache';
+
+// Deep-merge defaults so new config keys always have fallback values
+function deepMerge(defaults, overrides) {
+  if (!overrides || typeof overrides !== 'object') return { ...defaults };
+  const result = { ...defaults };
+  for (const key of Object.keys(overrides)) {
+    if (
+      overrides[key] !== null &&
+      typeof overrides[key] === 'object' &&
+      !Array.isArray(overrides[key]) &&
+      typeof defaults[key] === 'object' &&
+      defaults[key] !== null &&
+      !Array.isArray(defaults[key])
+    ) {
+      result[key] = deepMerge(defaults[key], overrides[key]);
+    } else {
+      result[key] = overrides[key];
+    }
+  }
+  return result;
+}
+
+function getInitialConfig() {
+  let base = { ...defaultConfig };
+  try {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      base = deepMerge(defaultConfig, parsed);
+    }
+  } catch (e) {
+    console.warn('Failed to parse cached site configuration', e);
+  }
+  if (!Array.isArray(base.products) || base.products.length === 0) {
+    base.products = defaultConfig.products || [];
+  }
+  if (!Array.isArray(base.categories) || base.categories.length === 0) {
+    base.categories = defaultConfig.categories || [];
+  }
+  if (!Array.isArray(base.sections)) {
+    base.sections = defaultConfig.sections || [];
+  }
+  return base;
+}
+
 export function SiteConfigProvider({ children }) {
-  const [config, setConfig] = useState(defaultConfig);
-  const [savedConfig, setSavedConfig] = useState(defaultConfig);
+  const [config, setConfig] = useState(getInitialConfig);
+  const [savedConfig, setSavedConfig] = useState(getInitialConfig);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(() => {
+    try {
+      return !localStorage.getItem(CACHE_KEY);
+    } catch {
+      return true;
+    }
+  });
   const channelRef = useRef(null);
   const sourceRef = useRef('init');
   const configRef = useRef(config);
@@ -59,28 +111,8 @@ export function SiteConfigProvider({ children }) {
     }
   }, [config, isLoading]);
 
-  // Load data from API
+  // Load data from API (Stale-While-Revalidate pattern)
   useEffect(() => {
-    // Deep-merge defaults so new config keys always have fallback values
-    function deepMerge(defaults, overrides) {
-      const result = { ...defaults };
-      for (const key of Object.keys(overrides)) {
-        if (
-          overrides[key] !== null &&
-          typeof overrides[key] === 'object' &&
-          !Array.isArray(overrides[key]) &&
-          typeof defaults[key] === 'object' &&
-          defaults[key] !== null &&
-          !Array.isArray(defaults[key])
-        ) {
-          result[key] = deepMerge(defaults[key], overrides[key]);
-        } else {
-          result[key] = overrides[key];
-        }
-      }
-      return result;
-    }
-
     async function loadData() {
       try {
         const [configRes, productsRes, categoriesRes] = await Promise.all([
@@ -113,6 +145,11 @@ export function SiteConfigProvider({ children }) {
         };
 
         setSavedConfig(fullConfig);
+        try {
+          localStorage.setItem(CACHE_KEY, JSON.stringify(fullConfig));
+        } catch (storageErr) {
+          console.warn('LocalStorage quota or write error on cache save:', storageErr);
+        }
 
         // Only set config if we haven't already received unsaved changes from sync
         if (sourceRef.current === 'init' || sourceRef.current === 'api') {
@@ -120,12 +157,10 @@ export function SiteConfigProvider({ children }) {
           setConfig(fullConfig);
         }
       } catch (error) {
-        console.error("Failed to load config from API, using default", error);
+        console.error("Failed to load config from API, using cached or default data", error);
         if (sourceRef.current === 'init' || sourceRef.current === 'api') {
           sourceRef.current = 'api';
-          setConfig(defaultConfig);
         }
-        setSavedConfig(defaultConfig);
       } finally {
         setIsLoading(false);
       }
@@ -205,6 +240,11 @@ export function SiteConfigProvider({ children }) {
       }
       
       setSavedConfig(config);
+      try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify(config));
+      } catch (storageErr) {
+        console.warn('LocalStorage quota or write error on saveConfig:', storageErr);
+      }
     } catch (error) {
       console.error("Error saving config:", error);
       alert("Failed to save configuration to the server.");
@@ -220,6 +260,9 @@ export function SiteConfigProvider({ children }) {
     sourceRef.current = 'user';
     setConfig(defaultConfig);
     setSavedConfig(defaultConfig);
+    try {
+      localStorage.removeItem(CACHE_KEY);
+    } catch {}
   }, []);
 
   const value = useMemo(

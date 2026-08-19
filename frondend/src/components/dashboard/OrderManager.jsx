@@ -140,7 +140,7 @@ function printOrderPDF(order, products) {
 // ── Main Component ──────────────────────────────────────────────────────────
 export default function OrderManager() {
   const { config } = useSiteConfig();
-  const { products } = config;
+  const products = Array.isArray(config.products) ? config.products : [];
 
   const [orders, setOrders]               = useState([]);
   const [loading, setLoading]             = useState(true);

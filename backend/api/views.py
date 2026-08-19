@@ -110,7 +110,9 @@ class SiteConfigView(APIView):
     def get(self, request):
         config, created = SiteConfig.objects.get_or_create(id=1)
         serializer = SiteConfigSerializer(config)
-        return Response(serializer.data['config_data'])
+        response = Response(serializer.data['config_data'])
+        response['Cache-Control'] = 'public, max-age=60, stale-while-revalidate=300'
+        return response
 
     def put(self, request):
         data = request.data.copy()
@@ -162,9 +164,19 @@ class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        response['Cache-Control'] = 'public, max-age=60, stale-while-revalidate=300'
+        return response
+
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        response['Cache-Control'] = 'public, max-age=60, stale-while-revalidate=300'
+        return response
 
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()

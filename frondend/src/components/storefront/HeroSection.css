@@ -27,6 +27,10 @@
   background-position: center;
   background-repeat: no-repeat;
   z-index: 1;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: auto;
+  transform: translateZ(0);
+  will-change: opacity;
 }
 
 .hero-slide.active {

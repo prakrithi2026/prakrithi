@@ -19,7 +19,9 @@ const SORT_OPTIONS = [
 
 export default function ShopPage() {
   const { config } = useSiteConfig();
-  const { products, categories, theme } = config;
+  const products = Array.isArray(config.products) ? config.products : [];
+  const categories = Array.isArray(config.categories) ? config.categories : [];
+  const theme = config.theme || {};
   const { addToCart } = useCart();
   const { toggleWishlist, isWishlisted } = useWishlist();
   const [searchParams, setSearchParams] = useSearchParams();

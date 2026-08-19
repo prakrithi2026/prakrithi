@@ -6,7 +6,8 @@ import './ShopByProduct.css';
 
 export default function ShopByProduct() {
   const { config } = useSiteConfig();
-  const { products, theme } = config;
+  const products = Array.isArray(config.products) ? config.products : [];
+  const theme = config.theme || {};
   const [activeFilter, setActiveFilter] = useState('all');
   const [scrollProgress, setScrollProgress] = useState(30);
   const scrollRef = useRef(null);

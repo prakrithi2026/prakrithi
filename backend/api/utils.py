@@ -3,10 +3,10 @@ import re
 from io import BytesIO
 from PIL import Image
 
-def compress_base64_image(base64_str, max_width=800, max_height=800, quality=75):
+def compress_base64_image(base64_str, max_width=1200, max_height=1200, quality=85):
     """
     If base64_str is a base64 data URL, decodes, resizes if larger than max dimensions,
-    re-compresses it as a JPEG at the given quality, and returns the compressed data URL.
+    re-compresses it as WebP at the given quality, and returns the compressed data URL.
     Otherwise returns base64_str unchanged.
     """
     if not base64_str or not isinstance(base64_str, str):
@@ -17,6 +17,7 @@ def compress_base64_image(base64_str, max_width=800, max_height=800, quality=75)
     if not match:
         return base64_str
         
+    img_format = match.group(1).lower()
     img_data_b64 = match.group(2)
     
     # Try decoding
@@ -45,15 +46,18 @@ def compress_base64_image(base64_str, max_width=800, max_height=800, quality=75)
             new_height = max_height
         img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
         resized = True
+    elif img_format == 'webp' and len(base64_str) < 500000:
+        # Already high quality WebP within dimensions — avoid generation loss
+        return base64_str
     
-    # Save image to bytes (using WebP format to preserve transparency)
+    # Save image to bytes (using WebP format to preserve transparency and high clarity)
     output = BytesIO()
     try:
-        img.save(output, format='WEBP', quality=quality)
+        img.save(output, format='WEBP', quality=quality, method=6)
         compressed_bytes = output.getvalue()
         compressed_b64 = base64.b64encode(compressed_bytes).decode('utf-8')
         new_base64_str = f"data:image/webp;base64,{compressed_b64}"
-        if len(new_base64_str) < len(base64_str):
+        if resized or len(new_base64_str) < len(base64_str):
             return new_base64_str
         return base64_str
     except Exception:
