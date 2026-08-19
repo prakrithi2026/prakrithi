@@ -6,11 +6,33 @@ export default function HeroSection() {
   const { config } = useSiteConfig();
   const { hero } = config;
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth <= 768;
+    }
+    return false;
+  });
 
-  // Fallback to old bgImage only if new images list is undefined (not yet migrated)
-  const images = hero.images !== undefined
+  // Track window resize to switch between desktop and mobile image sets
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Desktop images (fallback to legacy bgImage if needed)
+  const desktopImages = hero.images !== undefined
     ? hero.images
     : (hero.bgImage ? [hero.bgImage] : []);
+
+  // Mobile images
+  const mobileImages = Array.isArray(hero.mobileImages) ? hero.mobileImages : [];
+
+  // If on mobile viewport and mobileImages exist, use mobileImages; otherwise fallback to desktopImages
+  const isUsingMobileImages = isMobile && mobileImages.length > 0;
+  const images = isUsingMobileImages ? mobileImages : desktopImages;
 
   const enabled = hero.enabled !== false;
 
@@ -28,12 +50,12 @@ export default function HeroSection() {
 
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % images.length);
-    }, 5000); // 5 seconds fixed interval
+    }, 5000); // 5 seconds interval
 
     return () => clearInterval(interval);
   }, [images.length, enabled]);
 
-  // Reset currentSlide if it goes out of bounds when images are removed/cleared
+  // Reset currentSlide if it goes out of bounds when images are swapped/cleared
   useEffect(() => {
     if (currentSlide >= images.length && images.length > 0) {
       setCurrentSlide(0);
@@ -44,7 +66,7 @@ export default function HeroSection() {
   if (!enabled || images.length === 0) return null;
 
   return (
-    <section className="hero-section">
+    <section className={`hero-section ${isUsingMobileImages ? 'hero-section--mobile-view' : ''}`}>
       <div className="hero-slides-container">
         {images.map((image, index) => (
           <div

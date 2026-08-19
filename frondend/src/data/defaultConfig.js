@@ -103,6 +103,7 @@ const defaultConfig = {
   "hero": {
     "enabled": true,
     "images": [],
+    "mobileImages": [],
     "bgImage": "",
     "bgColor": "#2E7D32",
     "overlayOpacity": 0.3,

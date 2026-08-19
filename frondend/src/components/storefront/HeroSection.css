@@ -87,7 +87,12 @@
 
 @media (max-width: 768px) {
   .hero-section {
-    height: 320px;
+    height: 340px;
+  }
+
+  .hero-section.hero-section--mobile-view {
+    height: 480px;
+    max-height: 80vh;
   }
   
   .hero-dots {
@@ -103,5 +108,16 @@
   
   .hero-dot.active {
     width: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-section {
+    height: 280px;
+  }
+
+  .hero-section.hero-section--mobile-view {
+    height: 440px;
+    max-height: 82vh;
   }
 }

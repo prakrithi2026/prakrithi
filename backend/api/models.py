@@ -23,11 +23,18 @@ class SiteConfig(models.Model):
             if 'hero' in config and 'bgImage' in config['hero']:
                 config['hero']['bgImage'] = compress_base64_image(config['hero']['bgImage'], max_width=2560, max_height=1440, quality=90)
                 
-            # 2b. Hero slideshow images (High-res 2560x1440 at 90% quality)
+            # 2b. Hero slideshow images (Desktop / Laptop View) (High-res 2560x1440 at 90% quality)
             if 'hero' in config and 'images' in config['hero'] and isinstance(config['hero']['images'], list):
                 config['hero']['images'] = [
                     compress_base64_image(img, max_width=2560, max_height=1440, quality=90) if img else img
                     for img in config['hero']['images']
+                ]
+
+            # 2c. Hero slideshow images (Mobile View) (High-res 1080x1920 at 90% quality)
+            if 'hero' in config and 'mobileImages' in config['hero'] and isinstance(config['hero']['mobileImages'], list):
+                config['hero']['mobileImages'] = [
+                    compress_base64_image(img, max_width=1080, max_height=1920, quality=90) if img else img
+                    for img in config['hero']['mobileImages']
                 ]
                 
             # 3. Hero product images
