@@ -17,21 +17,26 @@ const SORT_OPTIONS = [
   { value: 'newest', label: 'New Arrivals' },
 ];
 
+const ALL_TAGS = [
+  { id: 'all', label: 'All' },
+  { id: 'on-sale', label: 'On Sale 🔥' },
+  { id: 'new-arrival', label: 'New Arrivals ✨' },
+  { id: 'best-seller', label: 'Best Sellers 🏆' },
+];
+
 export default function ShopPage() {
   const { config } = useSiteConfig();
   const products = Array.isArray(config.products) ? config.products : [];
-  const categories = Array.isArray(config.categories) ? config.categories : [];
+  const rawCategories = Array.isArray(config.categories) ? config.categories : [];
   const theme = config.theme || {};
   const { addToCart } = useCart();
   const { toggleWishlist, isWishlisted } = useWishlist();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Read all URL params
-  const queryParam    = searchParams.get('q')        || '';
+  // Read URL params
   const tagParam      = searchParams.get('tag')      || '';
   const categoryParam = searchParams.get('category') || '';
 
-  const [search,         setSearch]         = useState(queryParam);
   const [activeCategory, setActiveCategory] = useState(categoryParam || 'all');
   const [activeTag,      setActiveTag]      = useState(tagParam      || 'all');
   const [sortBy,         setSortBy]         = useState('default');
@@ -42,28 +47,18 @@ export default function ShopPage() {
 
   // Sync URL params → state whenever the URL changes (e.g. navbar link clicked)
   useEffect(() => {
-    setSearch(queryParam);
     setActiveCategory(categoryParam || 'all');
     setActiveTag(tagParam || 'all');
-  }, [queryParam, tagParam, categoryParam]);
+  }, [tagParam, categoryParam]);
 
-  const allTags = [
-    { id: 'all',         label: 'All' },
-    { id: 'on-sale',     label: 'On Sale 🔥' },
-    { id: 'new-arrival', label: 'New Arrivals ✨' },
-    { id: 'best-seller', label: 'Best Sellers 🏆' },
-  ];
+  // Normalized list of categories with 'All Categories' first
+  const categoryList = useMemo(() => {
+    const filteredCats = rawCategories.filter(c => (c.id || c.category_id) !== 'all');
+    return [{ id: 'all', label: 'All Categories' }, ...filteredCats];
+  }, [rawCategories]);
 
   const filtered = useMemo(() => {
     let list = [...products];
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      list = list.filter(p =>
-        p.name?.toLowerCase().includes(q) ||
-        p.description?.toLowerCase().includes(q) ||
-        p.category?.toLowerCase().includes(q)
-      );
-    }
     if (activeCategory !== 'all') list = list.filter(p => p.category === activeCategory);
     if (activeTag      !== 'all') list = list.filter(p => p.tags?.includes(activeTag));
 
@@ -74,37 +69,37 @@ export default function ShopPage() {
       case 'newest':     return [...list.filter(p => p.tags?.includes('new-arrival')), ...list.filter(p => !p.tags?.includes('new-arrival'))];
       default:           return list;
     }
-  }, [products, search, activeCategory, activeTag, sortBy]);
+  }, [products, activeCategory, activeTag, sortBy]);
 
-  // Helpers that keep ALL params in sync
+  // Helpers that keep URL params in sync
   const buildParams = (overrides = {}) => {
-    const base = { q: search, category: activeCategory, tag: activeTag };
+    const base = { category: activeCategory, tag: activeTag };
     const merged = { ...base, ...overrides };
     const out = {};
-    if (merged.q       && merged.q       !== '')    out.q        = merged.q;
     if (merged.category && merged.category !== 'all') out.category = merged.category;
     if (merged.tag      && merged.tag      !== 'all') out.tag      = merged.tag;
     return out;
   };
 
-  const handleSearchChange   = v   => { setSearch(v);   setSearchParams(buildParams({ q: v })); };
   const handleCategoryChange = cat => { setActiveCategory(cat); setSearchParams(buildParams({ category: cat })); };
   const handleTagChange      = tag => { setActiveTag(tag);      setSearchParams(buildParams({ tag })); };
-  const handleClear = () => { setActiveCategory('all'); setActiveTag('all'); setSearch(''); setSortBy('default'); setSearchParams({}); };
+  const handleSortChange     = s   => { setSortBy(s); };
+  const handleClear          = ()  => { setActiveCategory('all'); setActiveTag('all'); setSortBy('default'); setSearchParams({}); };
 
   // Dynamic heading based on active filter
   const tagLabels = { 'on-sale': 'Sale Items 🔥', 'new-arrival': 'New Arrivals ✨', 'best-seller': 'Best Sellers 🏆' };
-  const catObj = categories?.find(c => c.id === activeCategory || c.category_id === activeCategory);
+  const catObj = rawCategories?.find(c => (c.id || c.category_id) === activeCategory);
+  const activeCatLabel = catObj?.label || (activeCategory !== 'all' ? activeCategory : null);
+
   const pageHeading =
-    search          ? `Results for "${search}"` :
     activeTag !== 'all'      ? tagLabels[activeTag] || 'Products' :
-    activeCategory !== 'all' ? catObj?.label || activeCategory :
+    activeCategory !== 'all' ? activeCatLabel :
     'All Products';
 
   const themeStyle = {
-    '--primary': theme.primaryColor,
-    '--accent':  theme.accentColor,
-    fontFamily:  theme.fontFamily,
+    '--primary': theme.primaryColor || '#00472A',
+    '--accent':  theme.accentColor  || '#BDD681',
+    fontFamily:  theme.fontFamily   || "'Jost', sans-serif",
   };
 
   return (
@@ -117,88 +112,107 @@ export default function ShopPage() {
         <div className="shop-breadcrumb">
           <Link to="/">Home</Link> <span>/</span>
           <Link to="/shop">Shop</Link>
-          {(activeTag !== 'all' || activeCategory !== 'all' || search) && (
+          {(activeTag !== 'all' || activeCategory !== 'all') && (
             <><span>/</span><span>{pageHeading}</span></>
           )}
         </div>
 
-        {/* Header */}
+        {/* Header: Title & Count on Left, Controls on Right */}
         <div className="shop-header">
-          <div>
+          <div className="shop-header-title-block">
             <h1 className="shop-heading">{pageHeading}</h1>
-            <p className="shop-count">{filtered.length} product{filtered.length !== 1 ? 's' : ''} found</p>
+            <p className="shop-count">
+              Showing <strong>{filtered.length}</strong> {filtered.length === 1 ? 'product' : 'products'}
+            </p>
           </div>
-          <div className="shop-controls">
-            <div className="shop-search-wrap">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-              <input
-                type="search"
-                className="shop-search"
-                placeholder="Search products..."
-                value={search}
-                onChange={e => handleSearchChange(e.target.value)}
-              />
-            </div>
-            <select className="shop-sort" value={sortBy} onChange={e => setSortBy(e.target.value)}>
-              {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+
+          {/* Right Side Controls: Category, Filter, Sort, Clear Filter */}
+          <div className="shop-header-controls">
+            {/* Category Dropdown */}
+            <select
+              id="shop-category-select"
+              className="shop-select-btn"
+              value={activeCategory}
+              onChange={e => handleCategoryChange(e.target.value)}
+              aria-label="Category"
+            >
+              <option value="all">Category</option>
+              {categoryList.filter(c => (c.id || c.category_id) !== 'all').map(cat => {
+                const catId = cat.id || cat.category_id;
+                return (
+                  <option key={catId} value={catId}>
+                    {cat.label}
+                  </option>
+                );
+              })}
             </select>
+
+            {/* Filter Dropdown */}
+            <select
+              id="shop-tag-select"
+              className="shop-select-btn"
+              value={activeTag}
+              onChange={e => handleTagChange(e.target.value)}
+              aria-label="Filter"
+            >
+              <option value="all">Filter</option>
+              {ALL_TAGS.filter(t => t.id !== 'all').map(tag => (
+                <option key={tag.id} value={tag.id}>
+                  {tag.label}
+                </option>
+              ))}
+            </select>
+
+            {/* Sort Dropdown */}
+            <select
+              id="shop-sort-select"
+              className="shop-select-btn"
+              value={sortBy}
+              onChange={e => handleSortChange(e.target.value)}
+              aria-label="Sort"
+            >
+              <option value="default">Sort</option>
+              {SORT_OPTIONS.filter(o => o.value !== 'default').map(o => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+
+            {/* Clear Filter Option */}
+            <button
+              type="button"
+              className="shop-clear-btn"
+              onClick={handleClear}
+              title="Clear all filters"
+            >
+              Clear Filter
+            </button>
           </div>
         </div>
 
+        {/* Product Grid Area (Full Width) */}
         <div className="shop-body">
-          {/* Sidebar Filters */}
-          <aside className="shop-sidebar">
-            <div className="shop-filter-group">
-              <h4>Category</h4>
-              <button
-                className={`shop-filter-btn ${activeCategory === 'all' ? 'active' : ''}`}
-                style={activeCategory === 'all' ? { backgroundColor: theme.primaryColor, color: '#fff', borderColor: theme.primaryColor } : { borderColor: theme.primaryColor, color: theme.primaryColor }}
-                onClick={() => handleCategoryChange('all')}
-              >All Categories</button>
-              {categories.map(cat => (
-                <button
-                  key={cat.id || cat.category_id}
-                  className={`shop-filter-btn ${activeCategory === (cat.id || cat.category_id) ? 'active' : ''}`}
-                  style={activeCategory === (cat.id || cat.category_id) ? { backgroundColor: theme.primaryColor, color: '#fff', borderColor: theme.primaryColor } : { borderColor: theme.primaryColor, color: theme.primaryColor }}
-                  onClick={() => handleCategoryChange(cat.id || cat.category_id)}
-                >
-                  {cat.label}
-                </button>
-              ))}
-            </div>
-            <div className="shop-filter-group">
-              <h4>Filter by Tag</h4>
-              {allTags.map(tag => (
-                <button
-                  key={tag.id}
-                  className={`shop-filter-btn ${activeTag === tag.id ? 'active' : ''}`}
-                  style={activeTag === tag.id ? { backgroundColor: theme.primaryColor, color: '#fff', borderColor: theme.primaryColor } : { borderColor: theme.primaryColor, color: theme.primaryColor }}
-                  onClick={() => handleTagChange(tag.id)}
-                >
-                  {tag.label}
-                </button>
-              ))}
-            </div>
-            <button className="shop-reset-btn" onClick={handleClear}>
-              Clear All Filters
-            </button>
-          </aside>
-
-          {/* Product Grid */}
           <section className="shop-grid-area">
             {filtered.length === 0 ? (
               <div className="shop-no-results">
                 <div className="shop-no-results__icon">🔍</div>
                 <h3>No products found</h3>
-                <p>Try adjusting your search or filters</p>
-                <button className="shop-reset-btn" onClick={handleClear}>Clear Filters</button>
+                <p>Try adjusting your category or filter options</p>
+                <button
+                  className="shop-reset-btn"
+                  onClick={handleClear}
+                  style={{ backgroundColor: theme.primaryColor || '#00472A', color: '#fff', borderColor: theme.primaryColor || '#00472A' }}
+                >
+                  Clear Filter
+                </button>
               </div>
             ) : (
               <div className="shop-grid">
                 {filtered.map(product => (
                   <div key={product.id} className="shop-card">
                     {product.badge && (
-                      <span className="shop-card__badge" style={{ backgroundColor: product.badgeColor || theme.primaryColor, color: product.badgeTextColor || '#fff' }}>
+                      <span className="shop-card__badge" style={{ backgroundColor: product.badgeColor || theme.primaryColor || '#00472A', color: product.badgeTextColor || '#fff' }}>
                         {product.badge}
                       </span>
                     )}
@@ -233,7 +247,7 @@ export default function ShopPage() {
                         </div>
                         <button
                           className="shop-card__add"
-                          style={{ backgroundColor: theme.primaryColor }}
+                          style={{ backgroundColor: theme.primaryColor || '#00472A' }}
                           onClick={() => addToCart(product)}
                         >
                           + Cart
