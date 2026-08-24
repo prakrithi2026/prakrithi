@@ -22,8 +22,8 @@ export default function HeroSection() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Desktop images (fallback to legacy bgImage if needed)
-  const desktopImages = hero.images !== undefined
+  // Desktop images (fallback to legacy bgImage only if hero.images is not an array)
+  const desktopImages = Array.isArray(hero.images)
     ? hero.images
     : (hero.bgImage ? [hero.bgImage] : []);
 

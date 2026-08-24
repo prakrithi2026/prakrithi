@@ -1,28 +1,67 @@
-import { useState, useRef, useEffect } from 'react';
-import { FiUpload, FiImage, FiPlus, FiTrash2, FiMonitor, FiSmartphone, FiInfo, FiCheckCircle } from 'react-icons/fi';
+import { useState, useRef } from 'react';
+import { 
+  FiUpload, FiImage, FiPlus, FiTrash2, FiMonitor, FiSmartphone, 
+  FiInfo, FiCheckCircle, FiSave, FiCheck, FiChevronLeft, FiChevronRight, FiStar, FiRefreshCw 
+} from 'react-icons/fi';
 import { useSiteConfig } from '../../context/SiteConfigContext';
 import { compressImage } from '../../utils/imageOptimizer';
 import './HeroEditor.css';
 
 export default function HeroEditor() {
-  const { config, updateConfig } = useSiteConfig();
+  const { config, updateConfig, saveConfig, hasUnsavedChanges } = useSiteConfig();
   const { hero } = config;
   const [deviceView, setDeviceView] = useState('desktop'); // 'desktop' | 'mobile'
+  const [uploadMode, setUploadMode] = useState('replace'); // 'replace' | 'add'
   const [dragActive, setDragActive] = useState(false);
   const [urlInput, setUrlInput] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const fileInputRef = useRef(null);
 
-  const desktopImages = hero.images || [];
-  const mobileImages = hero.mobileImages || [];
-
-  // Automatically migrate legacy single background image to the slideshow images list
-  useEffect(() => {
-    if (!hero.images && hero.bgImage) {
-      updateConfig('hero.images', [hero.bgImage]);
-    }
-  }, [hero.images, hero.bgImage, updateConfig]);
+  const desktopImages = Array.isArray(hero.images) 
+    ? hero.images 
+    : (hero.bgImage ? [hero.bgImage] : []);
+  const mobileImages = Array.isArray(hero.mobileImages) ? hero.mobileImages : [];
 
   const currentImages = deviceView === 'desktop' ? desktopImages : mobileImages;
+
+  // Helper to update images and keep legacy bgImage in sync
+  const setImagesForDevice = (view, newImagesList, autoSave = false) => {
+    const nextHero = { ...hero };
+    if (view === 'desktop') {
+      nextHero.images = newImagesList;
+      nextHero.bgImage = newImagesList.length > 0 ? newImagesList[0] : '';
+    } else {
+      nextHero.mobileImages = newImagesList;
+    }
+
+    const nextConfig = {
+      ...config,
+      hero: nextHero
+    };
+
+    updateConfig('hero', nextHero);
+
+    if (autoSave) {
+      handleDirectSave(nextConfig);
+    }
+  };
+
+  const handleDirectSave = async (configToSave) => {
+    setIsSaving(true);
+    setSaveSuccess(false);
+    try {
+      const res = await saveConfig(configToSave || config);
+      if (res && res.success) {
+        setSaveSuccess(true);
+        setTimeout(() => setSaveSuccess(false), 3000);
+      }
+    } catch (err) {
+      console.error('Error saving hero configuration:', err);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const handleFilesUpload = async (files) => {
     const newImages = [];
@@ -37,17 +76,19 @@ export default function HeroEditor() {
           const compressed = await compressImage(file, maxWidth, maxHeight, 0.90);
           newImages.push(compressed);
         } catch (err) {
-          console.error(`Error compressing hero ${deviceView} slideshow image:`, err);
+          console.error(`Error compressing hero ${deviceView} image:`, err);
         }
       }
     }
 
     if (newImages.length > 0) {
-      if (isDesktop) {
-        updateConfig('hero.images', [...desktopImages, ...newImages]);
+      let updated;
+      if (uploadMode === 'replace') {
+        updated = newImages;
       } else {
-        updateConfig('hero.mobileImages', [...mobileImages, ...newImages]);
+        updated = [...currentImages, ...newImages];
       }
+      setImagesForDevice(deviceView, updated);
     }
   };
 
@@ -79,46 +120,55 @@ export default function HeroEditor() {
 
   const addImageUrl = () => {
     if (!urlInput.trim()) return;
-    if (deviceView === 'desktop') {
-      updateConfig('hero.images', [...desktopImages, urlInput.trim()]);
+    const trimmed = urlInput.trim();
+    let updated;
+    if (uploadMode === 'replace') {
+      updated = [trimmed];
     } else {
-      updateConfig('hero.mobileImages', [...mobileImages, urlInput.trim()]);
+      updated = [...currentImages, trimmed];
     }
+    setImagesForDevice(deviceView, updated);
     setUrlInput('');
   };
 
   const removeImage = (indexToRemove) => {
-    if (deviceView === 'desktop') {
-      const updated = desktopImages.filter((_, idx) => idx !== indexToRemove);
-      updateConfig('hero.images', updated);
-      if (updated.length === 0) {
-        updateConfig('hero.bgImage', '');
-      }
-    } else {
-      const updated = mobileImages.filter((_, idx) => idx !== indexToRemove);
-      updateConfig('hero.mobileImages', updated);
-    }
+    const updated = currentImages.filter((_, idx) => idx !== indexToRemove);
+    setImagesForDevice(deviceView, updated);
+  };
+
+  const setAsPrimary = (index) => {
+    if (index === 0 || index >= currentImages.length) return;
+    const updated = [...currentImages];
+    const [selected] = updated.splice(index, 1);
+    updated.unshift(selected); // Put at index 0
+    setImagesForDevice(deviceView, updated);
+  };
+
+  const moveImage = (index, direction) => {
+    const newIndex = index + direction;
+    if (newIndex < 0 || newIndex >= currentImages.length) return;
+    const updated = [...currentImages];
+    const temp = updated[index];
+    updated[index] = updated[newIndex];
+    updated[newIndex] = temp;
+    setImagesForDevice(deviceView, updated);
   };
 
   const clearAllImages = () => {
     const viewName = deviceView === 'desktop' ? 'Desktop / Laptop' : 'Mobile';
-    if (window.confirm(`Are you sure you want to remove all ${viewName} slideshow images?`)) {
-      if (deviceView === 'desktop') {
-        updateConfig('hero.images', []);
-        updateConfig('hero.bgImage', '');
-      } else {
-        updateConfig('hero.mobileImages', []);
-      }
+    if (window.confirm(`Are you sure you want to remove all ${viewName} banners?`)) {
+      setImagesForDevice(deviceView, []);
     }
   };
 
   return (
     <div>
       <div className="dash-panel">
+        {/* Header Bar */}
         <div className="section-manager-header" style={{ marginBottom: '16px' }}>
           <div>
-            <h2 className="dash-panel__title">🖼️ Hero Banner Slideshow</h2>
-            <p className="dash-panel__subtitle">Upload and manage responsive background slides for Desktop/Laptop and Mobile views</p>
+            <h2 className="dash-panel__title">🖼️ Hero Banner</h2>
+            <p className="dash-panel__subtitle">Upload, replace, or reorder responsive banners for Desktop and Mobile views</p>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginLeft: 'auto' }}>
             <span style={{ fontSize: '0.82rem', color: hero.enabled !== false ? '#16a34a' : '#9ca3af', fontWeight: 600 }}>
@@ -137,13 +187,58 @@ export default function HeroEditor() {
 
         {hero.enabled === false && (
           <div className="hero-editor-disabled-notice">
-            <p>🚫 The hero slideshow is currently <strong>hidden</strong> from your storefront.</p>
+            <p>🚫 The hero banner is currently <strong>hidden</strong> from your storefront.</p>
             <p>Toggle the switch above to make it visible again.</p>
           </div>
         )}
 
         {hero.enabled !== false && (
           <>
+            {/* Quick Action Save Bar */}
+            <div className={`hero-save-banner-bar ${hasUnsavedChanges ? 'hero-save-banner-bar--unsaved' : ''}`}>
+              <div className="hero-save-banner-bar__info">
+                {hasUnsavedChanges ? (
+                  <>
+                    <span className="hero-save-banner-bar__dot hero-save-banner-bar__dot--amber"></span>
+                    <span><strong>Unsaved Changes:</strong> Your banner edits are not saved to the database yet.</span>
+                  </>
+                ) : saveSuccess ? (
+                  <>
+                    <FiCheckCircle className="hero-save-banner-bar__icon--success" size={17} />
+                    <span style={{ color: '#15803d', fontWeight: 600 }}>Successfully saved to database!</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="hero-save-banner-bar__dot hero-save-banner-bar__dot--green"></span>
+                    <span>Banners are in sync with the database.</span>
+                  </>
+                )}
+              </div>
+              <button
+                type="button"
+                className={`hero-save-banner-btn ${saveSuccess ? 'hero-save-banner-btn--success' : ''}`}
+                onClick={() => handleDirectSave()}
+                disabled={isSaving || (!hasUnsavedChanges && !saveSuccess)}
+              >
+                {isSaving ? (
+                  <>
+                    <FiRefreshCw className="hero-spinner" size={15} />
+                    <span>Saving to Database...</span>
+                  </>
+                ) : saveSuccess ? (
+                  <>
+                    <FiCheck size={16} />
+                    <span>Saved!</span>
+                  </>
+                ) : (
+                  <>
+                    <FiSave size={16} />
+                    <span>Save Banner to Database</span>
+                  </>
+                )}
+              </button>
+            </div>
+
             {/* Device View Tabs Switcher */}
             <div className="hero-device-tabs">
               <button
@@ -173,7 +268,7 @@ export default function HeroEditor() {
                 <>
                   <div className="hero-device-info__header">
                     <FiMonitor size={17} className="hero-device-info__icon" />
-                    <strong>Desktop &amp; Laptop Banner Slides</strong>
+                    <strong>Desktop &amp; Laptop Banner</strong>
                     <span className="hero-device-info__tag">Screen &gt; 768px</span>
                   </div>
                   <p className="hero-device-info__desc">
@@ -187,20 +282,20 @@ export default function HeroEditor() {
                 <>
                   <div className="hero-device-info__header">
                     <FiSmartphone size={17} className="hero-device-info__icon" />
-                    <strong>Mobile View Banner Slides</strong>
+                    <strong>Mobile View Banner</strong>
                     <span className="hero-device-info__tag">Screen ≤ 768px</span>
                   </div>
                   <p className="hero-device-info__desc">
                     These portrait/vertical banners are optimized specifically for smartphone screens.
                   </p>
                   <p className="hero-device-info__hint">
-                    📐 <strong>Recommended size:</strong> <strong>1080×1350</strong> (Aspect ratio: <strong>4:5</strong> portrait — recommended standard for mobile) or <strong>1080×1920</strong> (Aspect ratio: <strong>9:16</strong> full vertical)
+                    📐 <strong>Recommended size:</strong> <strong>1080×1350</strong> (Aspect ratio: <strong>4:5</strong> portrait) or <strong>1080×1920</strong> (Aspect ratio: <strong>9:16</strong> full vertical)
                   </p>
                   {mobileImages.length === 0 && (
                     <div className="hero-device-info__fallback-note">
                       <FiInfo size={15} style={{ flexShrink: 0, marginTop: '2px' }} />
                       <span>
-                        <strong>Fallback active:</strong> No mobile-specific images are uploaded yet. The storefront will automatically display your <strong>Desktop slides</strong> on mobile devices.
+                        <strong>Fallback active:</strong> No mobile-specific images are uploaded yet. The storefront will automatically display your <strong>Desktop banner</strong> on mobile devices.
                       </span>
                     </div>
                   )}
@@ -210,9 +305,31 @@ export default function HeroEditor() {
 
             {/* Upload Area */}
             <div className="hero-editor-image-section">
-              <label className="dash-field__label" style={{ marginBottom: '12px', display: 'block' }}>
-                Upload {deviceView === 'desktop' ? 'Desktop / Laptop' : 'Mobile'} Slides
-              </label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
+                <label className="dash-field__label" style={{ margin: 0, fontWeight: 700 }}>
+                  Upload {deviceView === 'desktop' ? 'Desktop / Laptop' : 'Mobile'} Banner
+                </label>
+                
+                {/* Upload Mode Selector: Replace vs Add */}
+                <div className="hero-upload-mode-toggle">
+                  <button
+                    type="button"
+                    className={`hero-upload-mode-btn ${uploadMode === 'replace' ? 'hero-upload-mode-btn--active' : ''}`}
+                    onClick={() => setUploadMode('replace')}
+                    title="Uploading will replace existing banner"
+                  >
+                    🔄 Replace Current Banner
+                  </button>
+                  <button
+                    type="button"
+                    className={`hero-upload-mode-btn ${uploadMode === 'add' ? 'hero-upload-mode-btn--active' : ''}`}
+                    onClick={() => setUploadMode('add')}
+                    title="Uploading will add a new slide to create a slideshow"
+                  >
+                    ➕ Add as Slide (Slideshow)
+                  </button>
+                </div>
+              </div>
               
               <div
                 className={`hero-editor-upload ${dragActive ? 'hero-editor-upload--active' : ''}`}
@@ -226,18 +343,23 @@ export default function HeroEditor() {
                   ref={fileInputRef}
                   type="file"
                   accept="image/*"
-                  multiple
+                  multiple={uploadMode === 'add'}
                   onChange={handleFileChange}
                   style={{ display: 'none' }}
                 />
                 <div className="hero-editor-upload__icon"><FiUpload size={28} /></div>
                 <p className="hero-editor-upload__text">
-                  <strong>Click to upload</strong> or drag and drop multiple {deviceView === 'desktop' ? 'desktop' : 'mobile'} images
+                  <strong>Click to upload</strong> or drag &amp; drop {deviceView === 'desktop' ? 'desktop' : 'mobile'} image
                 </p>
                 <p className="hero-editor-upload__hint">
+                  {uploadMode === 'replace' 
+                    ? '⚡ Replace Mode Active: Uploading will set this image as the main banner.' 
+                    : '➕ Slideshow Mode Active: Uploading will add new slides to cycle through.'}
+                </p>
+                <p className="hero-editor-upload__hint" style={{ marginTop: '4px' }}>
                   {deviceView === 'desktop'
-                    ? 'PNG, JPG, WEBP up to 5MB (Landscape 16:9 / 21:9 — 1920×1080 recommended)'
-                    : 'PNG, JPG, WEBP up to 5MB (Portrait 4:5 / 9:16 — 1080×1350 recommended)'}
+                    ? 'PNG, JPG, WEBP (Landscape 16:9 / 21:9 — 1920×1080 recommended)'
+                    : 'PNG, JPG, WEBP (Portrait 4:5 / 9:16 — 1080×1350 recommended)'}
                 </p>
               </div>
 
@@ -251,11 +373,11 @@ export default function HeroEditor() {
                       className="dash-field__input hero-editor-url__input"
                       value={urlInput}
                       onChange={(e) => setUrlInput(e.target.value)}
-                      placeholder={deviceView === 'desktop' ? "https://example.com/desktop-slide.jpg" : "https://example.com/mobile-slide.jpg"}
+                      placeholder={deviceView === 'desktop' ? "https://example.com/desktop-banner.jpg" : "https://example.com/mobile-banner.jpg"}
                     />
                   </div>
                   <button className="dash-btn" onClick={addImageUrl} style={{ height: '42px', padding: '0 16px' }}>
-                    <FiPlus size={16} style={{ marginRight: '6px' }} /> Add URL
+                    <FiPlus size={16} style={{ marginRight: '6px' }} /> {uploadMode === 'replace' ? 'Set as Banner' : 'Add Slide'}
                   </button>
                 </div>
               </div>
@@ -265,7 +387,7 @@ export default function HeroEditor() {
             <div style={{ marginTop: '28px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
                 <h3 style={{ fontSize: '1rem', fontWeight: 600, color: '#1e293b', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  {deviceView === 'desktop' ? '💻 Desktop Slides' : '📱 Mobile Slides'} ({currentImages.length})
+                  {deviceView === 'desktop' ? '💻 Desktop Banners' : '📱 Mobile Banners'} ({currentImages.length})
                 </h3>
                 {currentImages.length > 0 && (
                   <button className="hero-editor-preview__btn hero-editor-preview__btn--remove" onClick={clearAllImages}>
@@ -276,7 +398,7 @@ export default function HeroEditor() {
 
               {currentImages.length === 0 ? (
                 <div style={{
-                  padding: '32px',
+                  padding: '36px 20px',
                   border: '1px dashed #cbd5e1',
                   borderRadius: '10px',
                   textAlign: 'center',
@@ -284,33 +406,80 @@ export default function HeroEditor() {
                   fontSize: '0.9rem',
                   backgroundColor: '#fcfcfd'
                 }}>
-                  {deviceView === 'desktop'
-                    ? 'No desktop slides uploaded yet. Upload images above to show on desktop and laptop screens.'
-                    : 'No mobile slides uploaded yet. Upload vertical/portrait images above, or the desktop slideshow will be used as a fallback.'}
+                  <p style={{ margin: '0 0 8px 0', fontSize: '1rem', fontWeight: 600, color: '#475569' }}>
+                    No {deviceView === 'desktop' ? 'desktop' : 'mobile'} banners configured
+                  </p>
+                  <p style={{ margin: 0 }}>
+                    {deviceView === 'desktop'
+                      ? 'Upload an image above to show on desktop and laptop screens.'
+                      : 'Upload vertical/portrait images above, or the desktop banner will be used as a fallback.'}
+                  </p>
                 </div>
               ) : (
                 <div className={`hero-slides-grid ${deviceView === 'mobile' ? 'hero-slides-grid--mobile' : ''}`}>
-                  {currentImages.map((img, index) => (
-                    <div key={index} className={`hero-slide-card ${deviceView === 'mobile' ? 'hero-slide-card--mobile' : ''}`}>
-                      <div
-                        className={`hero-slide-card__preview ${deviceView === 'mobile' ? 'hero-slide-card__preview--mobile' : 'hero-slide-card__preview--desktop'}`}
-                        style={{ backgroundImage: `url(${img})` }}
-                      >
-                        <span className="hero-slide-card__badge">
-                          {deviceView === 'desktop' ? 'Desktop' : 'Mobile'} Slide {index + 1}
-                        </span>
-                      </div>
-                      <div className="hero-slide-card__actions">
-                        <button 
-                          className="hero-slide-card__delete-btn"
-                          onClick={() => removeImage(index)}
-                          title="Remove this slide"
+                  {currentImages.map((img, index) => {
+                    const isPrimary = index === 0;
+                    return (
+                      <div key={index} className={`hero-slide-card ${isPrimary ? 'hero-slide-card--primary' : ''} ${deviceView === 'mobile' ? 'hero-slide-card--mobile' : ''}`}>
+                        <div
+                          className={`hero-slide-card__preview ${deviceView === 'mobile' ? 'hero-slide-card__preview--mobile' : 'hero-slide-card__preview--desktop'}`}
+                          style={{ backgroundImage: `url(${img})` }}
                         >
-                          <FiTrash2 size={14} /> Remove
-                        </button>
+                          <span className={`hero-slide-card__badge ${isPrimary ? 'hero-slide-card__badge--primary' : ''}`}>
+                            {isPrimary ? '★ Primary (Main Banner)' : `Slide ${index + 1}`}
+                          </span>
+                        </div>
+                        
+                        {/* Slide Card Controls */}
+                        <div className="hero-slide-card__controls">
+                          {/* Reordering Controls */}
+                          <div className="hero-slide-card__reorder">
+                            <button
+                              type="button"
+                              className="hero-reorder-btn"
+                              onClick={() => moveImage(index, -1)}
+                              disabled={index === 0}
+                              title="Move Left (Earlier in sequence)"
+                            >
+                              <FiChevronLeft size={16} />
+                            </button>
+                            <span className="hero-reorder-index">#{index + 1}</span>
+                            <button
+                              type="button"
+                              className="hero-reorder-btn"
+                              onClick={() => moveImage(index, 1)}
+                              disabled={index === currentImages.length - 1}
+                              title="Move Right (Later in sequence)"
+                            >
+                              <FiChevronRight size={16} />
+                            </button>
+                          </div>
+
+                          {/* Make Primary Action */}
+                          {!isPrimary && (
+                            <button
+                              type="button"
+                              className="hero-make-primary-btn"
+                              onClick={() => setAsPrimary(index)}
+                              title="Set this slide as the primary banner shown on page load"
+                            >
+                              <FiStar size={13} /> Make Primary
+                            </button>
+                          )}
+
+                          {/* Remove Button */}
+                          <button 
+                            type="button"
+                            className="hero-slide-card__delete-btn"
+                            onClick={() => removeImage(index)}
+                            title="Remove this banner"
+                          >
+                            <FiTrash2 size={14} /> Remove
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -330,7 +499,7 @@ export default function HeroEditor() {
               }}>
                 <FiCheckCircle size={16} style={{ color: '#2563eb', flexShrink: 0 }} />
                 <span>
-                  Multiple {deviceView === 'desktop' ? 'desktop' : 'mobile'} slides uploaded. The storefront will automatically scroll through these slides with a smooth cross-fade transition every 5 seconds.
+                  Multiple slides active ({currentImages.length} slides). The storefront will start on <strong>Slide 1 (Primary)</strong> and smoothly auto-scroll through remaining slides every 5 seconds.
                 </span>
               </div>
             )}

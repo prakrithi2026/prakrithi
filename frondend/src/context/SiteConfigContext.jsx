@@ -225,29 +225,41 @@ export function SiteConfigProvider({ children }) {
     []
   );
 
-  const saveConfig = useCallback(async () => {
+  const saveConfig = useCallback(async (configOverride) => {
+    const configToSave = configOverride || config;
     try {
       const response = await fetch(`${API_BASE_URL}/config/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(config)
+        body: JSON.stringify(configToSave)
       });
       
       if (!response.ok) {
         throw new Error('Failed to save configuration');
       }
       
-      setSavedConfig(config);
+      const result = await response.json();
+      const updatedConfig = result.config_data ? {
+        ...configToSave,
+        ...result.config_data,
+        products: configToSave.products,
+        categories: configToSave.categories
+      } : configToSave;
+
+      setConfig(updatedConfig);
+      setSavedConfig(updatedConfig);
       try {
-        localStorage.setItem(CACHE_KEY, JSON.stringify(config));
+        localStorage.setItem(CACHE_KEY, JSON.stringify(updatedConfig));
       } catch (storageErr) {
         console.warn('LocalStorage quota or write error on saveConfig:', storageErr);
       }
+      return { success: true };
     } catch (error) {
       console.error("Error saving config:", error);
       alert("Failed to save configuration to the server.");
+      return { success: false, error };
     }
   }, [config]);
 

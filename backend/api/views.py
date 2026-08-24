@@ -111,7 +111,9 @@ class SiteConfigView(APIView):
         config, created = SiteConfig.objects.get_or_create(id=1)
         serializer = SiteConfigSerializer(config)
         response = Response(serializer.data['config_data'])
-        response['Cache-Control'] = 'public, max-age=60, stale-while-revalidate=300'
+        response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response['Pragma'] = 'no-cache'
+        response['Expires'] = '0'
         return response
 
     def put(self, request):
@@ -119,6 +121,16 @@ class SiteConfigView(APIView):
         products = data.pop('products', [])
         categories = data.pop('categories', [])
         
+        # Ensure hero.bgImage stays in sync with hero.images if hero.images is provided
+        if 'hero' in data and isinstance(data['hero'], dict):
+            hero_images = data['hero'].get('images')
+            if isinstance(hero_images, list):
+                # If images list is empty, clear bgImage; if it has images, set bgImage to first image or leave empty
+                if len(hero_images) == 0:
+                    data['hero']['bgImage'] = ''
+                else:
+                    data['hero']['bgImage'] = hero_images[0]
+
         config, created = SiteConfig.objects.get_or_create(id=1)
         config.config_data = data
         config.save()
@@ -158,7 +170,7 @@ class SiteConfigView(APIView):
                 }
             )
             
-        return Response({"status": "success", "message": "Configuration updated"})
+        return Response({"status": "success", "message": "Configuration updated", "config_data": config.config_data})
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
