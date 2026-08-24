@@ -270,7 +270,9 @@
 }
 
 .hero-slide-card__preview--mobile {
-  height: 220px;
+  aspect-ratio: 4 / 5;
+  height: auto;
+  min-height: 200px;
 }
 
 .hero-slide-card__badge {

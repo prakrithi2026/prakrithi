@@ -194,7 +194,7 @@ export default function HeroEditor() {
                     These portrait/vertical banners are optimized specifically for smartphone screens.
                   </p>
                   <p className="hero-device-info__hint">
-                    📐 <strong>Recommended size:</strong> 1080×1920 or 1080×1350 (Aspect ratio: <strong>9:16</strong> or <strong>4:5</strong> portrait)
+                    📐 <strong>Recommended size:</strong> <strong>1080×1350</strong> (Aspect ratio: <strong>4:5</strong> portrait — recommended standard for mobile) or <strong>1080×1920</strong> (Aspect ratio: <strong>9:16</strong> full vertical)
                   </p>
                   {mobileImages.length === 0 && (
                     <div className="hero-device-info__fallback-note">
@@ -236,8 +236,8 @@ export default function HeroEditor() {
                 </p>
                 <p className="hero-editor-upload__hint">
                   {deviceView === 'desktop'
-                    ? 'PNG, JPG, WEBP up to 5MB (Landscape 16:9 / 21:9 recommended)'
-                    : 'PNG, JPG, WEBP up to 5MB (Portrait 9:16 / 4:5 recommended)'}
+                    ? 'PNG, JPG, WEBP up to 5MB (Landscape 16:9 / 21:9 — 1920×1080 recommended)'
+                    : 'PNG, JPG, WEBP up to 5MB (Portrait 4:5 / 9:16 — 1080×1350 recommended)'}
                 </p>
               </div>
 

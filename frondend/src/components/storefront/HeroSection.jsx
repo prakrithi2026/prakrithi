@@ -36,11 +36,21 @@ export default function HeroSection() {
 
   const enabled = hero.enabled !== false;
 
-  // Preload first hero image immediately for instant LCP render
+  // Calculate dynamic aspect ratio from the first image if available
+  const [aspectRatio, setAspectRatio] = useState(null);
+
+  // Preload first hero image immediately for instant LCP render and determine exact aspect ratio
   useEffect(() => {
     if (images.length > 0 && images[0]) {
       const img = new Image();
+      img.onload = () => {
+        if (img.naturalWidth && img.naturalHeight) {
+          setAspectRatio(`${img.naturalWidth} / ${img.naturalHeight}`);
+        }
+      };
       img.src = images[0];
+    } else {
+      setAspectRatio(null);
     }
   }, [images]);
 
@@ -66,7 +76,10 @@ export default function HeroSection() {
   if (!enabled || images.length === 0) return null;
 
   return (
-    <section className={`hero-section ${isUsingMobileImages ? 'hero-section--mobile-view' : ''}`}>
+    <section
+      className={`hero-section ${isUsingMobileImages ? 'hero-section--mobile-view' : ''}`}
+      style={isMobile && aspectRatio ? { aspectRatio } : undefined}
+    >
       <div className="hero-slides-container">
         {images.map((image, index) => (
           <div

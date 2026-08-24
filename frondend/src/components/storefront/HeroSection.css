@@ -87,12 +87,17 @@
 
 @media (max-width: 768px) {
   .hero-section {
-    height: 340px;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    min-height: 220px;
+    max-height: 65vh;
   }
 
   .hero-section.hero-section--mobile-view {
-    height: 480px;
-    max-height: 80vh;
+    height: auto;
+    aspect-ratio: 4 / 5; /* Exact 1080x1350 aspect ratio (industry standard mobile banner) */
+    min-height: 340px;
+    max-height: 85vh;
   }
   
   .hero-dots {
@@ -113,11 +118,16 @@
 
 @media (max-width: 480px) {
   .hero-section {
-    height: 280px;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    min-height: 180px;
+    max-height: 60vh;
   }
 
   .hero-section.hero-section--mobile-view {
-    height: 440px;
-    max-height: 82vh;
+    height: auto;
+    aspect-ratio: 4 / 5; /* Exact 1080x1350 aspect ratio */
+    min-height: 300px;
+    max-height: 85vh;
   }
 }
