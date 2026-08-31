@@ -100,13 +100,29 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
 if DATABASE_URL:
-    DATABASES = {
-        "default": dj_database_url.config(
-            default=DATABASE_URL,
-            conn_max_age=0,
-            ssl_require=False,
+    try:
+        import psycopg2
+        parsed_db = dj_database_url.parse(DATABASE_URL, conn_max_age=0, ssl_require=False)
+        # Test connection with short timeout to prevent hanging on dead DB instances
+        conn = psycopg2.connect(
+            dbname=parsed_db.get('NAME'),
+            user=parsed_db.get('USER'),
+            password=parsed_db.get('PASSWORD'),
+            host=parsed_db.get('HOST'),
+            port=parsed_db.get('PORT') or 5432,
+            connect_timeout=4,
         )
-    }
+        conn.close()
+        DATABASES = {"default": parsed_db}
+        print("Connected to primary PostgreSQL database.")
+    except Exception as db_err:
+        print(f"Warning: Primary PostgreSQL connection failed ({db_err}). Falling back to local SQLite database.")
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.sqlite3",
+                "NAME": BASE_DIR / "db.sqlite3",
+            }
+        }
 else:
     DATABASES = {
         "default": {
