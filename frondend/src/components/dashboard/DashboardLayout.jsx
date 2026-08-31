@@ -45,9 +45,9 @@ const editorComponents = {
 };
 
 const viewportModes = [
-  { id: 'desktop', icon: FiMonitor, label: 'Desktop', width: '100%' },
-  { id: 'tablet', icon: FiTablet, label: 'Tablet', width: '768px' },
-  { id: 'mobile', icon: FiSmartphone, label: 'Mobile', width: '375px' },
+  { id: 'desktop', icon: FiMonitor, label: 'Desktop', width: 1280 },
+  { id: 'tablet', icon: FiTablet, label: 'Tablet', width: 768 },
+  { id: 'mobile', icon: FiSmartphone, label: 'Mobile', width: 375 },
 ];
 
 // ── Auth gate: shown when NOT logged in ─────────────────────────────────────
@@ -84,6 +84,35 @@ function DashboardContent({ logout }) {
   const toggleGroup = (title) => {
     setExpandedGroups(prev => ({ ...prev, [title]: !prev[title] }));
   };
+
+  const previewContainerRef = useRef(null);
+  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    if (!previewContainerRef.current) return;
+    const updateSize = () => {
+      if (previewContainerRef.current) {
+        const rect = previewContainerRef.current.getBoundingClientRect();
+        setContainerSize({
+          width: rect.width,
+          height: rect.height
+        });
+      }
+    };
+    updateSize();
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateSize();
+    });
+
+    resizeObserver.observe(previewContainerRef.current);
+    window.addEventListener('resize', updateSize);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', updateSize);
+    };
+  }, [activeSection, leftCollapsed, rightCollapsed, leftPanelWidth, rightPanelWidth]);
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -160,7 +189,88 @@ function DashboardContent({ logout }) {
   }, [hasUnsavedChanges]);
 
   const ActiveEditor = editorComponents[activeSection];
-  const activeViewport = viewportModes.find((v) => v.id === viewportMode);
+  const activeViewport = viewportModes.find((v) => v.id === viewportMode) || viewportModes[0];
+
+  const getViewportStyles = () => {
+    const cWidth = containerSize.width || 800;
+    const cHeight = containerSize.height || 700;
+
+    // Available space inside preview container with padding
+    const paddingX = 24;
+    const paddingY = 24;
+    const availW = Math.max(cWidth - paddingX, 320);
+    const availH = Math.max(cHeight - paddingY, 400);
+
+    if (viewportMode === 'desktop') {
+      const targetW = 1280;
+      const scale = Math.min(availW / targetW, 1);
+      const frameW = Math.round(targetW * scale);
+      const frameH = availH;
+      const iframeW = targetW;
+      const iframeH = Math.round(frameH / scale);
+
+      return {
+        frameStyle: {
+          width: `${frameW}px`,
+          height: `${frameH}px`,
+        },
+        iframeStyle: {
+          width: `${iframeW}px`,
+          height: `${iframeH}px`,
+          transform: scale < 1 ? `scale(${scale})` : 'none',
+          transformOrigin: 'top left',
+        },
+        scale: Math.round(scale * 100),
+      };
+    }
+
+    if (viewportMode === 'tablet') {
+      const targetW = 768;
+      const scale = Math.min(availW / targetW, 1);
+      const frameW = Math.round(targetW * scale);
+      const frameH = availH;
+      const iframeW = targetW;
+      const iframeH = Math.round(frameH / scale);
+
+      return {
+        frameStyle: {
+          width: `${frameW}px`,
+          height: `${frameH}px`,
+        },
+        iframeStyle: {
+          width: `${iframeW}px`,
+          height: `${iframeH}px`,
+          transform: scale < 1 ? `scale(${scale})` : 'none',
+          transformOrigin: 'top left',
+        },
+        scale: Math.round(scale * 100),
+      };
+    }
+
+    // Mobile mode (375px)
+    const targetW = 375;
+    const scale = Math.min(availW / targetW, 1);
+    const frameW = Math.round(targetW * scale);
+    const frameH = Math.min(availH, 812);
+    const iframeW = targetW;
+    const iframeH = Math.round(frameH / scale);
+
+    return {
+      frameStyle: {
+        width: `${frameW}px`,
+        height: `${frameH}px`,
+      },
+      iframeStyle: {
+        width: `${iframeW}px`,
+        height: `${iframeH}px`,
+        transform: scale < 1 ? `scale(${scale})` : 'none',
+        transformOrigin: 'top left',
+      },
+      scale: Math.round(scale * 100),
+    };
+  };
+
+  const { frameStyle, iframeStyle } = getViewportStyles();
 
   return (
     <div className="shopify-dash">
@@ -327,15 +437,19 @@ function DashboardContent({ logout }) {
           <>
             {/* CENTER PANEL — Live Preview */}
             <main className="shopify-dash__center">
-              <div className="shopify-dash__preview-container">
+              <div className="shopify-dash__preview-container" ref={previewContainerRef}>
                 <div
-                  className="shopify-dash__preview-frame"
-                  style={{ maxWidth: activeViewport.width }}
+                  className={`shopify-dash__preview-frame shopify-dash__preview-frame--${viewportMode}`}
+                  style={frameStyle}
                 >
                   <iframe
                     ref={iframeRef}
                     src={activeSection === 'products' ? "/shop?mode=preview" : "/?mode=preview"}
                     className="shopify-dash__iframe"
+                    style={{
+                      ...iframeStyle,
+                      pointerEvents: isResizing ? 'none' : 'auto',
+                    }}
                     title="Storefront Preview"
                   />
                 </div>

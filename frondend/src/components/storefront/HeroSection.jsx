@@ -18,6 +18,7 @@ export default function HeroSection() {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
     };
+    handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -30,10 +31,17 @@ export default function HeroSection() {
   // Mobile images
   const mobileImages = Array.isArray(hero.mobileImages) ? hero.mobileImages : [];
 
-  // If on mobile viewport and mobileImages exist, use mobileImages; otherwise fallback to desktopImages
-  const isUsingMobileImages = isMobile && mobileImages.length > 0;
-  const images = isUsingMobileImages ? mobileImages : desktopImages;
+  // Determine active image set based on viewport:
+  // On mobile (<= 768px): prefer mobileImages, fallback to desktopImages
+  // On desktop (> 768px): prefer desktopImages, fallback to mobileImages
+  let images = [];
+  if (isMobile) {
+    images = mobileImages.length > 0 ? mobileImages : desktopImages;
+  } else {
+    images = desktopImages.length > 0 ? desktopImages : mobileImages;
+  }
 
+  const isUsingMobileImages = isMobile && mobileImages.length > 0;
   const enabled = hero.enabled !== false;
 
   // Calculate dynamic aspect ratio from the first image if available

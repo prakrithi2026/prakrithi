@@ -138,10 +138,18 @@ export function SiteConfigProvider({ children }) {
           }
         }
 
+        const finalProducts = (Array.isArray(productsData) && productsData.length > 0)
+          ? productsData
+          : (Array.isArray(mergedConfig.products) && mergedConfig.products.length > 0 ? mergedConfig.products : (defaultConfig.products || []));
+
+        const finalCategories = (Array.isArray(categoriesData) && categoriesData.length > 0)
+          ? categoriesData.map(c => ({ id: c.category_id, label: c.label }))
+          : (Array.isArray(mergedConfig.categories) && mergedConfig.categories.length > 0 ? mergedConfig.categories : (defaultConfig.categories || []));
+
         const fullConfig = {
           ...mergedConfig,
-          products: productsData,
-          categories: categoriesData.map(c => ({ id: c.category_id, label: c.label }))
+          products: finalProducts,
+          categories: finalCategories
         };
 
         setSavedConfig(fullConfig);

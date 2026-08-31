@@ -106,6 +106,17 @@ class RegisterView(APIView):
             'email': user.email,
         }, status=status.HTTP_201_CREATED)
 
+def deep_merge(base, update):
+    if not isinstance(base, dict) or not isinstance(update, dict):
+        return update
+    result = dict(base)
+    for key, value in update.items():
+        if key in result and isinstance(result[key], dict) and isinstance(value, dict):
+            result[key] = deep_merge(result[key], value)
+        else:
+            result[key] = value
+    return result
+
 class SiteConfigView(APIView):
     def get(self, request):
         config, created = SiteConfig.objects.get_or_create(id=1)
@@ -118,8 +129,8 @@ class SiteConfigView(APIView):
 
     def put(self, request):
         data = request.data.copy()
-        products = data.pop('products', [])
-        categories = data.pop('categories', [])
+        products = data.pop('products', None)
+        categories = data.pop('categories', None)
         
         # Ensure hero.bgImage stays in sync with hero.images if hero.images is provided
         if 'hero' in data and isinstance(data['hero'], dict):
@@ -132,43 +143,47 @@ class SiteConfigView(APIView):
                     data['hero']['bgImage'] = hero_images[0]
 
         config, created = SiteConfig.objects.get_or_create(id=1)
-        config.config_data = data
+        merged_config = deep_merge(config.config_data or {}, data)
+        config.config_data = merged_config
         config.save()
         
-        # Sync Categories
-        for cat in categories:
-            Category.objects.update_or_create(
-                category_id=cat.get('id'),
-                defaults={'label': cat.get('label')}
-            )
+        # Sync Categories only if explicitly provided
+        if categories is not None and isinstance(categories, list) and len(categories) > 0:
+            for cat in categories:
+                Category.objects.update_or_create(
+                    category_id=cat.get('id'),
+                    defaults={'label': cat.get('label')}
+                )
             
-        # Sync Products
-        existing_ids = [p['id'] for p in products if 'id' in p and p['id']]
-        Product.objects.exclude(id__in=existing_ids).delete()
-        
-        for prod in products:
-            cat_id = prod.get('category')
-            category_obj = Category.objects.filter(category_id=cat_id).first() if cat_id else None
+        # Sync Products only if explicitly provided and non-empty
+        if products is not None and isinstance(products, list) and len(products) > 0:
+            existing_ids = [p['id'] for p in products if 'id' in p and p['id']]
+            if existing_ids:
+                Product.objects.exclude(id__in=existing_ids).delete()
             
-            Product.objects.update_or_create(
-                id=prod.get('id'),
-                defaults={
-                    'name': prod.get('name', ''),
-                    'description': prod.get('description', ''),
-                    'price': prod.get('price') or 0,
-                    'salePrice': prod.get('salePrice'),
-                    'image': prod.get('image', ''),
-                    'category': category_obj,
-                    'tags': prod.get('tags', []),
-                    'variants': prod.get('variants', []),
-                    'badge': prod.get('badge'),
-                    'badgeColor': prod.get('badgeColor'),
-                    'badgeTextColor': prod.get('badgeTextColor'),
-                    'rating': prod.get('rating') or 0,
-                    'reviews': prod.get('reviews') or 0,
-                    'couponNote': prod.get('couponNote')
-                }
-            )
+            for prod in products:
+                cat_id = prod.get('category')
+                category_obj = Category.objects.filter(category_id=cat_id).first() if cat_id else None
+                
+                Product.objects.update_or_create(
+                    id=prod.get('id'),
+                    defaults={
+                        'name': prod.get('name', ''),
+                        'description': prod.get('description', ''),
+                        'price': prod.get('price') or 0,
+                        'salePrice': prod.get('salePrice'),
+                        'image': prod.get('image', ''),
+                        'category': category_obj,
+                        'tags': prod.get('tags', []),
+                        'variants': prod.get('variants', []),
+                        'badge': prod.get('badge'),
+                        'badgeColor': prod.get('badgeColor'),
+                        'badgeTextColor': prod.get('badgeTextColor'),
+                        'rating': prod.get('rating') or 0,
+                        'reviews': prod.get('reviews') or 0,
+                        'couponNote': prod.get('couponNote')
+                    }
+                )
             
         return Response({"status": "success", "message": "Configuration updated", "config_data": config.config_data})
 

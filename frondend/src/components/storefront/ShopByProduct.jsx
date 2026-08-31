@@ -13,6 +13,7 @@ export default function ShopByProduct() {
   const scrollRef = useRef(null);
 
   const baseProducts = products.filter((p) => !p.tags?.includes('concern'));
+  const displayProducts = baseProducts.length > 0 ? baseProducts : products;
 
   const allFilters = [
     { id: 'all', label: 'All' },
@@ -22,13 +23,13 @@ export default function ShopByProduct() {
   ];
 
   const availableFilters = allFilters.filter(
-    (f) => f.id === 'all' || baseProducts.some((p) => p.tags && p.tags.includes(f.id))
+    (f) => f.id === 'all' || displayProducts.some((p) => p.tags && p.tags.includes(f.id))
   );
 
   const filteredProducts =
     activeFilter === 'all'
-      ? baseProducts
-      : baseProducts.filter((p) => p.tags && p.tags.includes(activeFilter));
+      ? displayProducts
+      : displayProducts.filter((p) => p.tags && p.tags.includes(activeFilter));
 
   const handleScroll = () => {
     if (!scrollRef.current) return;

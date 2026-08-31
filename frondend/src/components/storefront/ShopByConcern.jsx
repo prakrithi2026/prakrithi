@@ -13,10 +13,17 @@ export default function ShopByConcern() {
   const [scrollProgress, setScrollProgress] = useState(30);
   const scrollRef = useRef(null);
 
+  const concernProducts = products.filter(p => p.tags?.includes('concern'));
+  const displayProducts = concernProducts.length > 0 ? concernProducts : products;
+
+  const availableCategories = categories.filter(
+    (c) => c.id === 'all' || displayProducts.some((p) => p.category === c.id)
+  );
+
   const filteredProducts =
     activeCategory === 'all'
-      ? products.filter(p => p.tags?.includes('concern'))
-      : products.filter((p) => p.category === activeCategory && p.tags?.includes('concern'));
+      ? displayProducts
+      : displayProducts.filter((p) => p.category === activeCategory);
 
   const handleScroll = () => {
     if (!scrollRef.current) return;
@@ -31,22 +38,24 @@ export default function ShopByConcern() {
       <div className="section-container">
         <h2 className="section-title">Shop By Concern</h2>
 
-        <div className="filter-tabs">
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
-              className={`filter-btn ${activeCategory === cat.id ? 'active' : ''}`}
-              onClick={() => setActiveCategory(cat.id)}
-              style={
-                activeCategory === cat.id
-                  ? { backgroundColor: theme.primaryColor, color: '#fff', borderColor: theme.primaryColor }
-                  : { borderColor: theme.primaryColor, color: theme.primaryColor }
-              }
-            >
-              {cat.label}
-            </button>
-          ))}
-        </div>
+        {availableCategories.length > 1 && (
+          <div className="filter-tabs">
+            {availableCategories.map((cat) => (
+              <button
+                key={cat.id}
+                className={`filter-btn ${activeCategory === cat.id ? 'active' : ''}`}
+                onClick={() => setActiveCategory(cat.id)}
+                style={
+                  activeCategory === cat.id
+                    ? { backgroundColor: theme.primaryColor, color: '#fff', borderColor: theme.primaryColor }
+                    : { borderColor: theme.primaryColor, color: theme.primaryColor }
+                }
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
+        )}
 
         <div
           className="products-scroll-wrapper"
