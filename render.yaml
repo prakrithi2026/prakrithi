@@ -6,7 +6,7 @@ services:
     env: python
     rootDir: backend
     buildCommand: bash build.sh
-    startCommand: gunicorn backend.wsgi:application
+    startCommand: python manage.py migrate --no-input && python populate.py && gunicorn backend.wsgi:application
     envVars:
       - key: DATABASE_URL
         fromDatabase:

@@ -119,91 +119,144 @@ def deep_merge(base, update):
 
 class SiteConfigView(APIView):
     def get(self, request):
-        config, created = SiteConfig.objects.get_or_create(id=1)
-        serializer = SiteConfigSerializer(config)
-        response = Response(serializer.data['config_data'])
-        response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-        response['Pragma'] = 'no-cache'
-        response['Expires'] = '0'
-        return response
+        try:
+            config, created = SiteConfig.objects.get_or_create(id=1)
+            serializer = SiteConfigSerializer(config)
+            config_data = serializer.data.get('config_data') or {}
+            response = Response(config_data)
+            response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response['Pragma'] = 'no-cache'
+            response['Expires'] = '0'
+            return response
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def put(self, request):
-        data = request.data.copy()
-        products = data.pop('products', None)
-        categories = data.pop('categories', None)
-        
-        # Ensure hero.bgImage stays in sync with hero.images if hero.images is provided
-        if 'hero' in data and isinstance(data['hero'], dict):
-            hero_images = data['hero'].get('images')
-            if isinstance(hero_images, list):
-                # If images list is empty, clear bgImage; if it has images, set bgImage to first image or leave empty
-                if len(hero_images) == 0:
-                    data['hero']['bgImage'] = ''
-                else:
-                    data['hero']['bgImage'] = hero_images[0]
+        try:
+            data = request.data.copy()
+            products = data.pop('products', None)
+            categories = data.pop('categories', None)
+            
+            # Ensure hero.bgImage stays in sync with hero.images if hero.images is provided
+            if 'hero' in data and isinstance(data['hero'], dict):
+                hero_images = data['hero'].get('images')
+                if isinstance(hero_images, list):
+                    # If images list is empty, clear bgImage; if it has images, set bgImage to first image or leave empty
+                    if len(hero_images) == 0:
+                        data['hero']['bgImage'] = ''
+                    else:
+                        data['hero']['bgImage'] = hero_images[0]
 
-        config, created = SiteConfig.objects.get_or_create(id=1)
-        merged_config = deep_merge(config.config_data or {}, data)
-        config.config_data = merged_config
-        config.save()
-        
-        # Sync Categories only if explicitly provided
-        if categories is not None and isinstance(categories, list) and len(categories) > 0:
-            for cat in categories:
-                Category.objects.update_or_create(
-                    category_id=cat.get('id'),
-                    defaults={'label': cat.get('label')}
-                )
+            config, created = SiteConfig.objects.get_or_create(id=1)
+            merged_config = deep_merge(config.config_data or {}, data)
+            config.config_data = merged_config
+            config.save()
             
-        # Sync Products only if explicitly provided and non-empty
-        if products is not None and isinstance(products, list) and len(products) > 0:
-            existing_ids = [p['id'] for p in products if 'id' in p and p['id']]
-            if existing_ids:
-                Product.objects.exclude(id__in=existing_ids).delete()
-            
-            for prod in products:
-                cat_id = prod.get('category')
-                category_obj = Category.objects.filter(category_id=cat_id).first() if cat_id else None
+            # Sync Categories only if explicitly provided
+            if categories is not None and isinstance(categories, list) and len(categories) > 0:
+                for cat in categories:
+                    if isinstance(cat, dict) and cat.get('id'):
+                        Category.objects.update_or_create(
+                            category_id=cat.get('id'),
+                            defaults={'label': cat.get('label', '')}
+                        )
                 
-                Product.objects.update_or_create(
-                    id=prod.get('id'),
-                    defaults={
+            # Sync Products only if explicitly provided and non-empty
+            if products is not None and isinstance(products, list) and len(products) > 0:
+                existing_ids = [p['id'] for p in products if isinstance(p, dict) and 'id' in p and p['id']]
+                if existing_ids:
+                    try:
+                        Product.objects.exclude(id__in=existing_ids).delete()
+                    except Exception as del_err:
+                        print(f"Product delete warning: {del_err}")
+                
+                for prod in products:
+                    if not isinstance(prod, dict):
+                        continue
+                    cat_id = prod.get('category')
+                    category_obj = Category.objects.filter(category_id=cat_id).first() if cat_id else None
+                    
+                    price_val = prod.get('price')
+                    try:
+                        price_num = float(price_val) if price_val not in (None, '') else 0.0
+                    except (ValueError, TypeError):
+                        price_num = 0.0
+
+                    sale_price_val = prod.get('salePrice')
+                    try:
+                        sale_price_num = float(sale_price_val) if sale_price_val not in (None, '') else None
+                    except (ValueError, TypeError):
+                        sale_price_num = None
+
+                    rating_val = prod.get('rating')
+                    try:
+                        rating_num = float(rating_val) if rating_val not in (None, '') else 0.0
+                    except (ValueError, TypeError):
+                        rating_num = 0.0
+
+                    reviews_val = prod.get('reviews')
+                    try:
+                        reviews_num = int(reviews_val) if reviews_val not in (None, '') else 0
+                    except (ValueError, TypeError):
+                        reviews_num = 0
+
+                    prod_id = prod.get('id')
+                    defaults_dict = {
                         'name': prod.get('name', ''),
                         'description': prod.get('description', ''),
-                        'price': prod.get('price') or 0,
-                        'salePrice': prod.get('salePrice'),
+                        'price': price_num,
+                        'salePrice': sale_price_num,
                         'image': prod.get('image', ''),
                         'category': category_obj,
-                        'tags': prod.get('tags', []),
-                        'variants': prod.get('variants', []),
-                        'badge': prod.get('badge'),
-                        'badgeColor': prod.get('badgeColor'),
-                        'badgeTextColor': prod.get('badgeTextColor'),
-                        'rating': prod.get('rating') or 0,
-                        'reviews': prod.get('reviews') or 0,
-                        'couponNote': prod.get('couponNote')
+                        'tags': prod.get('tags', []) if isinstance(prod.get('tags'), list) else [],
+                        'variants': prod.get('variants', []) if isinstance(prod.get('variants'), list) else [],
+                        'badge': prod.get('badge') or None,
+                        'badgeColor': prod.get('badgeColor') or None,
+                        'badgeTextColor': prod.get('badgeTextColor') or None,
+                        'rating': rating_num,
+                        'reviews': reviews_num,
+                        'couponNote': prod.get('couponNote') or None
                     }
-                )
-            
-        return Response({"status": "success", "message": "Configuration updated", "config_data": config.config_data})
+
+                    if prod_id:
+                        Product.objects.update_or_create(
+                            id=prod_id,
+                            defaults=defaults_dict
+                        )
+                    else:
+                        Product.objects.create(**defaults_dict)
+                
+            return Response({"status": "success", "message": "Configuration updated", "config_data": config.config_data})
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return Response({"status": "error", "message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
     def list(self, request, *args, **kwargs):
-        response = super().list(request, *args, **kwargs)
-        response['Cache-Control'] = 'public, max-age=60, stale-while-revalidate=300'
-        return response
+        try:
+            response = super().list(request, *args, **kwargs)
+            response['Cache-Control'] = 'public, max-age=60, stale-while-revalidate=300'
+            return response
+        except Exception as e:
+            return Response([], status=status.HTTP_200_OK)
 
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
     def list(self, request, *args, **kwargs):
-        response = super().list(request, *args, **kwargs)
-        response['Cache-Control'] = 'public, max-age=60, stale-while-revalidate=300'
-        return response
+        try:
+            response = super().list(request, *args, **kwargs)
+            response['Cache-Control'] = 'public, max-age=60, stale-while-revalidate=300'
+            return response
+        except Exception as e:
+            return Response([], status=status.HTTP_200_OK)
 
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()

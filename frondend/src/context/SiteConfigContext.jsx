@@ -236,7 +236,7 @@ export function SiteConfigProvider({ children }) {
   const saveConfig = useCallback(async (configOverride) => {
     const configToSave = configOverride || config;
     try {
-      const response = await fetch(`${API_BASE_URL}/config/`, {
+      let response = await fetch(`${API_BASE_URL}/config/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -244,8 +244,33 @@ export function SiteConfigProvider({ children }) {
         body: JSON.stringify(configToSave)
       });
       
+      // If direct request failed with network error or 404/405, try relative /api/config/ fallback
+      if (!response.ok && API_BASE_URL !== '/api' && typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+        try {
+          const fallbackRes = await fetch('/api/config/', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(configToSave)
+          });
+          if (fallbackRes.ok) {
+            response = fallbackRes;
+          }
+        } catch {
+          // ignore fallback error and handle original response
+        }
+      }
+      
       if (!response.ok) {
-        throw new Error('Failed to save configuration');
+        let errMsg = `Server returned status ${response.status}`;
+        try {
+          const errData = await response.json();
+          if (errData?.message || errData?.detail || errData?.error) {
+            errMsg = errData.message || errData.detail || errData.error;
+          }
+        } catch {
+          // Response wasn't JSON
+        }
+        throw new Error(errMsg);
       }
       
       const result = await response.json();
@@ -266,7 +291,7 @@ export function SiteConfigProvider({ children }) {
       return { success: true };
     } catch (error) {
       console.error("Error saving config:", error);
-      alert("Failed to save configuration to the server.");
+      alert(`Failed to save configuration to the server: ${error.message || 'Network or Server Error'}`);
       return { success: false, error };
     }
   }, [config]);

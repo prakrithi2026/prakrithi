@@ -161,11 +161,13 @@ function DashboardContent({ logout }) {
     e.preventDefault();
   };
 
-  // Show a brief "Saved!" animation
-  const handleSave = () => {
-    saveConfig();
-    setSaveFlash(true);
-    setTimeout(() => setSaveFlash(false), 2000);
+  // Show a brief "Saved!" animation ONLY if save succeeds
+  const handleSave = async () => {
+    const res = await saveConfig();
+    if (res?.success) {
+      setSaveFlash(true);
+      setTimeout(() => setSaveFlash(false), 2000);
+    }
   };
 
   const handlePreview = () => {
