@@ -1,21 +1,18 @@
 import { useState, useRef } from 'react';
 import { 
   FiUpload, FiImage, FiPlus, FiTrash2, FiMonitor, FiSmartphone, 
-  FiInfo, FiCheckCircle, FiSave, FiCheck, FiChevronLeft, FiChevronRight, FiStar, FiRefreshCw 
+  FiInfo, FiChevronLeft, FiChevronRight, FiStar 
 } from 'react-icons/fi';
 import { useSiteConfig } from '../../context/SiteConfigContext';
 import { compressImage } from '../../utils/imageOptimizer';
 import './HeroEditor.css';
 
 export default function HeroEditor() {
-  const { config, updateConfig, saveConfig, hasUnsavedChanges } = useSiteConfig();
+  const { config, updateConfig } = useSiteConfig();
   const { hero } = config;
   const [deviceView, setDeviceView] = useState('desktop'); // 'desktop' | 'mobile'
-  const [uploadMode, setUploadMode] = useState('replace'); // 'replace' | 'add'
   const [dragActive, setDragActive] = useState(false);
   const [urlInput, setUrlInput] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveSuccess, setSaveSuccess] = useState(false);
   const fileInputRef = useRef(null);
 
   const desktopImages = Array.isArray(hero.images) 
@@ -26,7 +23,7 @@ export default function HeroEditor() {
   const currentImages = deviceView === 'desktop' ? desktopImages : mobileImages;
 
   // Helper to update images and keep legacy bgImage in sync
-  const setImagesForDevice = (view, newImagesList, autoSave = false) => {
+  const setImagesForDevice = (view, newImagesList) => {
     const nextHero = { ...hero };
     if (view === 'desktop') {
       nextHero.images = newImagesList;
@@ -35,32 +32,7 @@ export default function HeroEditor() {
       nextHero.mobileImages = newImagesList;
     }
 
-    const nextConfig = {
-      ...config,
-      hero: nextHero
-    };
-
     updateConfig('hero', nextHero);
-
-    if (autoSave) {
-      handleDirectSave(nextConfig);
-    }
-  };
-
-  const handleDirectSave = async (configToSave) => {
-    setIsSaving(true);
-    setSaveSuccess(false);
-    try {
-      const res = await saveConfig(configToSave || config);
-      if (res && res.success) {
-        setSaveSuccess(true);
-        setTimeout(() => setSaveSuccess(false), 3000);
-      }
-    } catch (err) {
-      console.error('Error saving hero configuration:', err);
-    } finally {
-      setIsSaving(false);
-    }
   };
 
   const handleFilesUpload = async (files) => {
@@ -82,12 +54,7 @@ export default function HeroEditor() {
     }
 
     if (newImages.length > 0) {
-      let updated;
-      if (uploadMode === 'replace') {
-        updated = newImages;
-      } else {
-        updated = [...currentImages, ...newImages];
-      }
+      const updated = [...currentImages, ...newImages];
       setImagesForDevice(deviceView, updated);
     }
   };
@@ -121,12 +88,7 @@ export default function HeroEditor() {
   const addImageUrl = () => {
     if (!urlInput.trim()) return;
     const trimmed = urlInput.trim();
-    let updated;
-    if (uploadMode === 'replace') {
-      updated = [trimmed];
-    } else {
-      updated = [...currentImages, trimmed];
-    }
+    const updated = [...currentImages, trimmed];
     setImagesForDevice(deviceView, updated);
     setUrlInput('');
   };
@@ -194,51 +156,6 @@ export default function HeroEditor() {
 
         {hero.enabled !== false && (
           <>
-            {/* Quick Action Save Bar */}
-            <div className={`hero-save-banner-bar ${hasUnsavedChanges ? 'hero-save-banner-bar--unsaved' : ''}`}>
-              <div className="hero-save-banner-bar__info">
-                {hasUnsavedChanges ? (
-                  <>
-                    <span className="hero-save-banner-bar__dot hero-save-banner-bar__dot--amber"></span>
-                    <span><strong>Unsaved Changes:</strong> Your banner edits are not saved to the database yet.</span>
-                  </>
-                ) : saveSuccess ? (
-                  <>
-                    <FiCheckCircle className="hero-save-banner-bar__icon--success" size={17} />
-                    <span style={{ color: '#15803d', fontWeight: 600 }}>Successfully saved to database!</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="hero-save-banner-bar__dot hero-save-banner-bar__dot--green"></span>
-                    <span>Banners are in sync with the database.</span>
-                  </>
-                )}
-              </div>
-              <button
-                type="button"
-                className={`hero-save-banner-btn ${saveSuccess ? 'hero-save-banner-btn--success' : ''}`}
-                onClick={() => handleDirectSave()}
-                disabled={isSaving || (!hasUnsavedChanges && !saveSuccess)}
-              >
-                {isSaving ? (
-                  <>
-                    <FiRefreshCw className="hero-spinner" size={15} />
-                    <span>Saving to Database...</span>
-                  </>
-                ) : saveSuccess ? (
-                  <>
-                    <FiCheck size={16} />
-                    <span>Saved!</span>
-                  </>
-                ) : (
-                  <>
-                    <FiSave size={16} />
-                    <span>Save Banner to Database</span>
-                  </>
-                )}
-              </button>
-            </div>
-
             {/* Device View Tabs Switcher */}
             <div className="hero-device-tabs">
               <button
@@ -305,30 +222,10 @@ export default function HeroEditor() {
 
             {/* Upload Area */}
             <div className="hero-editor-image-section">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
                 <label className="dash-field__label" style={{ margin: 0, fontWeight: 700 }}>
                   Upload {deviceView === 'desktop' ? 'Desktop / Laptop' : 'Mobile'} Banner
                 </label>
-                
-                {/* Upload Mode Selector: Replace vs Add */}
-                <div className="hero-upload-mode-toggle">
-                  <button
-                    type="button"
-                    className={`hero-upload-mode-btn ${uploadMode === 'replace' ? 'hero-upload-mode-btn--active' : ''}`}
-                    onClick={() => setUploadMode('replace')}
-                    title="Uploading will replace existing banner"
-                  >
-                    🔄 Replace Current Banner
-                  </button>
-                  <button
-                    type="button"
-                    className={`hero-upload-mode-btn ${uploadMode === 'add' ? 'hero-upload-mode-btn--active' : ''}`}
-                    onClick={() => setUploadMode('add')}
-                    title="Uploading will add a new slide to create a slideshow"
-                  >
-                    ➕ Add as Slide (Slideshow)
-                  </button>
-                </div>
               </div>
               
               <div
@@ -343,18 +240,16 @@ export default function HeroEditor() {
                   ref={fileInputRef}
                   type="file"
                   accept="image/*"
-                  multiple={uploadMode === 'add'}
+                  multiple
                   onChange={handleFileChange}
                   style={{ display: 'none' }}
                 />
                 <div className="hero-editor-upload__icon"><FiUpload size={28} /></div>
                 <p className="hero-editor-upload__text">
-                  <strong>Click to upload</strong> or drag &amp; drop {deviceView === 'desktop' ? 'desktop' : 'mobile'} image
+                  <strong>Click to upload</strong> or drag &amp; drop {deviceView === 'desktop' ? 'desktop' : 'mobile'} image(s)
                 </p>
                 <p className="hero-editor-upload__hint">
-                  {uploadMode === 'replace' 
-                    ? '⚡ Replace Mode Active: Uploading will set this image as the main banner.' 
-                    : '➕ Slideshow Mode Active: Uploading will add new slides to cycle through.'}
+                  Upload one or multiple images. When multiple images are added, they automatically cycle as slides.
                 </p>
                 <p className="hero-editor-upload__hint" style={{ marginTop: '4px' }}>
                   {deviceView === 'desktop'
@@ -377,7 +272,7 @@ export default function HeroEditor() {
                     />
                   </div>
                   <button className="dash-btn" onClick={addImageUrl} style={{ height: '42px', padding: '0 16px' }}>
-                    <FiPlus size={16} style={{ marginRight: '6px' }} /> {uploadMode === 'replace' ? 'Set as Banner' : 'Add Slide'}
+                    <FiPlus size={16} style={{ marginRight: '6px' }} /> Add Image
                   </button>
                 </div>
               </div>
@@ -483,26 +378,6 @@ export default function HeroEditor() {
                 </div>
               )}
             </div>
-
-            {currentImages.length >= 2 && (
-              <div style={{
-                marginTop: '20px',
-                padding: '12px 16px',
-                backgroundColor: '#eff6ff',
-                borderRadius: '8px',
-                border: '1px solid #bfdbfe',
-                fontSize: '0.85rem',
-                color: '#1e3a8a',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}>
-                <FiCheckCircle size={16} style={{ color: '#2563eb', flexShrink: 0 }} />
-                <span>
-                  Multiple slides active ({currentImages.length} slides). The storefront will start on <strong>Slide 1 (Primary)</strong> and smoothly auto-scroll through remaining slides every 5 seconds.
-                </span>
-              </div>
-            )}
           </>
         )}
       </div>
