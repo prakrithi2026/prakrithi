@@ -87,7 +87,7 @@ export default function SectionManager() {
   const handleDeliveryStepImageUpload = async (idx, file) => {
     if (!file || !file.type.startsWith('image/')) return;
     try {
-      const compressed = await compressImage(file, 96, 96, 0.75);
+      const compressed = await compressImage(file, 160, 160, 0.85);
       updateDeliveryStep(idx, 'image', compressed);
     } catch (err) {
       console.error('Error compressing delivery step image:', err);
@@ -110,7 +110,7 @@ export default function SectionManager() {
   const handlePressLogoImageUpload = async (idx, file) => {
     if (!file || !file.type.startsWith('image/')) return;
     try {
-      const compressed = await compressImage(file, 200, 200, 0.75);
+      const compressed = await compressImage(file, 350, 150, 0.85);
       updatePressLogo(idx, 'image', compressed);
     } catch (err) {
       console.error('Error compressing press logo image:', err);
