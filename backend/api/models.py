@@ -11,68 +11,6 @@ class SiteConfig(models.Model):
         return f"Site Configuration (Last updated: {self.updated_at})"
 
     def save(self, *args, **kwargs):
-        if self.config_data:
-            try:
-                from .utils import compress_base64_image
-                config = self.config_data
-                
-                # 1. Navbar logo
-                if 'navbar' in config and 'logo' in config['navbar']:
-                    config['navbar']['logo'] = compress_base64_image(config['navbar']['logo'], max_width=400, max_height=400, quality=85)
-                    
-                # 2. Hero background (High-res 2560x1440 support)
-                if 'hero' in config and 'bgImage' in config['hero']:
-                    config['hero']['bgImage'] = compress_base64_image(config['hero']['bgImage'], max_width=2560, max_height=1440, quality=90)
-                    
-                # 2b. Hero slideshow images (Desktop / Laptop View) (High-res 2560x1440 at 90% quality)
-                if 'hero' in config and 'images' in config['hero'] and isinstance(config['hero']['images'], list):
-                    config['hero']['images'] = [
-                        compress_base64_image(img, max_width=2560, max_height=1440, quality=90) if img else img
-                        for img in config['hero']['images']
-                    ]
-
-                # 2c. Hero slideshow images (Mobile View) (High-res 1080x1920 at 90% quality)
-                if 'hero' in config and 'mobileImages' in config['hero'] and isinstance(config['hero']['mobileImages'], list):
-                    config['hero']['mobileImages'] = [
-                        compress_base64_image(img, max_width=1080, max_height=1920, quality=90) if img else img
-                        for img in config['hero']['mobileImages']
-                    ]
-                    
-                # 3. Hero product images
-                if 'hero' in config and 'productImages' in config['hero'] and isinstance(config['hero']['productImages'], list):
-                    for item in config['hero']['productImages']:
-                        if isinstance(item, dict) and 'image' in item:
-                            item['image'] = compress_base64_image(item['image'], max_width=600, max_height=600, quality=80)
-                            
-                # 4. Delivery step images
-                if 'delivery' in config and 'steps' in config['delivery'] and isinstance(config['delivery']['steps'], list):
-                    for step in config['delivery']['steps']:
-                        if isinstance(step, dict) and 'image' in step:
-                            step['image'] = compress_base64_image(step['image'], max_width=120, max_height=120, quality=85)
-                            
-                # 5. Press logo images
-                if 'press' in config and 'logos' in config['press'] and isinstance(config['press']['logos'], list):
-                    for logo in config['press']['logos']:
-                        if isinstance(logo, dict) and 'image' in logo:
-                            logo['image'] = compress_base64_image(logo['image'], max_width=300, max_height=300, quality=85)
-                            
-                # 6. Reviews section image
-                if 'reviewsSection' in config and 'image' in config['reviewsSection']:
-                    config['reviewsSection']['image'] = compress_base64_image(config['reviewsSection']['image'], max_width=800, max_height=800, quality=80)
-                    
-                # 7. Our Story image
-                if 'ourStory' in config and 'image' in config['ourStory']:
-                    config['ourStory']['image'] = compress_base64_image(config['ourStory']['image'], max_width=1200, max_height=1200, quality=85)
-
-                # 8. Sections backgrounds
-                if 'sections' in config and isinstance(config['sections'], list):
-                    for sec in config['sections']:
-                        if isinstance(sec, dict) and 'bgImage' in sec:
-                            sec['bgImage'] = compress_base64_image(sec['bgImage'], max_width=1600, max_height=1600, quality=85)
-                            
-                self.config_data = config
-            except Exception:
-                pass
         super().save(*args, **kwargs)
 
 class Category(models.Model):
@@ -106,7 +44,7 @@ class Product(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        if self.image:
+        if self.image and isinstance(self.image, str) and self.image.startswith('data:image/') and not self.image.startswith('data:image/webp;base64,'):
             try:
                 from .utils import compress_base64_image
                 self.image = compress_base64_image(self.image, max_width=800, max_height=800, quality=80)

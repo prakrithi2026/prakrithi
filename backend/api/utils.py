@@ -4,13 +4,20 @@ from io import BytesIO
 
 def compress_base64_image(base64_str, max_width=1200, max_height=1200, quality=85):
     """
-    If base64_str is a base64 data URL, decodes, resizes if larger than max dimensions,
-    re-compresses it as WebP at the given quality, and returns the compressed data URL.
-    Otherwise returns base64_str unchanged.
+    Fast base64 image compression.
+    If image is already a WebP data URL under 800KB, returns immediately without re-encoding.
     """
     if not base64_str or not isinstance(base64_str, str):
         return base64_str
         
+    # If it's a standard URL (http/https or relative path), return as is
+    if not base64_str.startswith('data:image/'):
+        return base64_str
+
+    # Fast bypass: if it's already WebP and < 800KB, it's already optimized by the frontend
+    if base64_str.startswith('data:image/webp;base64,') and len(base64_str) < 800000:
+        return base64_str
+
     # Check if it's a base64 data URL
     match = re.match(r'^data:image/(\w+);base64,(.+)$', base64_str, re.DOTALL)
     if not match:
@@ -19,30 +26,15 @@ def compress_base64_image(base64_str, max_width=1200, max_height=1200, quality=8
     try:
         from PIL import Image
     except Exception:
-        # If PIL is unavailable or C-extensions are blocked by OS policy,
-        # return base64_str as the frontend already optimizes images to WebP
         return base64_str
         
-    img_format = match.group(1).lower()
     img_data_b64 = match.group(2)
     
-    # Try decoding
     try:
         img_bytes = base64.b64decode(img_data_b64)
-    except Exception:
-        return base64_str
-        
-    # Load image with Pillow
-    try:
         img = Image.open(BytesIO(img_bytes))
-    except Exception:
-        return base64_str
-        
-    # Check dimensions
-    try:
         width, height = img.size
         
-        # Calculate new size maintaining aspect ratio
         resized = False
         if width > max_width or height > max_height:
             if width > height:
@@ -51,16 +43,13 @@ def compress_base64_image(base64_str, max_width=1200, max_height=1200, quality=8
             else:
                 new_width = int((width * max_height) / height)
                 new_height = max_height
-            resample_filter = getattr(getattr(Image, 'Resampling', Image), 'LANCZOS', Image.BICUBIC)
-            img = img.resize((new_width, new_height), resample_filter)
+            img = img.resize((new_width, new_height), Image.BICUBIC)
             resized = True
-        elif img_format == 'webp' and len(base64_str) < 500000:
-            # Already high quality WebP within dimensions — avoid generation loss
+        elif base64_str.startswith('data:image/webp;base64,'):
             return base64_str
         
-        # Save image to bytes (using WebP format to preserve transparency and high clarity)
         output = BytesIO()
-        img.save(output, format='WEBP', quality=quality, method=6)
+        img.save(output, format='WEBP', quality=quality, method=3)
         compressed_bytes = output.getvalue()
         compressed_b64 = base64.b64encode(compressed_bytes).decode('utf-8')
         new_base64_str = f"data:image/webp;base64,{compressed_b64}"

@@ -336,7 +336,7 @@ export function SiteConfigProvider({ children }) {
       }
       
       const result = await response.json();
-      const updatedConfig = result.config_data ? {
+      const updatedConfig = (result && result.config_data) ? {
         ...configToSave,
         ...result.config_data,
         products: configToSave.products,
