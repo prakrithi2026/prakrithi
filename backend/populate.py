@@ -1,236 +1,134 @@
 import os
+import json
 import django
 from decimal import Decimal
+from pathlib import Path
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
 django.setup()
 
 from api.models import Category, Product, SiteConfig
 
-config_data = {
-  "theme": {
-    "primaryColor": "#00472A",
-    "secondaryColor": "#F5F5DC",
-    "accentColor": "#BDD681",
-    "backgroundColor": "#fdfdfd",
-    "textColor": "#333333",
-    "headingColor": "#012B28",
-    "fontFamily": "'Jost', 'Poppins', sans-serif",
-    "borderRadius": "12px",
-    "cardShadow": "0 2px 12px rgba(0,0,0,0.08)"
-  },
-  "announcement": {
-    "enabled": True,
-    "text": "Extra Rs.250 OFF on your 1st Order on all orders above Rs.999 Use Code : PR 999",
-    "bgColor": "#00472A",
-    "textColor": "#FFFFFF"
-  },
-  "navbar": {
-    "logo": "",
-    "logoSize": 125,
-    "brandName": "Prakrithi",
-    "brandSubtitle": "NATURALS",
-    "bgColor": "#FFFFFF",
-    "textColor": "#012B28",
-    "items": [
-      { "id": "products", "label": "Our products", "href": "#", "hasDropdown": True, "dropdownItems": [
-        { "label": "Best Sellers", "href": "#" },
-        { "label": "New Arrivals", "href": "#" },
-        { "label": "Kerala Spices", "href": "#" },
-        { "label": "Snacks", "href": "#" },
-        { "label": "Honey", "href": "#" }
-      ]},
-      { "id": "sale", "label": "Sale On", "href": "#", "badge": "10% OFF", "badgeColor": "#BDD681", "badgeTextColor": "#012B28" },
-      { "id": "new", "label": "New arrivals", "href": "#", "badge": "Trending ⚡", "badgeColor": "#00472A", "badgeTextColor": "#FFFFFF" },
-      { "id": "best", "label": "Best Sellers", "href": "#" },
-      { "id": "account", "label": "My Account & More", "href": "#", "hasDropdown": True, "dropdownItems": [
-        { "label": "My Orders", "href": "#" },
-        { "label": "Wishlist", "href": "#" },
-        { "label": "Track Order", "href": "#" },
-        { "label": "Contact Us", "href": "#" }
-      ]}
-    ]
-  },
-  "hero": {
-    "enabled": True,
-    "bgImage": "",
-    "bgColor": "#2E7D32",
-    "overlayOpacity": 0.3,
-    "tagline": "100% Natural | Premium Quality",
-    "title": "Kerala Spices",
-    "subtitle": "Get 25% OFF On your 1st order.",
-    "ctaText": "Use Code : PR25",
-    "ctaLink": "#",
-    "ctaBgColor": "#00472A",
-    "ctaTextColor": "#FFFFFF",
-    "textAlign": "left",
-    "showProductImages": True,
-    "productImages": [
-      { "id": 1, "emoji": "🌿", "label": "Kerala\nSpices", "image": "" },
-      { "id": 2, "emoji": "🌶️", "label": "Black\nPepper", "image": "" }
-    ]
-  },
-  "sections": [
-    { "id": "shopByProduct", "label": "Shop by Product", "enabled": True, "order": 0 },
-    { "id": "delivery", "label": "Delivery Process", "enabled": True, "order": 1 },
-    { "id": "shopByConcern", "label": "Shop by Concern", "enabled": True, "order": 2 },
-    { "id": "press", "label": "Press / Media", "enabled": True, "order": 3 },
-    { "id": "ourStory", "label": "Our Story", "enabled": True, "order": 4 },
-    { "id": "reviews", "label": "Reviews & Ratings", "enabled": True, "order": 5 }
-  ],
-  "delivery": {
-    "title": "How we deliver",
-    "subtitle": "fresh natural products",
-    "tcNote": "*T&C Apply.",
-    "steps": [
-      { "icon": "bag", "label": "ORDER" },
-      { "icon": "seedling", "label": "SOURCE" },
-      { "icon": "check", "label": "INSPECT" },
-      { "icon": "box", "label": "PACKING" },
-      { "icon": "truck", "label": "SHIPPING" },
-      { "icon": "location", "label": "DELIVER" }
-    ]
-  },
-  "ourStory": {
-    "title": "Its Online, Not a Physicalstore",
-    "subtitle": "",
-    "content": "From the lush hills of kerala to your kitchen, every product is selected with care. we work closely with trusted farmers and producers to source authentic spices and natural products at their finest. each batch is carefully checked for purity, freshness, and quality, then hygienically packed to preserve its natural aroma and flavor until it reaches your home",
-    "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&q=80&w=2340&ixlib=rb-4.0.3",
-    "founderName": "Anjana KA",
-    "founderTitle": "Founder Prakrithi India"
-  },
-  "press": {
-    "bgColor": "#BDD681",
-    "logos": [
-      { "name": "മാതൃഭൂമി", "style": "malayalam" },
-      { "name": "YOURSTORY", "style": "yourstory" },
-      { "name": "INDIA TODAY", "style": "indiatoday" },
-      { "name": "mint", "style": "mint" },
-      { "name": "THE HINDU", "style": "thehindu" }
-    ]
-  },
-  "reviewsSection": {
-    "familyCount": "1000+",
-    "googleRating": 4.9,
-    "totalReviews": 1183
-  },
-  "footer": {
-    "brandName": "Prakrithi Origins",
-    "trademark": True,
-    "aboutText": "Founded In 2024, Prakrithi Pure Organics brings you the pure essence of nature from the lush hills of Idukki and wayanad, kerala. We're dedicated to offering authentic, Natural products crafted with care — Straight from nature's heart to your home.",
-    "columns": [
-      {
-        "title": "Shop For",
-        "links": [
-          { "label": "Kerala Spices", "href": "#" },
-          { "label": "Blended Spice", "href": "#" },
-          { "label": "Essential Oils", "href": "#" },
-          { "label": "Ayurveda", "href": "#" },
-          { "label": "Grains", "href": "#" },
-          { "label": "Dry Fruits", "href": "#" },
-          { "label": "Honey", "href": "#" },
-          { "label": "All Products", "href": "#" }
-        ]
-      }
-    ],
-    "contact": {
-      "phone": "+91 8606282501",
-      "email": "info@prakrithi.in",
-      "orderEmail": "sale.prakrithi@gmail.com"
-    },
-    "address": "13i DD Sunset Island Apartment Complex Vypin, Munapam Road, Schoolmuttam, Kochi, Kerala 682511",
-    "socialLinks": {
-      "facebook": "#",
-      "twitter": "#",
-      "instagram": "#",
-      "whatsapp": "#"
-    },
-    "copyright": "© 2026, Prakrithi Naturals"
-  }
-}
+BASE_DIR = Path(__file__).resolve().parent
+json_path = BASE_DIR / 'default_config.json'
 
-categories = [
-  { "id": "all", "label": "All" },
-  { "id": "spices", "label": "Spices" },
-  { "id": "snacks", "label": "Snacks" },
-  { "id": "honey", "label": "Honey" },
-  { "id": "whole-grains", "label": "Whole Grains" }
-]
-
-products = [
-  {
-    "id": 1,
-    "name": "Organic Cardamom",
-    "description": "From our organic farms to your kitchen.",
-    "price": 200,
-    "salePrice": None,
-    "image": "",
-    "category": "spices",
-    "tags": ["new-arrival"],
-    "badge": "New",
-    "badgeColor": "#00472A",
-    "rating": 4.9,
-    "reviews": 28,
-    "variants": [],
-    "couponNote": None
-  },
-  {
-    "id": 2,
-    "name": "Organic Cardamom",
-    "description": "From our organic farms to your kitchen.",
-    "price": 200,
-    "salePrice": 180,
-    "image": "",
-    "category": "spices",
-    "tags": ["on-sale"],
-    "badge": "Sale 10% Off",
-    "badgeColor": "#BDD681",
-    "badgeTextColor": "#012B28",
-    "rating": 4.9,
-    "reviews": 28,
-    "variants": [],
-    "couponNote": "*Best Price ₹180 with coupon"
-  }
-]
-
-# Only seed SiteConfig if it does not already exist
-if not SiteConfig.objects.exists():
-    print("No SiteConfig found. Seeding initial configuration...")
-    SiteConfig.objects.create(id=1, config_data=config_data)
+if json_path.exists():
+    with open(json_path, 'r', encoding='utf-8') as f:
+        full_data = json.load(f)
 else:
-    print("SiteConfig already exists. Preserving admin custom configuration and images.")
+    full_data = {}
 
-# Seed categories if none exist
-if not Category.objects.exists():
-    print("Seeding initial Categories...")
-    for cat in categories:
-        Category.objects.update_or_create(category_id=cat["id"], defaults={"label": cat["label"]})
+products_data = full_data.pop('products', [])
+categories_data = full_data.pop('categories', [
+    {"id": "all", "label": "All"},
+    {"id": "spices", "label": "Spices"},
+    {"id": "snacks", "label": "Snacks"},
+    {"id": "honey", "label": "Honey"},
+    {"id": "whole-grains", "label": "Whole Grains"},
+])
+
+# 1. Seed / Update Categories
+print("Seeding/updating Categories...")
+for cat in categories_data:
+    Category.objects.update_or_create(
+        category_id=cat["id"],
+        defaults={"label": cat["label"]}
+    )
+
+# 2. Seed / Update SiteConfig
+config_obj = SiteConfig.objects.filter(id=1).first()
+if not config_obj:
+    print("Creating initial SiteConfig with full images...")
+    SiteConfig.objects.create(id=1, config_data=full_data)
 else:
-    print("Categories already exist. Preserving existing categories.")
+    # If existing SiteConfig is missing logo, delivery images, press images, etc., merge and restore them
+    existing = config_obj.config_data or {}
+    
+    # Restore navbar logo if empty
+    if not existing.get('navbar', {}).get('logo') and full_data.get('navbar', {}).get('logo'):
+        existing.setdefault('navbar', {})['logo'] = full_data['navbar']['logo']
+        
+    # Restore delivery step images if empty
+    if full_data.get('delivery', {}).get('steps'):
+        existing_steps = existing.get('delivery', {}).get('steps', [])
+        for i, default_step in enumerate(full_data['delivery']['steps']):
+            if i < len(existing_steps):
+                if not existing_steps[i].get('image') and default_step.get('image'):
+                    existing_steps[i]['image'] = default_step['image']
+            else:
+                existing_steps.append(default_step)
+        existing.setdefault('delivery', {})['steps'] = existing_steps
+        
+    # Restore press logos if empty
+    if full_data.get('press', {}).get('logos'):
+        existing_logos = existing.get('press', {}).get('logos', [])
+        for i, default_logo in enumerate(full_data['press']['logos']):
+            if i < len(existing_logos):
+                if not existing_logos[i].get('image') and default_logo.get('image'):
+                    existing_logos[i]['image'] = default_logo['image']
+            else:
+                existing_logos.append(default_logo)
+        existing.setdefault('press', {})['logos'] = existing_logos
+        
+    # Restore reviews image if empty
+    if not existing.get('reviewsSection', {}).get('image') and full_data.get('reviewsSection', {}).get('image'):
+        existing.setdefault('reviewsSection', {})['image'] = full_data['reviewsSection']['image']
+        
+    config_obj.config_data = existing
+    config_obj.save()
+    print("SiteConfig updated with complete images.")
 
-# Seed initial products only if no products exist
-if not Product.objects.exists():
-    print("Seeding initial Products...")
-    for prod in products:
-        category_obj = Category.objects.filter(category_id=prod["category"]).first()
-        Product.objects.create(
-            id=prod["id"],
-            name=prod["name"],
-            description=prod["description"],
-            price=Decimal(str(prod["price"])),
-            salePrice=Decimal(str(prod["salePrice"])) if prod["salePrice"] else None,
-            image=prod.get("image", ""),
-            category=category_obj,
-            tags=prod["tags"],
-            variants=prod["variants"],
-            badge=prod.get("badge"),
-            badgeColor=prod.get("badgeColor"),
-            badgeTextColor=prod.get("badgeTextColor"),
-            rating=Decimal(str(prod["rating"])),
-            reviews=prod["reviews"],
-            couponNote=prod.get("couponNote")
-        )
-else:
-    print("Products already exist in database. Preserving admin products.")
+# 3. Seed / Update Products
+print(f"Seeding/updating {len(products_data)} Products...")
+for prod in products_data:
+    cat_id = prod.get("category")
+    category_obj = Category.objects.filter(category_id=cat_id).first() if cat_id else None
+    
+    price_val = prod.get("price")
+    try:
+        price_dec = Decimal(str(price_val)) if price_val not in (None, "") else Decimal("0.00")
+    except Exception:
+        price_dec = Decimal("0.00")
+        
+    sale_val = prod.get("salePrice")
+    try:
+        sale_dec = Decimal(str(sale_val)) if sale_val not in (None, "") else None
+    except Exception:
+        sale_dec = None
+        
+    rating_val = prod.get("rating")
+    try:
+        rating_dec = Decimal(str(rating_val)) if rating_val not in (None, "") else Decimal("0.0")
+    except Exception:
+        rating_dec = Decimal("0.0")
+        
+    reviews_val = prod.get("reviews")
+    try:
+        reviews_int = int(reviews_val) if reviews_val not in (None, "") else 0
+    except Exception:
+        reviews_int = 0
+        
+    prod_id = prod.get("id")
+    defaults = {
+        "name": prod.get("name", ""),
+        "description": prod.get("description", ""),
+        "price": price_dec,
+        "salePrice": sale_dec,
+        "image": prod.get("image", ""),
+        "category": category_obj,
+        "tags": prod.get("tags", []),
+        "variants": prod.get("variants", []),
+        "badge": prod.get("badge") or None,
+        "badgeColor": prod.get("badgeColor") or None,
+        "badgeTextColor": prod.get("badgeTextColor") or None,
+        "rating": rating_dec,
+        "reviews": reviews_int,
+        "couponNote": prod.get("couponNote") or None,
+    }
+    
+    Product.objects.update_or_create(
+        id=prod_id,
+        defaults=defaults
+    )
 
-print("Database check completed successfully!")
+print("Database population and image restoration completed successfully!")

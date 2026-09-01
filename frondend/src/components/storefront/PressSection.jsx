@@ -1,4 +1,5 @@
 import { useSiteConfig } from '../../context/SiteConfigContext';
+import defaultConfig from '../../data/defaultConfig';
 import './PressSection.css';
 
 export default function PressSection() {
@@ -8,11 +9,13 @@ export default function PressSection() {
   return (
     <section className="press-section" style={{ backgroundColor: press.bgColor || '#BDD681' }}>
       <div className="press-container">
-        {press.logos.map((logo, i) => (
-          <div key={i} className="press-logo">
-            {logo.image ? (
-              <img src={logo.image} alt={logo.name} className="press-logo-img" loading="lazy" />
-            ) : (
+        {press.logos.map((logo, i) => {
+          const logoImage = logo.image || defaultConfig.press?.logos?.[i]?.image;
+          return (
+            <div key={i} className="press-logo">
+              {logoImage ? (
+                <img src={logoImage} alt={logo.name} className="press-logo-img" loading="lazy" />
+              ) : (
               <span className={`press-text press-${logo.style || 'default'}`}>
                 {logo.style === 'thehindu' && (
                   <svg className="thehindu-emblem" viewBox="0 0 100 45" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -41,7 +44,8 @@ export default function PressSection() {
               </span>
             )}
           </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

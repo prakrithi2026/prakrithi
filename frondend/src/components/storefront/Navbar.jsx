@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useSiteConfig } from '../../context/SiteConfigContext';
+import defaultConfig from '../../data/defaultConfig';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
 import { useAuth } from '../../context/AuthContext';
@@ -186,15 +187,18 @@ export default function Navbar() {
       <div className="nav-container">
 
         {/* ── Logo ── */}
-        {navbar.logo ? (
-          <Link to="/" className="navbar-brand">
-            <img
-              src={navbar.logo}
-              alt={navbar.brandName || "Logo"}
-              style={{ height: '48px', width: 'auto' }}
-            />
-          </Link>
-        ) : null}
+        {(() => {
+          const logoSrc = navbar.logo || defaultConfig.navbar?.logo;
+          return logoSrc ? (
+            <Link to="/" className="navbar-brand">
+              <img
+                src={logoSrc}
+                alt={navbar.brandName || "Logo"}
+                style={{ height: '48px', width: 'auto' }}
+              />
+            </Link>
+          ) : null;
+        })()}
 
         {/* ── Nav Links ── */}
         <div className={`nav-links ${mobileOpen ? 'nav-links--open' : ''}`}>

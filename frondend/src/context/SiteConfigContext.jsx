@@ -20,7 +20,10 @@ function deepMerge(defaults, overrides) {
       !Array.isArray(defaults[key])
     ) {
       result[key] = deepMerge(defaults[key], overrides[key]);
-    } else {
+    } else if (overrides[key] === '' && defaults[key]) {
+      // If override is empty string but default has content (e.g. logo or image), keep default
+      result[key] = defaults[key];
+    } else if (overrides[key] !== undefined && overrides[key] !== null) {
       result[key] = overrides[key];
     }
   }
@@ -42,7 +45,13 @@ function getInitialConfig() {
     base.products = defaultConfig.products || [];
   }
   if (!Array.isArray(base.categories) || base.categories.length === 0) {
-    base.categories = defaultConfig.categories || [];
+    base.categories = defaultConfig.categories || [
+      { id: 'all', label: 'All' },
+      { id: 'spices', label: 'Spices' },
+      { id: 'snacks', label: 'Snacks' },
+      { id: 'honey', label: 'Honey' },
+      { id: 'whole-grains', label: 'Whole Grains' },
+    ];
   }
   if (!Array.isArray(base.sections)) {
     base.sections = defaultConfig.sections || [];
@@ -138,13 +147,69 @@ export function SiteConfigProvider({ children }) {
           }
         }
 
-        const finalProducts = (Array.isArray(productsData) && productsData.length > 0)
-          ? productsData
-          : (Array.isArray(mergedConfig.products) && mergedConfig.products.length > 0 ? mergedConfig.products : (defaultConfig.products || []));
+        // Ensure delivery steps preserve default images if override step image is empty
+        if (Array.isArray(mergedConfig.delivery?.steps)) {
+          mergedConfig.delivery.steps = mergedConfig.delivery.steps.map((step, idx) => ({
+            ...defaultConfig.delivery?.steps?.[idx],
+            ...step,
+            image: step.image || defaultConfig.delivery?.steps?.[idx]?.image || '',
+          }));
+        }
 
-        const finalCategories = (Array.isArray(categoriesData) && categoriesData.length > 0)
-          ? categoriesData.map(c => ({ id: c.category_id, label: c.label }))
-          : (Array.isArray(mergedConfig.categories) && mergedConfig.categories.length > 0 ? mergedConfig.categories : (defaultConfig.categories || []));
+        // Ensure press logos preserve default images if override logo image is empty
+        if (Array.isArray(mergedConfig.press?.logos)) {
+          mergedConfig.press.logos = mergedConfig.press.logos.map((logo, idx) => ({
+            ...defaultConfig.press?.logos?.[idx],
+            ...logo,
+            image: logo.image || defaultConfig.press?.logos?.[idx]?.image || '',
+          }));
+        }
+
+        // Merge backend products with defaultConfig products so images and catalog items are never lost
+        let finalProducts = [];
+        if (Array.isArray(productsData) && productsData.length > 0) {
+          finalProducts = productsData.map((p) => {
+            const def = defaultConfig.products?.find((dp) => dp.id === p.id || dp.name === p.name);
+            return {
+              ...p,
+              image: p.image || def?.image || '',
+              description: p.description || def?.description || '',
+            };
+          });
+          const existingIds = new Set(finalProducts.map((p) => p.id));
+          const missingDefaults = (defaultConfig.products || []).filter((dp) => !existingIds.has(dp.id));
+          if (missingDefaults.length > 0) {
+            finalProducts = [...finalProducts, ...missingDefaults];
+          }
+        } else {
+          finalProducts = defaultConfig.products || [];
+        }
+
+        // Merge backend categories with default categories
+        let finalCategories = [];
+        if (Array.isArray(categoriesData) && categoriesData.length > 0) {
+          finalCategories = categoriesData.map((c) => ({ id: c.category_id, label: c.label }));
+          const existingCatIds = new Set(finalCategories.map((c) => c.id));
+          const defaultCats = defaultConfig.categories || [
+            { id: 'all', label: 'All' },
+            { id: 'spices', label: 'Spices' },
+            { id: 'snacks', label: 'Snacks' },
+            { id: 'honey', label: 'Honey' },
+            { id: 'whole-grains', label: 'Whole Grains' },
+          ];
+          const missingCats = defaultCats.filter((dc) => !existingCatIds.has(dc.id));
+          if (missingCats.length > 0) {
+            finalCategories = [...finalCategories, ...missingCats];
+          }
+        } else {
+          finalCategories = defaultConfig.categories || [
+            { id: 'all', label: 'All' },
+            { id: 'spices', label: 'Spices' },
+            { id: 'snacks', label: 'Snacks' },
+            { id: 'honey', label: 'Honey' },
+            { id: 'whole-grains', label: 'Whole Grains' },
+          ];
+        }
 
         const fullConfig = {
           ...mergedConfig,
