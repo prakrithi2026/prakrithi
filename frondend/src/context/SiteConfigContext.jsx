@@ -53,6 +53,9 @@ function getInitialConfig() {
   if (!Array.isArray(base.sections)) {
     base.sections = defaultConfig.sections || [];
   }
+  if (base.reviewsSection && (!base.reviewsSection.image || base.reviewsSection.image.startsWith('data:image/webp;base64,UklGRsgMAAB'))) {
+    base.reviewsSection = { ...base.reviewsSection, image: '/images/rating.png' };
+  }
   return base;
 }
 
@@ -160,6 +163,11 @@ export function SiteConfigProvider({ children }) {
             ...logo,
             image: logo.image !== undefined ? logo.image : (defaultConfig.press?.logos?.[idx]?.image || ''),
           }));
+        }
+
+        // Ensure reviewsSection uses the new rating image if it has the legacy base64 or is empty
+        if (mergedConfig.reviewsSection && (!mergedConfig.reviewsSection.image || mergedConfig.reviewsSection.image.startsWith('data:image/webp;base64,UklGRsgMAAB'))) {
+          mergedConfig.reviewsSection.image = '/images/rating.png';
         }
 
         // Merge backend products with defaultConfig products so catalog items are not lost, but respecting removed images

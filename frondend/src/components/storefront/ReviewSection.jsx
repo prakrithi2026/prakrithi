@@ -10,7 +10,8 @@ export default function ReviewSection() {
     background: `linear-gradient(90deg, #0D5130 0%, #9FBD58 100%)`
   };
 
-  const reviewImage = image || '/images/rating.png';
+  const isLegacyBase64 = typeof image === 'string' && image.startsWith('data:image/webp;base64,UklGRsgMAAB');
+  const reviewImage = (!image || isLegacyBase64) ? '/images/rating.png' : image;
 
   return (
     <section className="review-section" style={dynamicStyle}>
