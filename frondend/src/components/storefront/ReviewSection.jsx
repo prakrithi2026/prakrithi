@@ -15,9 +15,11 @@ export default function ReviewSection() {
       <div className="review-container">
         
         {/* Left Image Column */}
-        <div className="review-laurel-col">
-          <img src="/images/rating.png" alt="Reviews Graphic" className="review-left-uploaded-img" />
-        </div>
+        {image ? (
+          <div className="review-laurel-col">
+            <img src={image} alt="Reviews Graphic" className="review-left-uploaded-img" />
+          </div>
+        ) : null}
 
         {/* Right Google Rating Column */}
         <div className="review-rating-col">

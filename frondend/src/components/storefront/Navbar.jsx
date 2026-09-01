@@ -188,16 +188,28 @@ export default function Navbar() {
 
         {/* ── Logo ── */}
         {(() => {
-          const logoSrc = navbar.logo || defaultConfig.navbar?.logo;
-          return logoSrc ? (
-            <Link to="/" className="navbar-brand">
-              <img
-                src={logoSrc}
-                alt={navbar.brandName || "Logo"}
-                style={{ height: '48px', width: 'auto' }}
-              />
-            </Link>
-          ) : null;
+          const logoSrc = navbar.logo !== undefined ? navbar.logo : defaultConfig.navbar?.logo;
+          if (logoSrc) {
+            return (
+              <Link to="/" className="navbar-brand">
+                <img
+                  src={logoSrc}
+                  alt={navbar.brandName || "Logo"}
+                  style={{ height: '48px', width: 'auto' }}
+                />
+              </Link>
+            );
+          }
+          if (navbar.brandName) {
+            return (
+              <Link to="/" className="navbar-brand" style={{ textDecoration: 'none' }}>
+                <span style={{ fontSize: '1.4rem', fontWeight: 700, color: navbar.textColor || '#012B28' }}>
+                  {navbar.brandName}
+                </span>
+              </Link>
+            );
+          }
+          return null;
         })()}
 
         {/* ── Nav Links ── */}

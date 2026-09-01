@@ -176,6 +176,7 @@ export default function SectionManager() {
                       fileInputRefs.current[section.id].accept = 'image/*';
                       fileInputRefs.current[section.id].addEventListener('change', (e) => {
                         handleBgImageUpload(section.id, e.target.files?.[0]);
+                        e.target.value = '';
                       });
                     }
                     fileInputRefs.current[section.id].click();

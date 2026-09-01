@@ -10,7 +10,7 @@ export default function PressSection() {
     <section className="press-section" style={{ backgroundColor: press.bgColor || '#BDD681' }}>
       <div className="press-container">
         {press.logos.map((logo, i) => {
-          const logoImage = logo.image || defaultConfig.press?.logos?.[i]?.image;
+          const logoImage = logo.image !== undefined ? logo.image : defaultConfig.press?.logos?.[i]?.image;
           return (
             <div key={i} className="press-logo">
               {logoImage ? (

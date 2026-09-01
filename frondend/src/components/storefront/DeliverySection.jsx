@@ -25,7 +25,7 @@ export default function DeliverySection() {
         </div>
         <div className="delivery-steps">
           {delivery.steps.map((step, i) => {
-            const stepImage = step.image || defaultConfig.delivery.steps[i]?.image;
+            const stepImage = step.image !== undefined ? step.image : defaultConfig.delivery?.steps?.[i]?.image;
             return (
               <div key={i} className="delivery-step-group">
                 <div className="delivery-step">

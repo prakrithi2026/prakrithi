@@ -20,9 +20,6 @@ function deepMerge(defaults, overrides) {
       !Array.isArray(defaults[key])
     ) {
       result[key] = deepMerge(defaults[key], overrides[key]);
-    } else if (overrides[key] === '' && defaults[key]) {
-      // If override is empty string but default has content (e.g. logo or image), keep default
-      result[key] = defaults[key];
     } else if (overrides[key] !== undefined && overrides[key] !== null) {
       result[key] = overrides[key];
     }
@@ -147,33 +144,33 @@ export function SiteConfigProvider({ children }) {
           }
         }
 
-        // Ensure delivery steps preserve default images if override step image is empty
+        // Ensure delivery steps preserve default images ONLY if override step image is undefined
         if (Array.isArray(mergedConfig.delivery?.steps)) {
           mergedConfig.delivery.steps = mergedConfig.delivery.steps.map((step, idx) => ({
             ...defaultConfig.delivery?.steps?.[idx],
             ...step,
-            image: step.image || defaultConfig.delivery?.steps?.[idx]?.image || '',
+            image: step.image !== undefined ? step.image : (defaultConfig.delivery?.steps?.[idx]?.image || ''),
           }));
         }
 
-        // Ensure press logos preserve default images if override logo image is empty
+        // Ensure press logos preserve default images ONLY if override logo image is undefined
         if (Array.isArray(mergedConfig.press?.logos)) {
           mergedConfig.press.logos = mergedConfig.press.logos.map((logo, idx) => ({
             ...defaultConfig.press?.logos?.[idx],
             ...logo,
-            image: logo.image || defaultConfig.press?.logos?.[idx]?.image || '',
+            image: logo.image !== undefined ? logo.image : (defaultConfig.press?.logos?.[idx]?.image || ''),
           }));
         }
 
-        // Merge backend products with defaultConfig products so images and catalog items are never lost
+        // Merge backend products with defaultConfig products so catalog items are not lost, but respecting removed images
         let finalProducts = [];
         if (Array.isArray(productsData) && productsData.length > 0) {
           finalProducts = productsData.map((p) => {
             const def = defaultConfig.products?.find((dp) => dp.id === p.id || dp.name === p.name);
             return {
               ...p,
-              image: p.image || def?.image || '',
-              description: p.description || def?.description || '',
+              image: p.image !== undefined ? p.image : (def?.image || ''),
+              description: p.description !== undefined ? p.description : (def?.description || ''),
             };
           });
           const existingIds = new Set(finalProducts.map((p) => p.id));
