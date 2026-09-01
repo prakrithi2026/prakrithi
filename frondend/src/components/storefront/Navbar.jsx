@@ -365,10 +365,7 @@ export default function Navbar() {
               aria-label="Account"
               title={isLoggedIn ? `Signed in as ${user?.name}` : 'Sign in'}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="26" viewBox="0 0 19 25" fill="none">
-                <circle cx="12" cy="7" r="6" stroke={navbar.textColor || '#012B28'} strokeWidth="2"/>
-                <path d="M1 25C1 18.3726 5.92487 13 12 13" stroke={navbar.textColor || '#012B28'} strokeWidth="2"/>
-              </svg>
+              <img src="/images/Shopicon.png" alt="Account" className="nav-profile-icon-img" />
               {wishlistCount > 0 && (
                 <span className="nav-wishlist-badge">{wishlistCount}</span>
               )}

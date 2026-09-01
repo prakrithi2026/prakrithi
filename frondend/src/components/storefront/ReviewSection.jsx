@@ -10,14 +10,16 @@ export default function ReviewSection() {
     background: `linear-gradient(90deg, #0D5130 0%, #9FBD58 100%)`
   };
 
+  const reviewImage = image || '/images/rating.png';
+
   return (
     <section className="review-section" style={dynamicStyle}>
       <div className="review-container">
         
         {/* Left Image Column */}
-        {image ? (
+        {reviewImage ? (
           <div className="review-laurel-col">
-            <img src={image} alt="Reviews Graphic" className="review-left-uploaded-img" />
+            <img src={reviewImage} alt="Reviews Graphic" className="review-left-uploaded-img" />
           </div>
         ) : null}
 

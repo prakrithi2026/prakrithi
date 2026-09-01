@@ -179,6 +179,13 @@
   gap: 2px;
 }
 
+.nav-profile-icon-img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  display: block;
+}
+
 .nav-icon-user svg:last-child {
   margin-left: -2px;
 }
