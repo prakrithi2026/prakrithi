@@ -56,6 +56,14 @@ function getInitialConfig() {
   if (base.reviewsSection && (!base.reviewsSection.image || base.reviewsSection.image.startsWith('data:image/webp;base64,UklGRsgMAAB'))) {
     base.reviewsSection = { ...base.reviewsSection, image: '/images/rating.png' };
   }
+  if (Array.isArray(base.delivery?.steps)) {
+    base.delivery.steps = base.delivery.steps.map((step, idx) => {
+      if (step.image && step.image.startsWith('data:image/webp;base64,UklGRmo')) {
+        return { ...step, image: defaultConfig.delivery?.steps?.[idx]?.image || '' };
+      }
+      return step;
+    });
+  }
   return base;
 }
 
@@ -147,12 +155,14 @@ export function SiteConfigProvider({ children }) {
           }
         }
 
-        // Ensure delivery steps preserve default images ONLY if override step image is undefined
+        // Ensure delivery steps preserve default images ONLY if override step image is undefined or is legacy dot image
         if (Array.isArray(mergedConfig.delivery?.steps)) {
           mergedConfig.delivery.steps = mergedConfig.delivery.steps.map((step, idx) => ({
             ...defaultConfig.delivery?.steps?.[idx],
             ...step,
-            image: step.image !== undefined ? step.image : (defaultConfig.delivery?.steps?.[idx]?.image || ''),
+            image: (step.image !== undefined && !step.image?.startsWith('data:image/webp;base64,UklGRmo'))
+              ? step.image
+              : (defaultConfig.delivery?.steps?.[idx]?.image || ''),
           }));
         }
 
