@@ -16,6 +16,7 @@ import SignupPage from './pages/SignupPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import OurStoryPage from './pages/OurStoryPage';
 import DashboardLayout from './components/dashboard/DashboardLayout';
+import ScrollToTop from './components/ScrollToTop';
 import './App.css';
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
         <CartProvider>
           <WishlistProvider>
             <BrowserRouter>
+              <ScrollToTop />
               <Routes>
                 {/* Storefront — public */}
                 <Route path="/"        element={<HomePage />} />

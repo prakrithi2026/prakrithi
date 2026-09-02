@@ -44,11 +44,19 @@ export default function ProductPage() {
     .slice(0, 4);
 
   useEffect(() => {
+    try {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    } catch {
+      window.scrollTo(0, 0);
+    }
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+
     if (product) {
       document.title = `${product.name} — Prakrithi Naturals`;
       if (product.variants?.length > 0) setSelectedVariant(product.variants[0]);
     }
-  }, [product]);
+  }, [id, product]);
 
   if (!product) {
     return (
