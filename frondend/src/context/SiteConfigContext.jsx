@@ -64,6 +64,23 @@ function getInitialConfig() {
       return step;
     });
   }
+  if (!Array.isArray(base.hero?.images) || base.hero.images.length === 0) {
+    if (Array.isArray(defaultConfig.hero?.images) && defaultConfig.hero.images.length > 0) {
+      base.hero = {
+        ...(base.hero || {}),
+        images: defaultConfig.hero.images,
+        bgImage: defaultConfig.hero.bgImage || defaultConfig.hero.images[0]
+      };
+    }
+  }
+  if (!Array.isArray(base.hero?.mobileImages) || base.hero.mobileImages.length === 0) {
+    if (Array.isArray(defaultConfig.hero?.mobileImages) && defaultConfig.hero.mobileImages.length > 0) {
+      base.hero = {
+        ...(base.hero || {}),
+        mobileImages: defaultConfig.hero.mobileImages
+      };
+    }
+  }
   return base;
 }
 
@@ -178,6 +195,25 @@ export function SiteConfigProvider({ children }) {
         // Ensure reviewsSection uses the new rating image if it has the legacy base64 or is empty
         if (mergedConfig.reviewsSection && (!mergedConfig.reviewsSection.image || mergedConfig.reviewsSection.image.startsWith('data:image/webp;base64,UklGRsgMAAB'))) {
           mergedConfig.reviewsSection.image = '/images/rating.png';
+        }
+
+        // Ensure hero banners fallback to defaultConfig if backend returns empty images
+        if (!Array.isArray(mergedConfig.hero?.images) || mergedConfig.hero.images.length === 0) {
+          if (Array.isArray(defaultConfig.hero?.images) && defaultConfig.hero.images.length > 0) {
+            mergedConfig.hero = {
+              ...(mergedConfig.hero || {}),
+              images: defaultConfig.hero.images,
+              bgImage: defaultConfig.hero.bgImage || defaultConfig.hero.images[0]
+            };
+          }
+        }
+        if (!Array.isArray(mergedConfig.hero?.mobileImages) || mergedConfig.hero.mobileImages.length === 0) {
+          if (Array.isArray(defaultConfig.hero?.mobileImages) && defaultConfig.hero.mobileImages.length > 0) {
+            mergedConfig.hero = {
+              ...(mergedConfig.hero || {}),
+              mobileImages: defaultConfig.hero.mobileImages
+            };
+          }
         }
 
         // Merge backend products with defaultConfig products so catalog items are not lost, but respecting removed images

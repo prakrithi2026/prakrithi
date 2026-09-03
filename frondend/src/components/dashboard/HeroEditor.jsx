@@ -1,19 +1,34 @@
 import { useState, useRef } from 'react';
 import { 
   FiUpload, FiImage, FiPlus, FiTrash2, FiMonitor, FiSmartphone, 
-  FiInfo, FiChevronLeft, FiChevronRight, FiStar 
+  FiInfo, FiChevronLeft, FiChevronRight, FiStar, FiSave, FiCheck 
 } from 'react-icons/fi';
 import { useSiteConfig } from '../../context/SiteConfigContext';
 import { compressImage } from '../../utils/imageOptimizer';
 import './HeroEditor.css';
 
 export default function HeroEditor() {
-  const { config, updateConfig } = useSiteConfig();
+  const { config, updateConfig, saveConfig, hasUnsavedChanges } = useSiteConfig();
   const { hero } = config;
   const [deviceView, setDeviceView] = useState('desktop'); // 'desktop' | 'mobile'
   const [dragActive, setDragActive] = useState(false);
   const [urlInput, setUrlInput] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const fileInputRef = useRef(null);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const res = await saveConfig();
+      if (res?.success) {
+        setSaveSuccess(true);
+        setTimeout(() => setSaveSuccess(false), 3000);
+      }
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const desktopImages = Array.isArray(hero.images) 
     ? hero.images 
@@ -132,7 +147,42 @@ export default function HeroEditor() {
             <h2 className="dash-panel__title">🖼️ Hero Banner</h2>
             <p className="dash-panel__subtitle">Upload, replace, or reorder responsive banners for Desktop and Mobile views</p>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginLeft: 'auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginLeft: 'auto' }}>
+            <button
+              type="button"
+              className="dash-btn dash-btn--primary"
+              onClick={handleSave}
+              disabled={isSaving}
+              style={{
+                height: '36px',
+                padding: '0 16px',
+                fontSize: '0.85rem',
+                fontWeight: 600,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                backgroundColor: saveSuccess ? '#16a34a' : hasUnsavedChanges ? '#00472A' : '#334155',
+                borderColor: saveSuccess ? '#16a34a' : hasUnsavedChanges ? '#00472A' : '#334155',
+                color: '#ffffff',
+                cursor: isSaving ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              {isSaving ? (
+                <span>Saving...</span>
+              ) : saveSuccess ? (
+                <>
+                  <FiCheck size={16} />
+                  <span>Saved!</span>
+                </>
+              ) : (
+                <>
+                  <FiSave size={16} />
+                  <span>Save Hero Banners</span>
+                </>
+              )}
+            </button>
+            <div style={{ width: '1px', height: '24px', backgroundColor: '#e2e8f0', margin: '0 4px' }} />
             <span style={{ fontSize: '0.82rem', color: hero.enabled !== false ? '#16a34a' : '#9ca3af', fontWeight: 600 }}>
               {hero.enabled !== false ? 'Visible' : 'Hidden'}
             </span>
@@ -377,6 +427,62 @@ export default function HeroEditor() {
                   })}
                 </div>
               )}
+
+              {/* Bottom Save Bar */}
+              <div style={{
+                marginTop: '24px',
+                padding: '16px 20px',
+                backgroundColor: '#f8fafc',
+                border: '1px solid #e2e8f0',
+                borderRadius: '10px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '12px'
+              }}>
+                <div>
+                  <strong style={{ fontSize: '0.9rem', color: '#1e293b' }}>
+                    {hasUnsavedChanges ? '⚠️ You have unsaved hero banner changes' : '✓ Hero banners are synced with server'}
+                  </strong>
+                  <p style={{ margin: '2px 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>
+                    Click Save to persist changes to the database and update your live storefront.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className="dash-btn dash-btn--primary"
+                  onClick={handleSave}
+                  disabled={isSaving}
+                  style={{
+                    height: '40px',
+                    padding: '0 20px',
+                    fontSize: '0.9rem',
+                    fontWeight: 600,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    backgroundColor: saveSuccess ? '#16a34a' : '#00472A',
+                    borderColor: saveSuccess ? '#16a34a' : '#00472A',
+                    color: '#ffffff',
+                    cursor: isSaving ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  {isSaving ? (
+                    <span>Saving...</span>
+                  ) : saveSuccess ? (
+                    <>
+                      <FiCheck size={18} />
+                      <span>Saved Successfully!</span>
+                    </>
+                  ) : (
+                    <>
+                      <FiSave size={18} />
+                      <span>Save Hero Banners</span>
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </>
         )}

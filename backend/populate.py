@@ -74,6 +74,15 @@ else:
     if not existing.get('reviewsSection', {}).get('image') and full_data.get('reviewsSection', {}).get('image'):
         existing.setdefault('reviewsSection', {})['image'] = full_data['reviewsSection']['image']
         
+    # Restore hero desktop and mobile images if empty
+    if full_data.get('hero', {}).get('images'):
+        if not existing.get('hero', {}).get('images') or len(existing.get('hero', {}).get('images', [])) == 0:
+            existing.setdefault('hero', {})['images'] = full_data['hero']['images']
+            existing.setdefault('hero', {})['bgImage'] = full_data['hero'].get('bgImage', full_data['hero']['images'][0])
+    if full_data.get('hero', {}).get('mobileImages'):
+        if not existing.get('hero', {}).get('mobileImages') or len(existing.get('hero', {}).get('mobileImages', [])) == 0:
+            existing.setdefault('hero', {})['mobileImages'] = full_data['hero']['mobileImages']
+        
     config_obj.config_data = existing
     config_obj.save()
     print("SiteConfig updated with complete images.")

@@ -1,11 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSiteConfig } from '../../context/SiteConfigContext';
 import './HeroSection.css';
 
 export default function HeroSection() {
   const { config } = useSiteConfig();
-  const { hero } = config;
+  const hero = config?.hero || {};
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
   const [isMobile, setIsMobile] = useState(() => {
     if (typeof window !== 'undefined') {
       return window.innerWidth <= 768;
@@ -24,12 +27,14 @@ export default function HeroSection() {
   }, []);
 
   // Desktop images (fallback to legacy bgImage only if hero.images is not an array)
-  const desktopImages = Array.isArray(hero.images)
-    ? hero.images
-    : (hero.bgImage ? [hero.bgImage] : []);
+  const desktopImages = (
+    Array.isArray(hero.images)
+      ? hero.images
+      : (hero.bgImage ? [hero.bgImage] : [])
+  ).filter(Boolean);
 
   // Mobile images
-  const mobileImages = Array.isArray(hero.mobileImages) ? hero.mobileImages : [];
+  const mobileImages = (Array.isArray(hero.mobileImages) ? hero.mobileImages : []).filter(Boolean);
 
   // Determine active image set based on viewport:
   // On mobile (<= 768px): prefer mobileImages, fallback to desktopImages
@@ -57,6 +62,9 @@ export default function HeroSection() {
         }
       };
       img.src = images[0];
+      if (img.complete && img.naturalWidth && img.naturalHeight) {
+        setAspectRatio(`${img.naturalWidth} / ${img.naturalHeight}`);
+      }
     } else {
       setAspectRatio(null);
     }
@@ -64,14 +72,14 @@ export default function HeroSection() {
 
   // Set up automatic scrolling interval if there are 2 or more images
   useEffect(() => {
-    if (!enabled || images.length < 2) return;
+    if (!enabled || images.length < 2 || isPaused) return;
 
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % images.length);
     }, 5000); // 5 seconds interval
 
     return () => clearInterval(interval);
-  }, [images.length, enabled]);
+  }, [images.length, enabled, isPaused]);
 
   // Reset currentSlide if it goes out of bounds when images are swapped/cleared
   useEffect(() => {
@@ -80,13 +88,42 @@ export default function HeroSection() {
     }
   }, [images.length, currentSlide]);
 
+  // Touch handlers for mobile swipe navigation
+  const minSwipeDistance = 45;
+
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    if (distance > minSwipeDistance) {
+      // Swiped left -> next slide
+      setCurrentSlide((prev) => (prev + 1) % images.length);
+    } else if (distance < -minSwipeDistance) {
+      // Swiped right -> prev slide
+      setCurrentSlide((prev) => (prev - 1 + images.length) % images.length);
+    }
+  };
+
   // If the hero section is disabled or has no images, render nothing (no empty blank space)
   if (!enabled || images.length === 0) return null;
 
   return (
     <section
       className={`hero-section ${isUsingMobileImages ? 'hero-section--mobile-view' : ''}`}
-      style={isMobile && aspectRatio ? { aspectRatio } : undefined}
+      style={aspectRatio ? { aspectRatio } : undefined}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
     >
       <div className="hero-slides-container">
         {images.map((image, index) => (
@@ -102,6 +139,32 @@ export default function HeroSection() {
           />
         ))}
       </div>
+
+      {/* Navigation arrows (desktop/hover) */}
+      {images.length >= 2 && (
+        <>
+          <button
+            type="button"
+            className="hero-arrow hero-arrow--prev"
+            onClick={() => setCurrentSlide((prev) => (prev - 1 + images.length) % images.length)}
+            aria-label="Previous slide"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            className="hero-arrow hero-arrow--next"
+            onClick={() => setCurrentSlide((prev) => (prev + 1) % images.length)}
+            aria-label="Next slide"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </button>
+        </>
+      )}
 
       {/* Render navigation indicators (dots) only if 2 or more images */}
       {images.length >= 2 && (
