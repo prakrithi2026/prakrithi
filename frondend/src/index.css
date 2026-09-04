@@ -52,6 +52,9 @@
 html {
   font-size: 16px;
   scroll-behavior: smooth;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
 }
 
 body {
@@ -61,6 +64,15 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
+}
+
+#root,
+.storefront {
+  width: 100%;
+  max-width: 100%;
   overflow-x: hidden;
 }
 
@@ -121,12 +133,16 @@ ul {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-light);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #ccc;
+  background: rgba(0, 0, 0, 0.18);
   border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.35);
 }
 
 .container {
@@ -182,9 +198,5 @@ ul {
 @media (max-width: 768px) {
   .section-container {
     padding: 28px 16px;
-  }
-
-  .nav-container {
-    padding: 0 16px !important;
   }
 }

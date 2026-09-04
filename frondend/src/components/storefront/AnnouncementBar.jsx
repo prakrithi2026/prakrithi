@@ -1,11 +1,22 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSiteConfig } from '../../context/SiteConfigContext';
 import './AnnouncementBar.css';
 
 export default function AnnouncementBar() {
   const { config } = useSiteConfig();
-  const { announcement } = config;
+  const announcement = config?.announcement || {};
   const [dismissed, setDismissed] = useState(false);
+
+  useEffect(() => {
+    if (!announcement?.enabled || dismissed) {
+      document.documentElement.style.setProperty('--announcement-height', '0px');
+    } else {
+      document.documentElement.style.setProperty('--announcement-height', '38px');
+    }
+    return () => {
+      document.documentElement.style.setProperty('--announcement-height', '0px');
+    };
+  }, [announcement?.enabled, dismissed]);
 
   if (!announcement.enabled || dismissed) return null;
 

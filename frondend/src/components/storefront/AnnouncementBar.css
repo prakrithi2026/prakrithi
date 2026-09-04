@@ -38,3 +38,30 @@
 .announcement-close:hover {
   opacity: 1;
 }
+
+@media (max-width: 768px) {
+  .announcement-bar {
+    padding: 6px 36px 6px 12px;
+    min-height: 32px;
+  }
+
+  .announcement-spacer {
+    display: none;
+  }
+
+  .announcement-text {
+    font-size: 0.74rem;
+    line-height: 1.35;
+    width: 100%;
+    text-align: center;
+  }
+
+  .announcement-close {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    flex: none;
+    padding: 4px;
+  }
+}
