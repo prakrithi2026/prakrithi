@@ -179,15 +179,8 @@
   gap: 2px;
 }
 
-.nav-profile-icon-img {
-  width: 24px;
-  height: 24px;
-  object-fit: contain;
+.nav-profile-btn svg {
   display: block;
-}
-
-.nav-icon-user svg:last-child {
-  margin-left: -2px;
 }
 
 .cart-link {
@@ -566,12 +559,8 @@
   }
 
   .nav-search-btn svg,
-  .cart-link svg {
-    width: 24px;
-    height: 24px;
-  }
-
-  .nav-profile-icon-img {
+  .nav-profile-btn svg,
+  .cart-link > svg:first-child {
     width: 24px;
     height: 24px;
   }

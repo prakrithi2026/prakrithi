@@ -297,11 +297,9 @@ export default function Navbar() {
               onClick={() => setSearchOpen(prev => !prev)}
               aria-label="Search"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 30 30" fill="none">
-                <path d="M13.125 25C18.993 25 23.75 20.243 23.75 14.375C23.75 8.507 18.993 3.75 13.125 3.75C7.257 3.75 2.5 8.507 2.5 14.375C2.5 20.243 7.257 25 13.125 25Z"
-                  stroke={navbar.textColor || '#012B28'} strokeWidth="2" strokeLinejoin="round"/>
-                <path d="M20.7637 22.0137L26.067 27.317"
-                  stroke={navbar.textColor || '#012B28'} strokeWidth="2" strokeLinejoin="round"/>
+              <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M13.125 25C18.993 25 23.75 20.243 23.75 14.375C23.75 8.507 18.993 3.75 13.125 3.75C7.257 3.75 2.5 8.507 2.5 14.375C2.5 20.243 7.257 25 13.125 25Z" stroke={navbar.textColor || '#012B28'} strokeWidth="2" strokeLinejoin="round"/>
+                <path d="M20.7637 22.0137L26.067 27.317" stroke={navbar.textColor || '#012B28'} strokeWidth="2" strokeLinejoin="round"/>
               </svg>
             </button>
 
@@ -365,7 +363,18 @@ export default function Navbar() {
               aria-label="Account"
               title={isLoggedIn ? `Signed in as ${user?.name}` : 'Sign in'}
             >
-              <img src="/images/Shopicon.png" alt="Account" className="nav-profile-icon-img" />
+              <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g clipPath="url(#clip0_524_232)">
+                  <circle cx="15" cy="10" r="6" stroke={navbar.textColor || '#012B28'} strokeWidth="2"/>
+                  <path d="M4 28C4 21.3726 8.92487 16 15 16" stroke={navbar.textColor || '#012B28'} strokeWidth="2"/>
+                  <path d="M18.2222 28L20.4444 23.875L16 23.325L22.6667 17H23.7778L21.5556 21.125L26 21.675L19.3333 28H18.2222Z" fill="#FF0000"/>
+                </g>
+                <defs>
+                  <clipPath id="clip0_524_232">
+                    <rect width="30" height="30" fill="white"/>
+                  </clipPath>
+                </defs>
+              </svg>
               {wishlistCount > 0 && (
                 <span className="nav-wishlist-badge">{wishlistCount}</span>
               )}
@@ -444,11 +453,16 @@ export default function Navbar() {
 
           {/* Cart */}
           <button className="nav-icon-link cart-link" onClick={toggleCart} aria-label="Cart">
-            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30" fill="none">
-              <path d="M25.8828 11L24.1045 27H5.89551L4.11719 11H25.8828Z"
-                stroke={navbar.textColor || '#012B28'} strokeWidth="2"/>
-              <path d="M20 11C20 11 20.0002 3 15.0001 3C9.99987 3 10 11 10 11"
-                stroke={navbar.textColor || '#012B28'} strokeWidth="2"/>
+            <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g clipPath="url(#clip0_524_224)">
+                <path d="M25.8828 11L24.1045 27H5.89551L4.11719 11H25.8828Z" stroke={navbar.textColor || '#012B28'} strokeWidth="2"/>
+                <path d="M20 11C20 11 20.0002 3 15.0001 3C9.99987 3 10 11 10 11" stroke={navbar.textColor || '#012B28'} strokeWidth="2"/>
+              </g>
+              <defs>
+                <clipPath id="clip0_524_224">
+                  <rect width="30" height="30" fill="white"/>
+                </clipPath>
+              </defs>
             </svg>
             {cartCount > 0 && (
               <svg className="cart-badge-svg" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
