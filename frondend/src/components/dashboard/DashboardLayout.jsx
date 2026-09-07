@@ -4,7 +4,7 @@ import {
   FiDroplet, FiNavigation, FiImage, FiBox, FiLayout, FiFileText,
   FiArrowLeft, FiRefreshCw, FiExternalLink, FiMonitor, FiSmartphone,
   FiTablet, FiChevronLeft, FiChevronRight, FiChevronDown, FiEye, FiSave, FiCheck, FiShoppingCart,
-  FiLogOut
+  FiLogOut, FiColumns, FiMaximize2
 } from 'react-icons/fi';
 import { useSiteConfig } from '../../context/SiteConfigContext';
 import NavbarEditor from './NavbarEditor';
@@ -69,17 +69,18 @@ function DashboardContent({ logout }) {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('navbar');
   const [viewportMode, setViewportMode] = useState('desktop');
+  const [viewMode, setViewMode] = useState('split'); // 'split' | 'editor'
   const [leftCollapsed, setLeftCollapsed] = useState(false);
   const [rightCollapsed, setRightCollapsed] = useState(false);
   const [saveFlash, setSaveFlash] = useState(false);
   const [leftPanelWidth, setLeftPanelWidth] = useState(260);
-  const [rightPanelWidth, setRightPanelWidth] = useState(400);
+  const [rightPanelWidth, setRightPanelWidth] = useState(480);
   const [isResizing, setIsResizing] = useState(false);
   const isResizingLeftRef = useRef(false);
   const isResizingRightRef = useRef(false);
   const iframeRef = useRef(null);
 
-  const [expandedGroups, setExpandedGroups] = useState({ 'Home': false, 'Store': true });
+  const [expandedGroups, setExpandedGroups] = useState({ 'Home': true, 'Store': true });
 
   const toggleGroup = (title) => {
     setExpandedGroups(prev => ({ ...prev, [title]: !prev[title] }));
@@ -292,20 +293,45 @@ function DashboardContent({ logout }) {
         </div>
 
         <div className="shopify-dash__header-center">
-          {/* Viewport switcher */}
+          {/* View Mode & Viewport switcher */}
           {activeSection !== 'orders' && activeSection !== 'products' && (
-            <div className="shopify-dash__viewport-switcher">
-              {viewportModes.map((mode) => (
+            <>
+              <div className="shopify-dash__mode-switcher">
                 <button
-                  key={mode.id}
-                  className={`shopify-dash__viewport-btn ${viewportMode === mode.id ? 'shopify-dash__viewport-btn--active' : ''}`}
-                  onClick={() => setViewportMode(mode.id)}
-                  title={mode.label}
+                  type="button"
+                  className={`shopify-dash__mode-btn ${viewMode === 'split' ? 'shopify-dash__mode-btn--active' : ''}`}
+                  onClick={() => setViewMode('split')}
+                  title="Split View (Preview + Editor side-by-side)"
                 >
-                  <mode.icon size={16} />
+                  <FiColumns size={14} />
+                  <span>Split View</span>
                 </button>
-              ))}
-            </div>
+                <button
+                  type="button"
+                  className={`shopify-dash__mode-btn ${viewMode === 'editor' ? 'shopify-dash__mode-btn--active' : ''}`}
+                  onClick={() => setViewMode('editor')}
+                  title="Full Workspace (Editor Focus Mode)"
+                >
+                  <FiMaximize2 size={13} />
+                  <span>Full Workspace</span>
+                </button>
+              </div>
+
+              {viewMode === 'split' && (
+                <div className="shopify-dash__viewport-switcher">
+                  {viewportModes.map((mode) => (
+                    <button
+                      key={mode.id}
+                      className={`shopify-dash__viewport-btn ${viewportMode === mode.id ? 'shopify-dash__viewport-btn--active' : ''}`}
+                      onClick={() => setViewportMode(mode.id)}
+                      title={mode.label}
+                    >
+                      <mode.icon size={16} />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </div>
 
@@ -429,9 +455,9 @@ function DashboardContent({ logout }) {
         )}
 
         {/* Dynamic Center and Right Layout */}
-        {activeSection === 'orders' || activeSection === 'products' ? (
+        {activeSection === 'orders' || activeSection === 'products' || viewMode === 'editor' ? (
           <main className="shopify-dash__center" style={{ background: '#f8f9fb', padding: '32px', overflowY: 'auto', flex: 1, display: 'block' }}>
-            <div style={{ maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
+            <div style={{ maxWidth: '1100px', margin: '0 auto', width: '100%' }}>
               <ActiveEditor />
             </div>
           </main>

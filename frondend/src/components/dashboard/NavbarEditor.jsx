@@ -1,50 +1,12 @@
-import { useState, useRef } from 'react';
-import { FiPlus, FiTrash2, FiMove, FiUpload, FiImage, FiX } from 'react-icons/fi';
+import { useState } from 'react';
+import { FiPlus, FiTrash2 } from 'react-icons/fi';
 import { useSiteConfig } from '../../context/SiteConfigContext';
-import { compressImage } from '../../utils/imageOptimizer';
+import ImageUploader from './ImageUploader';
 import './NavbarEditor.css';
 
 export default function NavbarEditor() {
   const { config, updateConfig } = useSiteConfig();
   const { navbar, announcement } = config;
-  const [logoDragActive, setLogoDragActive] = useState(false);
-  const logoFileInputRef = useRef(null);
-
-  const handleLogoFile = async (file) => {
-    if (!file || !file.type.startsWith('image/')) return;
-    try {
-      const compressed = await compressImage(file, 240, 240, 0.75);
-      updateConfig('navbar.logo', compressed);
-    } catch (err) {
-      console.error('Error compressing logo image:', err);
-    }
-  };
-
-  const handleLogoFileChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) handleLogoFile(file);
-    e.target.value = '';
-  };
-
-  const handleLogoDrop = (e) => {
-    e.preventDefault();
-    setLogoDragActive(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file) handleLogoFile(file);
-  };
-
-  const handleLogoDragOver = (e) => {
-    e.preventDefault();
-    setLogoDragActive(true);
-  };
-
-  const handleLogoDragLeave = () => {
-    setLogoDragActive(false);
-  };
-
-  const removeLogo = () => {
-    updateConfig('navbar.logo', '');
-  };
 
   const updateNavItem = (index, field, value) => {
     const items = [...navbar.items];
@@ -148,56 +110,15 @@ export default function NavbarEditor() {
 
         {/* Logo Upload */}
         <div className="dash-field">
-          <label className="dash-field__label">Logo Image</label>
-
-          {/* Preview */}
-          {navbar.logo && (
-            <div className="nb-logo-preview">
-              <img src={navbar.logo} alt="Logo preview" className="nb-logo-preview__img" />
-              <button className="nb-logo-preview__remove" onClick={removeLogo} title="Remove logo">
-                <FiX size={14} /> Remove
-              </button>
-            </div>
-          )}
-
-          {/* Upload and URL options (hidden if logo exists) */}
-          {!navbar.logo && (
-            <>
-              {/* Upload zone */}
-              <div
-                className={`nb-logo-upload ${logoDragActive ? 'nb-logo-upload--active' : ''}`}
-                onClick={() => logoFileInputRef.current?.click()}
-                onDrop={handleLogoDrop}
-                onDragOver={handleLogoDragOver}
-                onDragLeave={handleLogoDragLeave}
-              >
-                <input
-                  ref={logoFileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleLogoFileChange}
-                  style={{ display: 'none' }}
-                />
-                <div className="nb-logo-upload__icon"><FiUpload size={20} /></div>
-                <p className="nb-logo-upload__text"><strong>Click to upload</strong> or drag & drop</p>
-                <p className="nb-logo-upload__hint">PNG, JPG, SVG, WEBP</p>
-              </div>
-
-              {/* URL paste */}
-              <div className="nb-logo-url">
-                <div className="nb-logo-url__divider"><span>or paste image URL</span></div>
-                <div className="nb-logo-url__row">
-                  <FiImage size={15} className="nb-logo-url__icon" />
-                  <input
-                    className="dash-field__input nb-logo-url__input"
-                    value={navbar.logo}
-                    onChange={(e) => updateConfig('navbar.logo', e.target.value)}
-                    placeholder="https://example.com/logo.png"
-                  />
-                </div>
-              </div>
-            </>
-          )}
+          <ImageUploader
+            label="Logo Image"
+            value={navbar.logo}
+            onChange={(val) => updateConfig('navbar.logo', val)}
+            placeholder="https://example.com/logo.svg or /images/..."
+            maxWidth={400}
+            maxHeight={400}
+            helperText="Upload an SVG, PNG, JPG or paste raw SVG code for crisp vector rendering."
+          />
         </div>
 
 

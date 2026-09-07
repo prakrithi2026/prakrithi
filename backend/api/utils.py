@@ -14,6 +14,10 @@ def compress_base64_image(base64_str, max_width=1200, max_height=1200, quality=8
     if not base64_str.startswith('data:image/'):
         return base64_str
 
+    # Fast bypass: preserve vector SVG images without PIL rasterization
+    if base64_str.startswith('data:image/svg+xml'):
+        return base64_str
+
     # Fast bypass: if it's already WebP and < 800KB, it's already optimized by the frontend
     if base64_str.startswith('data:image/webp;base64,') and len(base64_str) < 800000:
         return base64_str

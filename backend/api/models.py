@@ -44,7 +44,7 @@ class Product(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        if self.image and isinstance(self.image, str) and self.image.startswith('data:image/') and not self.image.startswith('data:image/webp;base64,'):
+        if self.image and isinstance(self.image, str) and self.image.startswith('data:image/') and not self.image.startswith('data:image/webp;base64,') and not self.image.startswith('data:image/svg+xml'):
             try:
                 from .utils import compress_base64_image
                 self.image = compress_base64_image(self.image, max_width=800, max_height=800, quality=80)

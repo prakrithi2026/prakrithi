@@ -10,14 +10,18 @@ export default function ReviewSection() {
     background: `linear-gradient(90deg, #0D5130 0%, #9FBD58 100%)`
   };
 
-  const isLegacyBase64 = typeof image === 'string' && image.startsWith('data:image/webp;base64,UklGRsgMAAB');
-  const reviewImage = (!image || isLegacyBase64) ? '/images/rating.png' : image;
+  // Only display image if admin provided an image URL or SVG code (legacy fallback removed)
+  const isLegacy = typeof image === 'string' && (
+    image === '/images/rating.png' ||
+    image.startsWith('data:image/webp;base64,UklGRsgMAAB')
+  );
+  const reviewImage = (!image || isLegacy) ? '' : image;
 
   return (
     <section className="review-section" style={dynamicStyle}>
-      <div className="review-container">
+      <div className={`review-container ${!reviewImage ? 'review-container--no-image' : ''}`}>
         
-        {/* Left Image Column */}
+        {/* Left Image Column - Only displayed if admin added an image URL or SVG code */}
         {reviewImage ? (
           <div className="review-laurel-col">
             <img src={reviewImage} alt="Reviews Graphic" className="review-left-uploaded-img" />

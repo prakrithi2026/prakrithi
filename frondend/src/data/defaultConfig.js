@@ -259,7 +259,7 @@ const defaultConfig = {
     "familyCount": "1000+",
     "googleRating": 4.9,
     "totalReviews": 1183,
-    "image": "/images/rating.png"
+    "image": ""
   },
   "footer": {
     "brandName": "Prakrithi Origins",

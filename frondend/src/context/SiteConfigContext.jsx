@@ -53,8 +53,8 @@ function getInitialConfig() {
   if (!Array.isArray(base.sections)) {
     base.sections = defaultConfig.sections || [];
   }
-  if (base.reviewsSection && (!base.reviewsSection.image || base.reviewsSection.image.startsWith('data:image/webp;base64,UklGRsgMAAB'))) {
-    base.reviewsSection = { ...base.reviewsSection, image: '/images/rating.png' };
+  if (base.reviewsSection && (base.reviewsSection.image === '/images/rating.png' || (typeof base.reviewsSection.image === 'string' && base.reviewsSection.image.startsWith('data:image/webp;base64,UklGRsgMAAB')))) {
+    base.reviewsSection = { ...base.reviewsSection, image: '' };
   }
   if (Array.isArray(base.delivery?.steps)) {
     base.delivery.steps = base.delivery.steps.map((step, idx) => {
@@ -192,9 +192,9 @@ export function SiteConfigProvider({ children }) {
           }));
         }
 
-        // Ensure reviewsSection uses the new rating image if it has the legacy base64 or is empty
-        if (mergedConfig.reviewsSection && (!mergedConfig.reviewsSection.image || mergedConfig.reviewsSection.image.startsWith('data:image/webp;base64,UklGRsgMAAB'))) {
-          mergedConfig.reviewsSection.image = '/images/rating.png';
+        // Ensure reviewsSection does not retain legacy /images/rating.png or legacy base64
+        if (mergedConfig.reviewsSection && (mergedConfig.reviewsSection.image === '/images/rating.png' || (typeof mergedConfig.reviewsSection.image === 'string' && mergedConfig.reviewsSection.image.startsWith('data:image/webp;base64,UklGRsgMAAB')))) {
+          mergedConfig.reviewsSection.image = '';
         }
 
         // Ensure hero banners fallback to defaultConfig if backend returns empty images

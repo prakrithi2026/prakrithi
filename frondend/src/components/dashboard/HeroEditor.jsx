@@ -1,34 +1,20 @@
 import { useState, useRef } from 'react';
 import { 
   FiUpload, FiImage, FiPlus, FiTrash2, FiMonitor, FiSmartphone, 
-  FiInfo, FiChevronLeft, FiChevronRight, FiStar, FiSave, FiCheck 
+  FiInfo, FiChevronLeft, FiChevronRight, FiStar
 } from 'react-icons/fi';
 import { useSiteConfig } from '../../context/SiteConfigContext';
-import { compressImage } from '../../utils/imageOptimizer';
+import { compressImage, normalizeImageInput } from '../../utils/imageOptimizer';
 import './HeroEditor.css';
 
 export default function HeroEditor() {
-  const { config, updateConfig, saveConfig, hasUnsavedChanges } = useSiteConfig();
+  const { config, updateConfig } = useSiteConfig();
   const { hero } = config;
   const [deviceView, setDeviceView] = useState('desktop'); // 'desktop' | 'mobile'
+  const [uploadMode, setUploadMode] = useState('file'); // 'file' | 'url'
   const [dragActive, setDragActive] = useState(false);
   const [urlInput, setUrlInput] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveSuccess, setSaveSuccess] = useState(false);
   const fileInputRef = useRef(null);
-
-  const handleSave = async () => {
-    setIsSaving(true);
-    try {
-      const res = await saveConfig();
-      if (res?.success) {
-        setSaveSuccess(true);
-        setTimeout(() => setSaveSuccess(false), 3000);
-      }
-    } finally {
-      setIsSaving(false);
-    }
-  };
 
   const desktopImages = Array.isArray(hero.images) 
     ? hero.images 
@@ -103,7 +89,8 @@ export default function HeroEditor() {
   const addImageUrl = () => {
     if (!urlInput.trim()) return;
     const trimmed = urlInput.trim();
-    const updated = [...currentImages, trimmed];
+    const formatted = normalizeImageInput(trimmed);
+    const updated = [...currentImages, formatted];
     setImagesForDevice(deviceView, updated);
     setUrlInput('');
   };
@@ -147,42 +134,7 @@ export default function HeroEditor() {
             <h2 className="dash-panel__title">🖼️ Hero Banner</h2>
             <p className="dash-panel__subtitle">Upload, replace, or reorder responsive banners for Desktop and Mobile views</p>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginLeft: 'auto' }}>
-            <button
-              type="button"
-              className="dash-btn dash-btn--primary"
-              onClick={handleSave}
-              disabled={isSaving}
-              style={{
-                height: '36px',
-                padding: '0 16px',
-                fontSize: '0.85rem',
-                fontWeight: 600,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                backgroundColor: saveSuccess ? '#16a34a' : hasUnsavedChanges ? '#00472A' : '#334155',
-                borderColor: saveSuccess ? '#16a34a' : hasUnsavedChanges ? '#00472A' : '#334155',
-                color: '#ffffff',
-                cursor: isSaving ? 'not-allowed' : 'pointer',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              {isSaving ? (
-                <span>Saving...</span>
-              ) : saveSuccess ? (
-                <>
-                  <FiCheck size={16} />
-                  <span>Saved!</span>
-                </>
-              ) : (
-                <>
-                  <FiSave size={16} />
-                  <span>Save Hero Banners</span>
-                </>
-              )}
-            </button>
-            <div style={{ width: '1px', height: '24px', backgroundColor: '#e2e8f0', margin: '0 4px' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginLeft: 'auto' }}>
             <span style={{ fontSize: '0.82rem', color: hero.enabled !== false ? '#16a34a' : '#9ca3af', fontWeight: 600 }}>
               {hero.enabled !== false ? 'Visible' : 'Hidden'}
             </span>
@@ -270,62 +222,85 @@ export default function HeroEditor() {
               )}
             </div>
 
-            {/* Upload Area */}
+            {/* Upload Banner Area */}
             <div className="hero-editor-image-section">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
                 <label className="dash-field__label" style={{ margin: 0, fontWeight: 700 }}>
                   Upload {deviceView === 'desktop' ? 'Desktop / Laptop' : 'Mobile'} Banner
                 </label>
               </div>
-              
-              <div
-                className={`hero-editor-upload ${dragActive ? 'hero-editor-upload--active' : ''}`}
-                onClick={() => fileInputRef.current?.click()}
-                onDrop={handleDrop}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                style={{ cursor: 'pointer' }}
-              >
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handleFileChange}
-                  style={{ display: 'none' }}
-                />
-                <div className="hero-editor-upload__icon"><FiUpload size={28} /></div>
-                <p className="hero-editor-upload__text">
-                  <strong>Click to upload</strong> or drag &amp; drop {deviceView === 'desktop' ? 'desktop' : 'mobile'} image(s)
-                </p>
-                <p className="hero-editor-upload__hint">
-                  Upload one or multiple images. When multiple images are added, they automatically cycle as slides.
-                </p>
-                <p className="hero-editor-upload__hint" style={{ marginTop: '4px' }}>
-                  {deviceView === 'desktop'
-                    ? 'PNG, JPG, WEBP (Landscape 16:9 / 21:9 — 1920×1080 recommended)'
-                    : 'PNG, JPG, WEBP (Portrait 4:5 / 9:16 — 1080×1350 recommended)'}
-                </p>
+
+              {/* Tabs */}
+              <div className="img-uploader__tabs" style={{ marginBottom: '14px' }}>
+                <button
+                  type="button"
+                  className={`img-uploader__tab ${uploadMode === 'file' ? 'img-uploader__tab--active' : ''}`}
+                  onClick={() => setUploadMode('file')}
+                >
+                  <FiUpload size={13} /> Upload Image File(s)
+                </button>
+                <button
+                  type="button"
+                  className={`img-uploader__tab ${uploadMode === 'url' ? 'img-uploader__tab--active' : ''}`}
+                  onClick={() => setUploadMode('url')}
+                >
+                  <FiImage size={13} /> Image URL
+                </button>
               </div>
 
-              {/* URL Input */}
-              <div className="hero-editor-url" style={{ marginTop: '16px' }}>
-                <div className="hero-editor-url__divider"><span>or paste image URL</span></div>
-                <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
-                  <div className="hero-editor-url__input-wrap" style={{ flex: 1 }}>
-                    <FiImage size={16} className="hero-editor-url__icon" />
-                    <input
-                      className="dash-field__input hero-editor-url__input"
-                      value={urlInput}
-                      onChange={(e) => setUrlInput(e.target.value)}
-                      placeholder={deviceView === 'desktop' ? "https://example.com/desktop-banner.jpg" : "https://example.com/mobile-banner.jpg"}
-                    />
-                  </div>
-                  <button className="dash-btn" onClick={addImageUrl} style={{ height: '42px', padding: '0 16px' }}>
-                    <FiPlus size={16} style={{ marginRight: '6px' }} /> Add Image
-                  </button>
+              {uploadMode === 'file' && (
+                <div
+                  className={`hero-editor-upload ${dragActive ? 'hero-editor-upload--active' : ''}`}
+                  onClick={() => fileInputRef.current?.click()}
+                  onDrop={handleDrop}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/jpg,image/webp"
+                    multiple
+                    onChange={handleFileChange}
+                    style={{ display: 'none' }}
+                  />
+                  <div className="hero-editor-upload__icon"><FiUpload size={28} /></div>
+                  <p className="hero-editor-upload__text">
+                    <strong>Click to upload</strong> or drag &amp; drop {deviceView === 'desktop' ? 'desktop' : 'mobile'} image(s)
+                  </p>
+                  <p className="hero-editor-upload__hint">
+                    {deviceView === 'desktop'
+                      ? 'PNG, JPG, WEBP (Landscape 16:9 / 21:9 — 1920×1080 recommended)'
+                      : 'PNG, JPG, WEBP (Portrait 4:5 / 9:16 — 1080×1350 recommended)'}
+                  </p>
                 </div>
-              </div>
+              )}
+
+              {uploadMode === 'url' && (
+                <div className="hero-editor-url" style={{ marginTop: '6px' }}>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <div className="hero-editor-url__input-wrap" style={{ flex: 1 }}>
+                      <FiImage size={16} className="hero-editor-url__icon" />
+                      <input
+                        className="dash-field__input hero-editor-url__input"
+                        value={urlInput}
+                        onChange={(e) => setUrlInput(e.target.value)}
+                        placeholder={deviceView === 'desktop' ? "https://example.com/desktop-banner.jpg or /images/..." : "https://example.com/mobile-banner.jpg or /images/..."}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            addImageUrl();
+                          }
+                        }}
+                      />
+                    </div>
+                    <button className="dash-btn dash-btn--primary" onClick={addImageUrl} style={{ height: '42px', padding: '0 16px', display: 'flex', alignItems: 'center' }}>
+                      <FiPlus size={16} style={{ marginRight: '6px' }} /> Add Image
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Uploaded Images List for Active View */}
@@ -427,62 +402,6 @@ export default function HeroEditor() {
                   })}
                 </div>
               )}
-
-              {/* Bottom Save Bar */}
-              <div style={{
-                marginTop: '24px',
-                padding: '16px 20px',
-                backgroundColor: '#f8fafc',
-                border: '1px solid #e2e8f0',
-                borderRadius: '10px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                flexWrap: 'wrap',
-                gap: '12px'
-              }}>
-                <div>
-                  <strong style={{ fontSize: '0.9rem', color: '#1e293b' }}>
-                    {hasUnsavedChanges ? '⚠️ You have unsaved hero banner changes' : '✓ Hero banners are synced with server'}
-                  </strong>
-                  <p style={{ margin: '2px 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>
-                    Click Save to persist changes to the database and update your live storefront.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  className="dash-btn dash-btn--primary"
-                  onClick={handleSave}
-                  disabled={isSaving}
-                  style={{
-                    height: '40px',
-                    padding: '0 20px',
-                    fontSize: '0.9rem',
-                    fontWeight: 600,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    backgroundColor: saveSuccess ? '#16a34a' : '#00472A',
-                    borderColor: saveSuccess ? '#16a34a' : '#00472A',
-                    color: '#ffffff',
-                    cursor: isSaving ? 'not-allowed' : 'pointer',
-                  }}
-                >
-                  {isSaving ? (
-                    <span>Saving...</span>
-                  ) : saveSuccess ? (
-                    <>
-                      <FiCheck size={18} />
-                      <span>Saved Successfully!</span>
-                    </>
-                  ) : (
-                    <>
-                      <FiSave size={18} />
-                      <span>Save Hero Banners</span>
-                    </>
-                  )}
-                </button>
-              </div>
             </div>
           </>
         )}

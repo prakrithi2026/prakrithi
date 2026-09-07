@@ -77,6 +77,45 @@
   justify-content: center;
 }
 
+.shopify-dash__mode-switcher {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  margin-right: 12px;
+}
+
+.shopify-dash__mode-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 8px;
+  background: transparent;
+  color: #8b8ba4;
+  border: none;
+  cursor: pointer;
+  font-size: 0.76rem;
+  font-weight: 600;
+  transition: all 200ms ease;
+  white-space: nowrap;
+}
+
+.shopify-dash__mode-btn:hover {
+  color: #e2e8f0;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.shopify-dash__mode-btn--active {
+  background: rgba(0, 107, 63, 0.35) !important;
+  color: #5fe8a8 !important;
+  box-shadow: 0 2px 8px rgba(0, 107, 63, 0.2);
+}
+
 .shopify-dash__viewport-switcher {
   display: flex;
   align-items: center;
@@ -354,8 +393,8 @@
 }
 
 .shopify-dash__group-header:hover {
-  background: #f0f0f5;
-  color: #111;
+  background: rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
 }
 
 .shopify-dash__group-title-text {
@@ -708,7 +747,8 @@
   }
   .shopify-dash__preview-btn span,
   .shopify-dash__save-btn span,
-  .shopify-dash__discard-btn span {
+  .shopify-dash__discard-btn span,
+  .shopify-dash__mode-btn span {
     display: none;
   }
   .shopify-dash__unsaved-badge {

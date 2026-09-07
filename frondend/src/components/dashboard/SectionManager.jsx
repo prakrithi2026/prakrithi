@@ -1,7 +1,7 @@
-import { useState, useRef } from 'react';
-import { FiPlus, FiTrash2, FiUpload, FiCopy, FiCheck, FiX, FiImage } from 'react-icons/fi';
+import { useState } from 'react';
+import { FiPlus, FiTrash2, FiCopy, FiCheck, FiX } from 'react-icons/fi';
 import { useSiteConfig } from '../../context/SiteConfigContext';
-import { compressImage } from '../../utils/imageOptimizer';
+import ImageUploader from './ImageUploader';
 import './SectionManager.css';
 
 export default function SectionManager() {
@@ -9,7 +9,6 @@ export default function SectionManager() {
   const { sections } = config;
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [copiedId, setCopiedId] = useState(null);
-  const fileInputRefs = useRef({});
 
   const sortedSections = [...sections].sort((a, b) => a.order - b.order);
   const coreSections = ['shopByProduct', 'delivery', 'shopByConcern', 'press', 'reviews', 'ourStory'];
@@ -40,17 +39,6 @@ export default function SectionManager() {
     const updated = sections.filter((s) => s.id !== id).map((s, i) => ({ ...s, order: i }));
     updateConfig('sections', updated);
     setDeleteConfirm(null);
-  };
-
-  const handleBgImageUpload = async (sectionId, file) => {
-    if (!file || !file.type.startsWith('image/')) return;
-    try {
-      const compressed = await compressImage(file, 800, 800, 0.65);
-      const updated = sections.map((s) => s.id === sectionId ? { ...s, bgImage: compressed } : s);
-      updateConfig('sections', updated);
-    } catch (err) {
-      console.error('Error compressing background image:', err);
-    }
   };
 
   const handleBgImageUrl = (sectionId, url) => {
@@ -84,15 +72,6 @@ export default function SectionManager() {
   const removeDeliveryStep = (idx) => {
     updateConfig('delivery.steps', config.delivery.steps.filter((_, i) => i !== idx));
   };
-  const handleDeliveryStepImageUpload = async (idx, file) => {
-    if (!file || !file.type.startsWith('image/')) return;
-    try {
-      const compressed = await compressImage(file, 160, 160, 0.85);
-      updateDeliveryStep(idx, 'image', compressed);
-    } catch (err) {
-      console.error('Error compressing delivery step image:', err);
-    }
-  };
 
   /* ── Press logos helpers ── */
   const addPressLogo = () => {
@@ -106,15 +85,6 @@ export default function SectionManager() {
   };
   const removePressLogo = (idx) => {
     updateConfig('press.logos', config.press.logos.filter((_, i) => i !== idx));
-  };
-  const handlePressLogoImageUpload = async (idx, file) => {
-    if (!file || !file.type.startsWith('image/')) return;
-    try {
-      const compressed = await compressImage(file, 350, 150, 0.85);
-      updatePressLogo(idx, 'image', compressed);
-    } catch (err) {
-      console.error('Error compressing press logo image:', err);
-    }
   };
 
   /* ── Category helpers ── */
@@ -168,22 +138,6 @@ export default function SectionManager() {
               </div>
 
               <div className="section-item__actions">
-                {!coreSections.includes(section.id) && (
-                  <button className="section-item__img-btn" onClick={() => {
-                    if (!fileInputRefs.current[section.id]) {
-                      fileInputRefs.current[section.id] = document.createElement('input');
-                      fileInputRefs.current[section.id].type = 'file';
-                      fileInputRefs.current[section.id].accept = 'image/*';
-                      fileInputRefs.current[section.id].addEventListener('change', (e) => {
-                        handleBgImageUpload(section.id, e.target.files?.[0]);
-                        e.target.value = '';
-                      });
-                    }
-                    fileInputRefs.current[section.id].click();
-                  }} title="Add background image">
-                    <FiImage size={14} />
-                  </button>
-                )}
 
                 {!coreSections.includes(section.id) && (
                   deleteConfirm === section.id ? (
@@ -208,30 +162,16 @@ export default function SectionManager() {
                 </label>
               </div>
 
-              {/* BG preview for custom sections */}
-              {!coreSections.includes(section.id) && section.bgImage && (
-                <div className="section-item__bg-preview">
-                  <div className="section-item__bg-thumb" style={{ backgroundImage: `url(${section.bgImage})` }} />
-                  <div className="section-item__bg-actions">
-                    <button className="section-item__bg-action-btn" onClick={() => copyImageUrl(section.id, section.bgImage)}>
-                      {copiedId === section.id ? <FiCheck size={12} /> : <FiCopy size={12} />}
-                      {copiedId === section.id ? 'Copied!' : 'Copy URL'}
-                    </button>
-                    <button className="section-item__bg-action-btn section-item__bg-action-btn--remove" onClick={() => removeBgImage(section.id)}>
-                      <FiX size={12} /> Remove
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {!coreSections.includes(section.id) && !section.bgImage && (
-                <div className="section-item__url-input">
-                  <FiImage size={13} className="section-item__url-icon" />
-                  <input
-                    className="section-item__url-field"
-                    placeholder="Paste background image URL..."
+              {!coreSections.includes(section.id) && (
+                <div style={{ marginTop: '12px', width: '100%' }}>
+                  <ImageUploader
+                    compact
+                    label="Background Image / SVG"
                     value={section.bgImage || ''}
-                    onChange={(e) => handleBgImageUrl(section.id, e.target.value)}
+                    onChange={(val) => handleBgImageUrl(section.id, val)}
+                    placeholder="https://example.com/bg.jpg or paste SVG code..."
+                    maxWidth={800}
+                    maxHeight={800}
                   />
                 </div>
               )}
@@ -304,47 +244,14 @@ export default function SectionManager() {
                 </button>
               </div>
 
-              {/* Image preview */}
-              {step.image && (
-                <div className="delivery-step-card__preview">
-                  <img src={step.image} alt="" className="delivery-step-card__preview-img" />
-                  <button className="delivery-step-card__preview-remove" onClick={() => updateDeliveryStep(i, 'image', '')}
-                    title="Remove image">
-                    <FiX size={14} /> Remove
-                  </button>
-                </div>
-              )}
-
-              {/* Upload zone */}
-              {!step.image && (
-                <>
-                  <div className="delivery-step-card__upload" onClick={() => {
-                    const input = document.createElement('input');
-                    input.type = 'file';
-                    input.accept = 'image/*';
-                    input.onchange = (e) => handleDeliveryStepImageUpload(i, e.target.files?.[0]);
-                    input.click();
-                  }}>
-                    <FiUpload size={18} className="delivery-step-card__upload-icon" />
-                    <p className="delivery-step-card__upload-text"><strong>Click to upload</strong> image</p>
-                    <p className="delivery-step-card__upload-hint">PNG, JPG, SVG, WEBP</p>
-                  </div>
-
-                  {/* OR paste URL */}
-                  <div className="delivery-step-card__url">
-                    <div className="delivery-step-card__url-divider"><span>or paste image URL</span></div>
-                    <div className="delivery-step-card__url-row">
-                      <FiImage size={14} className="delivery-step-card__url-icon" />
-                      <input
-                        className="dash-field__input delivery-step-card__url-input"
-                        value={step.image || ''}
-                        onChange={(e) => updateDeliveryStep(i, 'image', e.target.value)}
-                        placeholder="https://example.com/icon.svg"
-                      />
-                    </div>
-                  </div>
-                </>
-              )}
+              <ImageUploader
+                compact
+                value={step.image || ''}
+                onChange={(val) => updateDeliveryStep(i, 'image', val)}
+                placeholder="https://example.com/icon.svg"
+                maxWidth={160}
+                maxHeight={160}
+              />
             </div>
           ))}
         </div>
@@ -412,47 +319,14 @@ export default function SectionManager() {
 
 
 
-              {/* Image preview */}
-              {logo.image && (
-                <div className="delivery-step-card__preview">
-                  <img src={logo.image} alt="" className="delivery-step-card__preview-img" />
-                  <button className="delivery-step-card__preview-remove" onClick={() => updatePressLogo(i, 'image', '')}
-                    title="Remove image">
-                    <FiX size={14} /> Remove
-                  </button>
-                </div>
-              )}
-
-              {/* Upload zone */}
-              {!logo.image && (
-                <>
-                  <div className="delivery-step-card__upload" onClick={() => {
-                    const input = document.createElement('input');
-                    input.type = 'file';
-                    input.accept = 'image/*';
-                    input.onchange = (e) => handlePressLogoImageUpload(i, e.target.files?.[0]);
-                    input.click();
-                  }}>
-                    <FiUpload size={18} className="delivery-step-card__upload-icon" />
-                    <p className="delivery-step-card__upload-text"><strong>Click to upload</strong> logo image</p>
-                    <p className="delivery-step-card__upload-hint">PNG, JPG, SVG, WEBP</p>
-                  </div>
-
-                  {/* OR paste URL */}
-                  <div className="delivery-step-card__url">
-                    <div className="delivery-step-card__url-divider"><span>or paste image URL</span></div>
-                    <div className="delivery-step-card__url-row">
-                      <FiImage size={14} className="delivery-step-card__url-icon" />
-                      <input
-                        className="dash-field__input delivery-step-card__url-input"
-                        value={logo.image || ''}
-                        onChange={(e) => updatePressLogo(i, 'image', e.target.value)}
-                        placeholder="https://example.com/logo.svg"
-                      />
-                    </div>
-                  </div>
-                </>
-              )}
+              <ImageUploader
+                compact
+                value={logo.image || ''}
+                onChange={(val) => updatePressLogo(i, 'image', val)}
+                placeholder="https://example.com/logo.svg"
+                maxWidth={350}
+                maxHeight={150}
+              />
             </div>
           ))}
         </div>
@@ -486,55 +360,16 @@ export default function SectionManager() {
         </div>
 
         {/* Image upload */}
-        <h4 style={{ marginTop: '16px', marginBottom: '10px', fontSize: '0.88rem', fontWeight: 600 }}>Story Image</h4>
-        <div className="delivery-step-card">
-          {config.ourStory?.image ? (
-            <div className="delivery-step-card__preview">
-              <img src={config.ourStory.image} alt="Our Story" className="delivery-step-card__preview-img" />
-              <button
-                className="delivery-step-card__preview-remove"
-                onClick={() => updateConfig('ourStory.image', '')}
-                title="Remove image"
-              >
-                <FiX size={14} /> Remove
-              </button>
-            </div>
-          ) : (
-            <>
-              <div className="delivery-step-card__upload" onClick={() => {
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = 'image/*';
-                input.onchange = async (e) => {
-                  const file = e.target.files?.[0];
-                  if (!file || !file.type.startsWith('image/')) return;
-                  try {
-                    const compressed = await compressImage(file, 700, 700, 0.65);
-                    updateConfig('ourStory.image', compressed);
-                  } catch (err) {
-                    console.error('Error compressing story image:', err);
-                  }
-                };
-                input.click();
-              }}>
-                <FiUpload size={18} className="delivery-step-card__upload-icon" />
-                <p className="delivery-step-card__upload-text"><strong>Click to upload</strong> image</p>
-                <p className="delivery-step-card__upload-hint">PNG, JPG, SVG, WEBP</p>
-              </div>
-              <div className="delivery-step-card__url">
-                <div className="delivery-step-card__url-divider"><span>or paste image URL</span></div>
-                <div className="delivery-step-card__url-row">
-                  <FiImage size={14} className="delivery-step-card__url-icon" />
-                  <input
-                    className="dash-field__input delivery-step-card__url-input"
-                    value={config.ourStory?.image || ''}
-                    onChange={(e) => updateConfig('ourStory.image', e.target.value)}
-                    placeholder="https://example.com/image.jpg"
-                  />
-                </div>
-              </div>
-            </>
-          )}
+        <div style={{ marginTop: '16px' }}>
+          <ImageUploader
+            label="Story Image"
+            value={config.ourStory?.image || ''}
+            onChange={(val) => updateConfig('ourStory.image', val)}
+            placeholder="https://example.com/story.jpg or /images/..."
+            maxWidth={700}
+            maxHeight={700}
+            helperText="Upload an SVG, PNG, JPG or paste raw SVG code."
+          />
         </div>
       </div>
 
@@ -558,55 +393,16 @@ export default function SectionManager() {
         </div>
 
         {/* Image upload */}
-        <h4 style={{ marginTop: '16px', marginBottom: '10px', fontSize: '0.88rem', fontWeight: 600 }}>Section Image (optional)</h4>
-        <div className="delivery-step-card">
-          {config.reviewsSection.image ? (
-            <div className="delivery-step-card__preview">
-              <img src={config.reviewsSection.image} alt="Review section" className="delivery-step-card__preview-img" />
-              <button
-                className="delivery-step-card__preview-remove"
-                onClick={() => updateConfig('reviewsSection.image', '')}
-                title="Remove image"
-              >
-                <FiX size={14} /> Remove
-              </button>
-            </div>
-          ) : (
-            <>
-              <div className="delivery-step-card__upload" onClick={() => {
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = 'image/*';
-                input.onchange = async (e) => {
-                  const file = e.target.files?.[0];
-                  if (!file || !file.type.startsWith('image/')) return;
-                  try {
-                    const compressed = await compressImage(file, 500, 500, 0.65);
-                    updateConfig('reviewsSection.image', compressed);
-                  } catch (err) {
-                    console.error('Error compressing review image:', err);
-                  }
-                };
-                input.click();
-              }}>
-                <FiUpload size={18} className="delivery-step-card__upload-icon" />
-                <p className="delivery-step-card__upload-text"><strong>Click to upload</strong> image</p>
-                <p className="delivery-step-card__upload-hint">PNG, JPG, SVG, WEBP</p>
-              </div>
-              <div className="delivery-step-card__url">
-                <div className="delivery-step-card__url-divider"><span>or paste image URL</span></div>
-                <div className="delivery-step-card__url-row">
-                  <FiImage size={14} className="delivery-step-card__url-icon" />
-                  <input
-                    className="dash-field__input delivery-step-card__url-input"
-                    value={config.reviewsSection.image || ''}
-                    onChange={(e) => updateConfig('reviewsSection.image', e.target.value)}
-                    placeholder="https://example.com/image.jpg"
-                  />
-                </div>
-              </div>
-            </>
-          )}
+        <div style={{ marginTop: '16px' }}>
+          <ImageUploader
+            label="Section Image (optional)"
+            value={config.reviewsSection.image || ''}
+            onChange={(val) => updateConfig('reviewsSection.image', val)}
+            placeholder="https://example.com/reviews.jpg or /images/..."
+            maxWidth={500}
+            maxHeight={500}
+            helperText="Paste SVG code or enter an image URL. If left empty, no image will be displayed."
+          />
         </div>
       </div>
 

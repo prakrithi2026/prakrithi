@@ -1,7 +1,7 @@
-import { useState, useRef } from 'react';
-import { FiPlus, FiEdit2, FiTrash2, FiX, FiSave, FiUpload, FiImage } from 'react-icons/fi';
+import { useState } from 'react';
+import { FiPlus, FiEdit2, FiTrash2, FiX, FiSave } from 'react-icons/fi';
 import { useSiteConfig } from '../../context/SiteConfigContext';
-import { compressImage } from '../../utils/imageOptimizer';
+import ImageUploader from './ImageUploader';
 import './ProductManager.css';
 
 const emptyProduct = {
@@ -27,44 +27,6 @@ export default function ProductManager() {
   const [isNew, setIsNew] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
-  const [imgDragActive, setImgDragActive] = useState(false);
-  const imgFileInputRef = useRef(null);
-
-  const handleProductImageFile = async (file) => {
-    if (!file || !file.type.startsWith('image/')) return;
-    try {
-      const compressed = await compressImage(file, 600, 600, 0.75);
-      setEditing((prev) => prev ? { ...prev, image: compressed } : prev);
-    } catch (err) {
-      console.error('Error compressing product image:', err);
-    }
-  };
-
-  const handleImgFileChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) handleProductImageFile(file);
-    e.target.value = '';
-  };
-
-  const handleImgDrop = (e) => {
-    e.preventDefault();
-    setImgDragActive(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file) handleProductImageFile(file);
-  };
-
-  const handleImgDragOver = (e) => {
-    e.preventDefault();
-    setImgDragActive(true);
-  };
-
-  const handleImgDragLeave = () => {
-    setImgDragActive(false);
-  };
-
-  const removeProductImage = () => {
-    setEditing((prev) => prev ? { ...prev, image: '' } : prev);
-  };
 
   const openNew = (isConcern) => {
     setEditing({ 
@@ -276,51 +238,16 @@ export default function ProductManager() {
 
               {/* ── Product Image Upload ── */}
               <div className="dash-field">
-                <label className="dash-field__label">Product Image</label>
-
-                {/* Preview */}
-                {editing.image && (
-                  <div className="pm-img-preview">
-                    <img src={editing.image} alt="Preview" className="pm-img-preview__img" />
-                    <button className="pm-img-preview__remove" onClick={removeProductImage} title="Remove image">
-                      <FiX size={14} /> Remove
-                    </button>
-                  </div>
-                )}
-
-                {/* Upload zone */}
-                <div
-                  className={`pm-img-upload ${imgDragActive ? 'pm-img-upload--active' : ''}`}
-                  onClick={() => imgFileInputRef.current?.click()}
-                  onDrop={handleImgDrop}
-                  onDragOver={handleImgDragOver}
-                  onDragLeave={handleImgDragLeave}
-                >
-                  <input
-                    ref={imgFileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImgFileChange}
-                    style={{ display: 'none' }}
-                  />
-                  <div className="pm-img-upload__icon"><FiUpload size={20} /></div>
-                  <p className="pm-img-upload__text"><strong>Click to upload</strong> or drag & drop</p>
-                  <p className="pm-img-upload__hint">PNG, JPG, WEBP up to 5MB</p>
-                </div>
-
-                {/* URL paste */}
-                <div className="pm-img-url">
-                  <div className="pm-img-url__divider"><span>or paste image URL</span></div>
-                  <div className="pm-img-url__row">
-                    <FiImage size={15} className="pm-img-url__icon" />
-                    <input
-                      className="dash-field__input pm-img-url__input"
-                      value={editing.image}
-                      onChange={(e) => setEditing({ ...editing, image: e.target.value })}
-                      placeholder="https://example.com/product.jpg"
-                    />
-                  </div>
-                </div>
+                <ImageUploader
+                  label="Product Image"
+                  value={editing.image}
+                  onChange={(val) => setEditing({ ...editing, image: val })}
+                  placeholder="https://example.com/product.jpg or /images/..."
+                  maxWidth={600}
+                  maxHeight={600}
+                  quality={0.80}
+                  helperText="Upload an SVG/image or paste raw SVG code for crisp vector rendering."
+                />
               </div>
 
               <div className="dash-row">

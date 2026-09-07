@@ -24,6 +24,16 @@
   box-sizing: border-box;
 }
 
+.review-container--no-image {
+  justify-content: center !important;
+}
+
+.review-container--no-image .review-rating-col {
+  justify-content: center !important;
+  padding: 0 !important;
+  max-width: 600px;
+}
+
 /* Laurel Wreath Left Column */
 .review-laurel-col {
   flex: 1;
