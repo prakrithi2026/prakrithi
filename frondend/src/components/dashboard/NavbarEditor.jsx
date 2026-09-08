@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { FiPlus, FiTrash2, FiUpload, FiX, FiRefreshCw, FiAlertCircle } from 'react-icons/fi';
 import { useSiteConfig } from '../../context/SiteConfigContext';
-import { compressImage, isSvg } from '../../utils/imageOptimizer';
+import { compressImage } from '../../utils/imageOptimizer';
 import './NavbarEditor.css';
 
 export default function NavbarEditor() {
@@ -183,19 +183,7 @@ export default function NavbarEditor() {
                 <img src={navbar.logo} alt="Navbar Logo Preview" className="nb-logo-preview__img" />
               </div>
 
-              <div className="nb-logo-preview__details">
-                <div className="nb-logo-preview__badge-row">
-                  <span className={`nb-logo-badge ${isSvg(navbar.logo) ? 'nb-logo-badge--svg' : 'nb-logo-badge--raster'}`}>
-                    {isSvg(navbar.logo) ? 'Vector SVG' : 'Optimized Image'}
-                  </span>
-                  <span className="nb-logo-badge nb-logo-badge--active">Active</span>
-                </div>
-                <p className="nb-logo-preview__hint">
-                  {isSvg(navbar.logo)
-                    ? 'Scales crisply to any resolution without pixelation.'
-                    : 'Optimized for fast loading and crisp high-DPI display.'}
-                </p>
-              </div>
+
 
               <div className="nb-logo-preview__actions">
                 <button
