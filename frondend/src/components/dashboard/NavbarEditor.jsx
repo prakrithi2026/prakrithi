@@ -1,12 +1,67 @@
-import { useState } from 'react';
-import { FiPlus, FiTrash2 } from 'react-icons/fi';
+import { useState, useRef } from 'react';
+import { FiPlus, FiTrash2, FiUpload, FiX, FiRefreshCw, FiAlertCircle } from 'react-icons/fi';
 import { useSiteConfig } from '../../context/SiteConfigContext';
-import ImageUploader from './ImageUploader';
+import { compressImage, isSvg } from '../../utils/imageOptimizer';
 import './NavbarEditor.css';
 
 export default function NavbarEditor() {
   const { config, updateConfig } = useSiteConfig();
   const { navbar, announcement } = config;
+
+  const [logoDragActive, setLogoDragActive] = useState(false);
+  const [isProcessingLogo, setIsProcessingLogo] = useState(false);
+  const [logoError, setLogoError] = useState('');
+  const logoFileInputRef = useRef(null);
+
+  const handleLogoFile = async (file) => {
+    if (!file) return;
+    setLogoError('');
+
+    const isImage = file.type?.startsWith('image/') || file.name?.toLowerCase().endsWith('.svg');
+    if (!isImage) {
+      setLogoError('Please select a valid image file (PNG, JPG, SVG, WEBP).');
+      return;
+    }
+
+    try {
+      setIsProcessingLogo(true);
+      // compressImage automatically preserves vector SVG or compresses raster to WebP
+      const optimizedLogo = await compressImage(file, 400, 400, 0.85);
+      updateConfig('navbar.logo', optimizedLogo);
+    } catch (err) {
+      console.error('Error processing logo image:', err);
+      setLogoError('Failed to process image: ' + (err.message || 'Unknown error'));
+    } finally {
+      setIsProcessingLogo(false);
+    }
+  };
+
+  const handleLogoFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) handleLogoFile(file);
+    if (e.target) e.target.value = '';
+  };
+
+  const handleLogoDrop = (e) => {
+    e.preventDefault();
+    setLogoDragActive(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) handleLogoFile(file);
+  };
+
+  const handleLogoDragOver = (e) => {
+    e.preventDefault();
+    setLogoDragActive(true);
+  };
+
+  const handleLogoDragLeave = () => {
+    setLogoDragActive(false);
+  };
+
+  const removeLogo = () => {
+    updateConfig('navbar.logo', '');
+    setLogoError('');
+  };
 
   const updateNavItem = (index, field, value) => {
     const items = [...navbar.items];
@@ -110,15 +165,97 @@ export default function NavbarEditor() {
 
         {/* Logo Upload */}
         <div className="dash-field">
-          <ImageUploader
-            label="Logo Image"
-            value={navbar.logo}
-            onChange={(val) => updateConfig('navbar.logo', val)}
-            placeholder="https://example.com/logo.svg or /images/..."
-            maxWidth={400}
-            maxHeight={400}
-            helperText="Upload an SVG, PNG, JPG or paste raw SVG code for crisp vector rendering."
+          <label className="dash-field__label">Navbar Logo</label>
+
+          {/* Hidden File Input */}
+          <input
+            ref={logoFileInputRef}
+            type="file"
+            accept="image/*,.svg"
+            onChange={handleLogoFileChange}
+            style={{ display: 'none' }}
           />
+
+          {/* Current Logo Preview Card */}
+          {navbar.logo ? (
+            <div className="nb-logo-preview">
+              <div className="nb-logo-preview__img-box">
+                <img src={navbar.logo} alt="Navbar Logo Preview" className="nb-logo-preview__img" />
+              </div>
+
+              <div className="nb-logo-preview__details">
+                <div className="nb-logo-preview__badge-row">
+                  <span className={`nb-logo-badge ${isSvg(navbar.logo) ? 'nb-logo-badge--svg' : 'nb-logo-badge--raster'}`}>
+                    {isSvg(navbar.logo) ? 'Vector SVG' : 'Optimized Image'}
+                  </span>
+                  <span className="nb-logo-badge nb-logo-badge--active">Active</span>
+                </div>
+                <p className="nb-logo-preview__hint">
+                  {isSvg(navbar.logo)
+                    ? 'Scales crisply to any resolution without pixelation.'
+                    : 'Optimized for fast loading and crisp high-DPI display.'}
+                </p>
+              </div>
+
+              <div className="nb-logo-preview__actions">
+                <button
+                  type="button"
+                  className="nb-logo-preview__change"
+                  onClick={() => logoFileInputRef.current?.click()}
+                  disabled={isProcessingLogo}
+                  title="Upload a different image file"
+                >
+                  <FiRefreshCw size={13} className={isProcessingLogo ? 'nb-spin' : ''} />
+                  {isProcessingLogo ? 'Processing...' : 'Change Image'}
+                </button>
+                <button
+                  type="button"
+                  className="nb-logo-preview__remove"
+                  onClick={removeLogo}
+                  disabled={isProcessingLogo}
+                  title="Remove current logo"
+                >
+                  <FiX size={14} /> Remove
+                </button>
+              </div>
+            </div>
+          ) : (
+            /* Upload Dropzone */
+            <div
+              className={`nb-logo-upload ${logoDragActive ? 'nb-logo-upload--active' : ''} ${isProcessingLogo ? 'nb-logo-upload--uploading' : ''}`}
+              onClick={() => !isProcessingLogo && logoFileInputRef.current?.click()}
+              onDrop={handleLogoDrop}
+              onDragOver={handleLogoDragOver}
+              onDragLeave={handleLogoDragLeave}
+            >
+              <div className="nb-logo-upload__icon">
+                {isProcessingLogo ? (
+                  <FiRefreshCw size={24} className="nb-spin" />
+                ) : (
+                  <FiUpload size={24} />
+                )}
+              </div>
+              <p className="nb-logo-upload__text">
+                {isProcessingLogo ? (
+                  <strong>Optimizing & processing logo...</strong>
+                ) : (
+                  <><strong>Click to upload</strong> or drag & drop</>
+                )}
+              </p>
+              <p className="nb-logo-upload__hint">PNG, JPG, SVG, WEBP (Recommended up to 400×400px)</p>
+            </div>
+          )}
+
+          {logoError && (
+            <div className="nb-logo-error">
+              <FiAlertCircle size={14} />
+              <span>{logoError}</span>
+            </div>
+          )}
+
+          <p className="dash-field__hint" style={{ marginTop: '6px' }}>
+            Upload your logo image directly. Vector SVGs and high-resolution images are automatically formatted for crisp display in the navbar.
+          </p>
         </div>
 
 
