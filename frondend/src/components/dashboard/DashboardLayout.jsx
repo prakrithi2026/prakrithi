@@ -74,7 +74,7 @@ function DashboardContent({ logout }) {
   const [rightCollapsed, setRightCollapsed] = useState(false);
   const [saveFlash, setSaveFlash] = useState(false);
   const [leftPanelWidth, setLeftPanelWidth] = useState(260);
-  const [rightPanelWidth, setRightPanelWidth] = useState(480);
+  const [rightPanelWidth, setRightPanelWidth] = useState(400);
   const [isResizing, setIsResizing] = useState(false);
   const isResizingLeftRef = useRef(false);
   const isResizingRightRef = useRef(false);
