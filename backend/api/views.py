@@ -275,7 +275,11 @@ class SiteConfigView(APIView):
                                 couponNote=couponNote
                             )
                     
-            return Response({"status": "success", "message": "Configuration updated"})
+            return Response({
+                "status": "success",
+                "message": "Configuration updated",
+                "config_data": merged_config
+            })
         except Exception as e:
             import traceback
             traceback.print_exc()

@@ -6,7 +6,7 @@ export default function CustomSection({ sectionData }) {
 
   const style = {};
   if (sectionData.bgImage) {
-    style.background = `linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url(${sectionData.bgImage}) center/cover no-repeat`;
+    style.background = `linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url("${sectionData.bgImage}") center/cover no-repeat`;
     style.color = 'white';
   } else if (sectionData.bgColor) {
     style.background = sectionData.bgColor;

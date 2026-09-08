@@ -15,25 +15,60 @@ export const COMPRESSION_PRESETS = {
 };
 
 /**
+ * Helper to encode UTF-8 string to Base64 across browser and Node.js environments
+ */
+function utf8ToBase64(str) {
+  if (typeof window !== 'undefined' && typeof window.btoa === 'function') {
+    try {
+      return window.btoa(unescape(encodeURIComponent(str)));
+    } catch {
+      return window.btoa(str);
+    }
+  }
+  if (typeof Buffer !== 'undefined') {
+    return Buffer.from(str, 'utf-8').toString('base64');
+  }
+  return '';
+}
+
+/**
+ * Helper to decode Base64 to UTF-8 string across browser and Node.js environments
+ */
+function base64ToUtf8(b64) {
+  if (typeof window !== 'undefined' && typeof window.atob === 'function') {
+    try {
+      return decodeURIComponent(escape(window.atob(b64)));
+    } catch {
+      return window.atob(b64);
+    }
+  }
+  if (typeof Buffer !== 'undefined') {
+    return Buffer.from(b64, 'base64').toString('utf-8');
+  }
+  return '';
+}
+
+/**
  * Checks whether a value represents SVG code, an SVG data URL, or an .svg URL.
+ * Handles raw <svg>, XML declarations (<?xml ...>), comments (<!-- ... -->), and DOCTYPE.
  * @param {string} value
  * @returns {boolean}
  */
 export function isSvg(value) {
   if (!value || typeof value !== 'string') return false;
   const trimmed = value.trim();
-  return (
-    trimmed.startsWith('<svg') ||
-    trimmed.startsWith('data:image/svg+xml') ||
-    /\.svg(\?.*)?$/i.test(trimmed)
-  );
+  if (trimmed.startsWith('data:image/svg+xml') || /\.svg(\?.*)?$/i.test(trimmed)) {
+    return true;
+  }
+  return /<svg[\s\S]*<\/svg>/i.test(trimmed);
 }
 
 /**
- * Converts raw SVG code into a valid, standard SVG Data URL for use in <img> tags.
+ * Converts raw SVG code into a valid, standard SVG Data URL for use in <img> tags and CSS.
  * Ensures the required xmlns attribute is present.
+ * Uses Base64 encoding for 100% universal browser and CSS url() compatibility.
  * @param {string} svgString
- * @returns {string} Standard data:image/svg+xml data URL
+ * @returns {string} Standard data:image/svg+xml;base64,... or data:image/svg+xml;utf8,...
  */
 export function svgToDataUrl(svgString) {
   if (!svgString || typeof svgString !== 'string') return '';
@@ -49,11 +84,20 @@ export function svgToDataUrl(svgString) {
     cleanSvg = cleanSvg.replace(/<svg\b/i, '<svg xmlns="http://www.w3.org/2000/svg"');
   }
 
+  try {
+    const b64 = utf8ToBase64(cleanSvg);
+    if (b64) {
+      return `data:image/svg+xml;base64,${b64}`;
+    }
+  } catch {
+    // Fallback to URL-encoded UTF-8
+  }
+
   return `data:image/svg+xml;utf8,${encodeURIComponent(cleanSvg)}`;
 }
 
 /**
- * Extracts raw SVG markup from an SVG data URL (utf-8 or base64) or raw SVG code.
+ * Extracts raw SVG markup from an SVG data URL (base64 or utf-8) or raw SVG code.
  * Returns empty string if not an SVG.
  * @param {string} value
  * @returns {string} Raw SVG markup (e.g. <svg ...>...</svg>)
@@ -62,21 +106,19 @@ export function extractSvgCode(value) {
   if (!value || typeof value !== 'string') return '';
   const trimmed = value.trim();
 
-  if (trimmed.startsWith('<svg')) {
+  // Raw SVG markup
+  if (/<svg[\s\S]*<\/svg>/i.test(trimmed) && !trimmed.startsWith('data:')) {
     return trimmed;
   }
 
+  // SVG Data URL
   if (trimmed.startsWith('data:image/svg+xml')) {
     if (trimmed.includes(';base64,')) {
       try {
         const b64 = trimmed.split(';base64,')[1];
-        return decodeURIComponent(escape(atob(b64)));
+        return base64ToUtf8(b64);
       } catch {
-        try {
-          return atob(trimmed.split(';base64,')[1]);
-        } catch {
-          return '';
-        }
+        return '';
       }
     }
     const commaIndex = trimmed.indexOf(',');
@@ -93,15 +135,15 @@ export function extractSvgCode(value) {
 }
 
 /**
- * Normalizes an image string input. If user pasted raw SVG code,
- * converts it into a data URL so it renders in <img> tags without breaking.
+ * Normalizes an image string input. If user pasted raw SVG code (including <?xml...),
+ * converts it into a valid SVG data URL so it renders in <img> tags without breaking.
  * @param {string} value
  * @returns {string}
  */
 export function normalizeImageInput(value) {
   if (!value || typeof value !== 'string') return '';
   const trimmed = value.trim();
-  if (trimmed.startsWith('<svg')) {
+  if (isSvg(trimmed) && !trimmed.startsWith('http://') && !trimmed.startsWith('https://') && !trimmed.startsWith('/')) {
     return svgToDataUrl(trimmed);
   }
   return trimmed;

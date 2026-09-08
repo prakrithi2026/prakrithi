@@ -30,15 +30,57 @@ export default function ImageUploader({
   // Detect whether current value is SVG
   const isCurrentSvg = isSvg(value);
 
-  // Sync SVG input when entering SVG edit mode
+  // Sync SVG input when entering SVG edit mode or when value changes
   useEffect(() => {
     if (isCurrentSvg && value) {
       const code = extractSvgCode(value);
-      if (code) setSvgInput(code);
+      if (code && !isEditingSvg) {
+        setSvgInput(code);
+      }
     }
-  }, [value, isCurrentSvg]);
+  }, [value, isCurrentSvg, isEditingSvg]);
 
-  // Handle applying direct SVG code
+  // Handle typing / pasting SVG code with automatic sync
+  const handleSvgChange = (text) => {
+    setSvgInput(text);
+    setSvgError('');
+    const trimmed = text.trim();
+    if (!trimmed) {
+      onChange('');
+      return;
+    }
+
+    if (isSvg(trimmed)) {
+      try {
+        const dataUrl = svgToDataUrl(trimmed);
+        onChange(dataUrl);
+      } catch (err) {
+        // Keep typing
+      }
+    }
+  };
+
+  // Handle blur on SVG textarea to ensure validity & sync
+  const handleSvgBlur = () => {
+    const trimmed = svgInput.trim();
+    if (!trimmed) {
+      onChange('');
+      return;
+    }
+
+    if (isSvg(trimmed)) {
+      try {
+        const dataUrl = svgToDataUrl(trimmed);
+        onChange(dataUrl);
+      } catch (err) {
+        setSvgError('Error converting SVG: ' + err.message);
+      }
+    } else {
+      setSvgError('Invalid SVG markup. Ensure it contains <svg> and </svg>.');
+    }
+  };
+
+  // Handle explicit "Apply SVG Code" button (optional user action to close edit panel)
   const handleApplySvg = () => {
     setSvgError('');
     const trimmed = svgInput.trim();
@@ -47,8 +89,8 @@ export default function ImageUploader({
       return;
     }
 
-    if (!trimmed.includes('<svg') || !trimmed.includes('</svg>')) {
-      setSvgError('Invalid SVG markup. Ensure it starts with <svg and ends with </svg>.');
+    if (!isSvg(trimmed)) {
+      setSvgError('Invalid SVG markup. Ensure it contains <svg> and </svg>.');
       return;
     }
 
@@ -61,19 +103,33 @@ export default function ImageUploader({
     }
   };
 
-  // Handle applying URL
+  // Handle applying URL with auto-sync
+  const handleUrlChange = (text) => {
+    setUrlInput(text);
+    const trimmed = text.trim();
+    if (!trimmed) {
+      return;
+    }
+    if (isSvg(trimmed)) {
+      const dataUrl = svgToDataUrl(trimmed);
+      onChange(dataUrl);
+    } else if (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('/')) {
+      onChange(normalizeImageInput(trimmed));
+    }
+  };
+
   const handleApplyUrl = () => {
     const trimmed = urlInput.trim();
     if (!trimmed) return;
 
-    // Auto-detect if user pasted raw SVG code in the URL box
-    if (trimmed.startsWith('<svg')) {
+    if (isSvg(trimmed)) {
       const dataUrl = svgToDataUrl(trimmed);
       onChange(dataUrl);
     } else {
       onChange(normalizeImageInput(trimmed));
     }
     setUrlInput('');
+    setIsEditingSvg(false);
   };
 
   const handleRemove = () => {
@@ -90,7 +146,14 @@ export default function ImageUploader({
     setIsEditingSvg(true);
   };
 
-  // If image is present and not currently editing its SVG
+  const handleStartReplace = () => {
+    setTab('svg');
+    setSvgInput('');
+    setUrlInput('');
+    setIsEditingSvg(true);
+  };
+
+  // If image is present and not currently editing/replacing it
   if (value && !isEditingSvg) {
     return (
       <div className={`img-uploader ${compact ? 'img-uploader--compact' : ''}`}>
@@ -109,7 +172,7 @@ export default function ImageUploader({
             </div>
 
             <div className="img-uploader__preview-actions">
-              {isCurrentSvg && (
+              {isCurrentSvg ? (
                 <button
                   type="button"
                   className="img-uploader__btn img-uploader__btn--secondary"
@@ -117,6 +180,15 @@ export default function ImageUploader({
                   title="View and edit the SVG code"
                 >
                   <FiCode size={14} /> Edit SVG Code
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="img-uploader__btn img-uploader__btn--secondary"
+                  onClick={handleStartReplace}
+                  title="Replace with SVG code or new image URL"
+                >
+                  <FiCode size={14} /> Replace with SVG / URL
                 </button>
               )}
               <button
@@ -170,10 +242,8 @@ export default function ImageUploader({
           <textarea
             className="img-uploader__svg-textarea"
             value={svgInput}
-            onChange={(e) => {
-              setSvgInput(e.target.value);
-              setSvgError('');
-            }}
+            onChange={(e) => handleSvgChange(e.target.value)}
+            onBlur={handleSvgBlur}
             placeholder={'<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">\n  <circle cx="15" cy="15" r="10" stroke="#00472A" stroke-width="2"/>\n</svg>'}
             rows={compact ? 4 : 6}
             spellCheck={false}
@@ -186,7 +256,7 @@ export default function ImageUploader({
           )}
 
           {/* Live mini preview of the SVG being edited */}
-          {svgInput.trim().startsWith('<svg') && svgInput.trim().endsWith('</svg>') && (
+          {isSvg(svgInput) && (
             <div className="img-uploader__svg-live-preview">
               <span className="img-uploader__svg-preview-label">Live Preview:</span>
               <div className="img-uploader__checkerboard img-uploader__checkerboard--mini">
@@ -204,6 +274,7 @@ export default function ImageUploader({
               type="button"
               className="dash-btn dash-btn--primary"
               onClick={handleApplySvg}
+              title="Apply SVG code and update preview"
             >
               <FiCheck size={14} style={{ marginRight: '5px' }} /> Apply SVG Code
             </button>
@@ -229,7 +300,8 @@ export default function ImageUploader({
               type="text"
               className="dash-field__input img-uploader__url-input"
               value={urlInput}
-              onChange={(e) => setUrlInput(e.target.value)}
+              onChange={(e) => handleUrlChange(e.target.value)}
+              onBlur={handleApplyUrl}
               placeholder={placeholder}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
