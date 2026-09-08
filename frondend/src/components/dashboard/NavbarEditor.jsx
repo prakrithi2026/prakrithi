@@ -253,9 +253,7 @@ export default function NavbarEditor() {
             </div>
           )}
 
-          <p className="dash-field__hint" style={{ marginTop: '6px' }}>
-            Upload your logo image directly. Vector SVGs and high-resolution images are automatically formatted for crisp display in the navbar.
-          </p>
+
         </div>
 
 
