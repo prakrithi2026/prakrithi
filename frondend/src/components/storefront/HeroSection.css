@@ -7,12 +7,12 @@
   padding: 0;
 }
 
-/* Desktop (> 768px): fills full viewport below header (eliminates bottom white space) */
+/* Desktop (> 768px): matches standard 2560x907 banner ratio */
 @media (min-width: 769px) {
   .hero-section {
     width: 100%;
-    height: calc(100vh - var(--announcement-height, 38px) - 64px);
-    min-height: 480px;
+    aspect-ratio: 2560 / 907;
+    height: auto;
   }
 }
 
