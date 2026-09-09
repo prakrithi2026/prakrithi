@@ -1,5 +1,5 @@
 import { useSiteConfig } from '../../context/SiteConfigContext';
-import defaultConfig from '../../data/defaultConfig';
+import { svgToDataUrl } from '../../utils/imageOptimizer';
 import './PressSection.css';
 
 export default function PressSection() {
@@ -10,7 +10,7 @@ export default function PressSection() {
     <section className="press-section" style={{ backgroundColor: press.bgColor || '#BDD681' }}>
       <div className="press-container">
         {press.logos.map((logo, i) => {
-          const logoImage = logo.image !== undefined ? logo.image : defaultConfig.press?.logos?.[i]?.image;
+          const logoImage = logo.image ? svgToDataUrl(logo.image) : '';
           return (
             <div key={i} className="press-logo">
               {logoImage ? (

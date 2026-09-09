@@ -1,4 +1,5 @@
 import { useSiteConfig } from '../../context/SiteConfigContext';
+import { svgToDataUrl } from '../../utils/imageOptimizer';
 import './ReviewSection.css';
 
 export default function ReviewSection() {
@@ -15,7 +16,7 @@ export default function ReviewSection() {
     image === '/images/rating.png' ||
     image.startsWith('data:image/webp;base64,UklGRsgMAAB')
   );
-  const reviewImage = (!image || isLegacy) ? '' : image;
+  const reviewImage = (!image || isLegacy) ? '' : svgToDataUrl(image);
 
   return (
     <section className="review-section" style={dynamicStyle}>

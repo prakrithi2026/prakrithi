@@ -1,20 +1,19 @@
 import { useSiteConfig } from '../../context/SiteConfigContext';
-import defaultConfig from '../../data/defaultConfig';
+import { svgToDataUrl } from '../../utils/imageOptimizer';
 import './DeliverySection.css';
 
-// iconMap commented out — icons are now uploaded images or pasted URLs
-// const iconMap = {
-//   bag: '🛍️',
-//   seedling: '🌱',
-//   check: '✅',
-//   box: '📦',
-//   truck: '🚚',
-//   location: '📍',
-// };
+const defaultStepIcons = {
+  bag: '🛍️',
+  seedling: '🌱',
+  check: '✅',
+  box: '📦',
+  truck: '🚚',
+  location: '📍',
+};
 
 export default function DeliverySection() {
   const { config } = useSiteConfig();
-  const { delivery, theme } = config;
+  const { delivery } = config;
 
   return (
     <section className="delivery-section">
@@ -25,17 +24,15 @@ export default function DeliverySection() {
         </div>
         <div className="delivery-steps">
           {delivery.steps.map((step, i) => {
-            const stepImage = (step.image !== undefined && !step.image?.startsWith('data:image/webp;base64,UklGRmo'))
-              ? step.image
-              : defaultConfig.delivery?.steps?.[i]?.image;
+            const stepImage = step.image ? svgToDataUrl(step.image) : '';
             return (
               <div key={i} className="delivery-step-group">
                 <div className="delivery-step">
                   <div className="step-icon">
                     {stepImage ? (
-                      <img src={stepImage} alt="" className="step-icon-img" loading="lazy" />
+                      <img src={stepImage} alt={step.label || ''} className="step-icon-img" loading="lazy" />
                     ) : (
-                      <span className="step-icon-placeholder">●</span>
+                      <span className="step-icon-placeholder">{defaultStepIcons[step.icon] || '●'}</span>
                     )}
                   </div>
                 </div>

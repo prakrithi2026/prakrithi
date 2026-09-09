@@ -56,14 +56,6 @@ function getInitialConfig() {
   if (base.reviewsSection && (base.reviewsSection.image === '/images/rating.png' || (typeof base.reviewsSection.image === 'string' && base.reviewsSection.image.startsWith('data:image/webp;base64,UklGRsgMAAB')))) {
     base.reviewsSection = { ...base.reviewsSection, image: '' };
   }
-  if (Array.isArray(base.delivery?.steps)) {
-    base.delivery.steps = base.delivery.steps.map((step, idx) => {
-      if (step.image && step.image.startsWith('data:image/webp;base64,UklGRmo')) {
-        return { ...step, image: defaultConfig.delivery?.steps?.[idx]?.image || '' };
-      }
-      return step;
-    });
-  }
   if (!Array.isArray(base.hero?.images) || base.hero.images.length === 0) {
     if (Array.isArray(defaultConfig.hero?.images) && defaultConfig.hero.images.length > 0) {
       base.hero = {
@@ -172,25 +164,6 @@ export function SiteConfigProvider({ children }) {
           }
         }
 
-        // Ensure delivery steps preserve default images ONLY if override step image is undefined or is legacy dot image
-        if (Array.isArray(mergedConfig.delivery?.steps)) {
-          mergedConfig.delivery.steps = mergedConfig.delivery.steps.map((step, idx) => ({
-            ...defaultConfig.delivery?.steps?.[idx],
-            ...step,
-            image: (step.image !== undefined && !step.image?.startsWith('data:image/webp;base64,UklGRmo'))
-              ? step.image
-              : (defaultConfig.delivery?.steps?.[idx]?.image || ''),
-          }));
-        }
-
-        // Ensure press logos preserve default images ONLY if override logo image is undefined
-        if (Array.isArray(mergedConfig.press?.logos)) {
-          mergedConfig.press.logos = mergedConfig.press.logos.map((logo, idx) => ({
-            ...defaultConfig.press?.logos?.[idx],
-            ...logo,
-            image: logo.image !== undefined ? logo.image : (defaultConfig.press?.logos?.[idx]?.image || ''),
-          }));
-        }
 
         // Ensure reviewsSection does not retain legacy /images/rating.png or legacy base64
         if (mergedConfig.reviewsSection && (mergedConfig.reviewsSection.image === '/images/rating.png' || (typeof mergedConfig.reviewsSection.image === 'string' && mergedConfig.reviewsSection.image.startsWith('data:image/webp;base64,UklGRsgMAAB')))) {

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useSiteConfig } from '../../context/SiteConfigContext';
+import { svgToDataUrl } from '../../utils/imageOptimizer';
 import './OurStorySection.css';
 
 export default function OurStorySection() {
@@ -7,6 +8,8 @@ export default function OurStorySection() {
   const { ourStory, theme } = config;
 
   if (!ourStory) return null;
+
+  const storyImgSrc = ourStory.image ? svgToDataUrl(ourStory.image) : '';
 
   // Extract the main paragraph content
   const paragraphs = ourStory.content.split('\n').filter(p => p.trim() && !p.startsWith('## '));
@@ -28,11 +31,11 @@ export default function OurStorySection() {
       <div className="our-story-card" style={{ backgroundColor: theme.primaryColor || '#00472A' }}>
         
         {/* Left Column: Image with Play Button */}
-        <div className="our-story-media-col">
-          {ourStory.image && (
+        {storyImgSrc ? (
+          <div className="our-story-media-col">
             <div className="our-story-image-wrapper">
               <img
-                src={ourStory.image}
+                src={storyImgSrc}
                 alt={ourStory.title}
                 className="our-story-img"
                 loading="lazy"
@@ -47,8 +50,8 @@ export default function OurStorySection() {
                 </svg>
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        ) : null}
 
         {/* Right Column: Content */}
         <div className="our-story-text-col">

@@ -1,14 +1,26 @@
 import { useState } from 'react';
-import { FiPlus, FiTrash2, FiCopy, FiCheck, FiX } from 'react-icons/fi';
+import { FiPlus, FiTrash2, FiCopy, FiCheck, FiX, FiSave, FiRefreshCw } from 'react-icons/fi';
 import { useSiteConfig } from '../../context/SiteConfigContext';
 import ImageUploader from './ImageUploader';
 import './SectionManager.css';
 
 export default function SectionManager() {
-  const { config, updateConfig } = useSiteConfig();
+  const { config, updateConfig, saveConfig, hasUnsavedChanges } = useSiteConfig();
   const { sections } = config;
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [copiedId, setCopiedId] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
+  const handleSaveSections = async () => {
+    setSaving(true);
+    const res = await saveConfig();
+    setSaving(false);
+    if (res?.success) {
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 2500);
+    }
+  };
 
   const sortedSections = [...sections].sort((a, b) => a.order - b.order);
   const coreSections = ['shopByProduct', 'delivery', 'shopByConcern', 'press', 'reviews', 'ourStory'];
@@ -115,6 +127,26 @@ export default function SectionManager() {
             <h2 className="dash-panel__title">🧩 Section Manager</h2>
             <p className="dash-panel__subtitle">Toggle, reorder, or remove homepage sections.</p>
           </div>
+          <button
+            type="button"
+            className={`dash-btn dash-btn--primary ${saveSuccess ? 'dash-btn--success' : ''}`}
+            onClick={handleSaveSections}
+            disabled={saving}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '10px 20px',
+              borderRadius: '8px',
+              fontWeight: 600,
+              fontSize: '0.88rem',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            {saving ? <FiRefreshCw className="spin" size={15} /> : (saveSuccess ? <FiCheck size={15} /> : <FiSave size={15} />)}
+            <span>{saving ? 'Saving...' : (saveSuccess ? 'Saved!' : 'Save Changes')}</span>
+          </button>
         </div>
 
         <div className="section-list">
@@ -404,6 +436,29 @@ export default function SectionManager() {
             helperText="Paste SVG code or enter an image URL. If left empty, no image will be displayed."
           />
         </div>
+      </div>
+
+      {/* ── Save Section Changes Bottom Bar ── */}
+      <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'flex-end', gap: '12px', padding: '16px 0' }}>
+        <button
+          type="button"
+          className={`dash-btn dash-btn--primary ${saveSuccess ? 'dash-btn--success' : ''}`}
+          onClick={handleSaveSections}
+          disabled={saving}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '12px 28px',
+            borderRadius: '10px',
+            fontSize: '0.95rem',
+            fontWeight: 600,
+            cursor: 'pointer'
+          }}
+        >
+          {saving ? <FiRefreshCw className="spin" size={16} /> : (saveSuccess ? <FiCheck size={16} /> : <FiSave size={16} />)}
+          <span>{saving ? 'Saving...' : (saveSuccess ? 'Saved to Server!' : 'Save Section Changes')}</span>
+        </button>
       </div>
 
     </div>
