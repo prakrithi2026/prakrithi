@@ -11,7 +11,7 @@ export default function OurStorySection() {
 
   if (!ourStory) return null;
 
-  const storyImgSrc = ourStory.image ? svgToDataUrl(ourStory.image) : '';
+  const storyImgSrc = ourStory.image ? svgToDataUrl(ourStory.image) : '/images/our-story.png';
   const hasVideo = Boolean(ourStory.video);
   const isVideoMode = ourStory.mediaType === 'video' || (hasVideo && ourStory.mediaType !== 'image');
   const isYouTubeOrVimeo = hasVideo && (
@@ -109,27 +109,23 @@ export default function OurStorySection() {
           </div>
         )}
 
-        {/* Right Column: Content */}
+        {/* Right Column: Content matching uploaded design */}
         <div className="our-story-text-col">
           <h2 className="our-story-heading">
             {ourStory.title}
           </h2>
           <p className="our-story-description">
-            {mainParagraphText}{' '}
-            <Link to="/our-story" className="our-story-inline-link">
-              read our story
-            </Link>
+            {mainParagraphText}
           </p>
 
           <div className="our-story-founder">
             <h4 className="our-story-founder-name">{founderName}</h4>
             <p className="our-story-founder-title">{founderTitle}</p>
-            <div className="our-story-signature-wrap">
-              <svg width="150" height="60" viewBox="0 0 150 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 34 C 28 14, 38 42, 42 42 C 48 42, 52 24, 58 28 C 62 32, 68 36, 72 32 C 78 28, 82 22, 88 28 C 92 32, 98 36, 102 34 C 108 30, 114 18, 124 24 C 132 28, 120 40, 112 44 C 102 48, 88 50, 116 46 C 130 44, 138 42, 144 42" stroke="#FFFFFF" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </div>
           </div>
+
+          <Link to="/our-story" className="our-story-btn">
+            Read our Story
+          </Link>
         </div>
 
       </div>

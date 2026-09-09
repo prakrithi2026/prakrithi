@@ -105,73 +105,73 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  justify-content: center;
 }
 
 .our-story-heading {
   color: #FFFFFF !important;
-  font-size: 2.2rem;
-  margin-bottom: 16px;
+  font-size: 2rem;
+  margin-bottom: 14px;
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.25;
   font-family: var(--font-heading);
 }
 
 .our-story-description {
-  color: #FFFFFF !important;
-  font-size: 0.98rem;
-  line-height: 1.65;
-  opacity: 0.88;
-  margin-bottom: 28px;
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-size: 0.94rem;
+  line-height: 1.62;
+  margin-bottom: 20px;
   font-family: var(--font-sans);
 }
 
-.our-story-inline-link {
-  color: #FFFFFF !important;
-  text-decoration: underline;
-  font-weight: 600;
-  margin-left: 4px;
-  transition: opacity 0.2s ease;
-  white-space: nowrap;
-}
-
-.our-story-inline-link:hover {
-  opacity: 0.8;
-}
-
-/* Founder details & signature */
+/* Founder details */
 .our-story-founder {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 2px;
-  margin-top: auto;
+  margin-bottom: 18px;
 }
 
 .our-story-founder-name {
   color: #FFFFFF !important;
-  font-size: 1.15rem;
+  font-size: 1.12rem;
   font-weight: 700;
   margin: 0;
   font-family: var(--font-sans);
 }
 
 .our-story-founder-title {
-  color: #FFFFFF !important;
-  font-size: 0.85rem;
-  opacity: 0.75;
-  margin: 0 0 10px 0;
+  color: rgba(255, 255, 255, 0.8) !important;
+  font-size: 0.82rem;
+  margin: 0;
   font-family: var(--font-sans);
 }
 
-.our-story-signature-wrap {
-  opacity: 0.95;
-  margin-top: 4px;
-  display: flex;
+/* Read our Story button matching uploaded design */
+.our-story-btn {
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
+  background-color: #12704A;
+  color: #FFFFFF !important;
+  font-family: var(--font-sans);
+  font-size: 0.84rem;
+  font-weight: 600;
+  padding: 8px 22px;
+  border-radius: 8px;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
 }
 
-.our-story-signature-wrap svg {
-  display: block;
+.our-story-btn:hover {
+  background-color: #168457;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
 }
 
 /* Desktop and Responsive Layouts */
