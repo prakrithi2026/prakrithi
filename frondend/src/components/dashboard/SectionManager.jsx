@@ -3,6 +3,7 @@ import { FiPlus, FiTrash2, FiCopy, FiCheck, FiX, FiSave, FiRefreshCw } from 'rea
 import { useSiteConfig } from '../../context/SiteConfigContext';
 import ImageUploader from './ImageUploader';
 import StoryMediaUploader from './StoryMediaUploader';
+import defaultConfig from '../../data/defaultConfig';
 import './SectionManager.css';
 
 export default function SectionManager() {
@@ -421,7 +422,7 @@ export default function SectionManager() {
         <StoryMediaUploader
           mediaType={config.ourStory?.mediaType || (config.ourStory?.video ? 'video' : 'image')}
           onMediaTypeChange={(type) => updateConfig('ourStory.mediaType', type)}
-          image={config.ourStory?.image || ''}
+          image={config.ourStory?.image || defaultConfig.ourStory?.image || ''}
           onImageChange={(val) => updateConfig('ourStory.image', val)}
           video={config.ourStory?.video || ''}
           onVideoChange={(val) => updateConfig('ourStory.video', val)}

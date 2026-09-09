@@ -4,7 +4,7 @@ import API_BASE_URL from '../utils/api';
 
 const SiteConfigContext = createContext(null);
 
-const CACHE_KEY = 'prakrithi_siteconfig_cache';
+const CACHE_KEY = 'prakrithi_siteconfig_cache_v4';
 
 // Deep-merge defaults so new config keys always have fallback values
 function deepMerge(defaults, overrides) {
@@ -55,6 +55,14 @@ function getInitialConfig() {
   }
   if (base.reviewsSection && (base.reviewsSection.image === '/images/rating.png' || (typeof base.reviewsSection.image === 'string' && base.reviewsSection.image.startsWith('data:image/webp;base64,UklGRsgMAAB')))) {
     base.reviewsSection = { ...base.reviewsSection, image: '' };
+  }
+  // Ensure ourStory has valid image
+  if (!base.ourStory || !base.ourStory.image) {
+    base.ourStory = {
+      ...(defaultConfig.ourStory || {}),
+      ...(base.ourStory || {}),
+      image: base.ourStory?.image || defaultConfig.ourStory?.image || '/images/our-story.png'
+    };
   }
   if (!Array.isArray(base.hero?.images) || base.hero.images.length === 0) {
     if (Array.isArray(defaultConfig.hero?.images) && defaultConfig.hero.images.length > 0) {
@@ -168,6 +176,15 @@ export function SiteConfigProvider({ children }) {
         // Ensure reviewsSection does not retain legacy /images/rating.png or legacy base64
         if (mergedConfig.reviewsSection && (mergedConfig.reviewsSection.image === '/images/rating.png' || (typeof mergedConfig.reviewsSection.image === 'string' && mergedConfig.reviewsSection.image.startsWith('data:image/webp;base64,UklGRsgMAAB')))) {
           mergedConfig.reviewsSection.image = '';
+        }
+
+        // Ensure ourStory has a valid image fallback
+        if (!mergedConfig.ourStory || !mergedConfig.ourStory.image) {
+          mergedConfig.ourStory = {
+            ...(defaultConfig.ourStory || {}),
+            ...(mergedConfig.ourStory || {}),
+            image: mergedConfig.ourStory?.image || defaultConfig.ourStory?.image || '/images/our-story.png'
+          };
         }
 
         // Ensure hero banners fallback to defaultConfig if backend returns empty images

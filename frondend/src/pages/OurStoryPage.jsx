@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useSiteConfig } from '../context/SiteConfigContext';
+import defaultConfig from '../data/defaultConfig';
 import Navbar from '../components/storefront/Navbar';
 import Footer from '../components/storefront/Footer';
 import CartModal from '../components/storefront/CartModal';
@@ -16,6 +17,8 @@ export default function OurStoryPage() {
     window.scrollTo(0, 0);
   }, [config.navbar?.brandName]);
 
+  const defaultImg = defaultConfig.ourStory?.image || '/images/our-story.png';
+  const storyImgSrc = ourStory?.image || defaultImg;
   const hasVideo = Boolean(ourStory?.video);
   const isVideoMode = ourStory?.mediaType === 'video' || (hasVideo && ourStory?.mediaType !== 'image');
   const isYouTubeOrVimeo = hasVideo && (
@@ -63,16 +66,26 @@ export default function OurStoryPage() {
                     src={ourStory.video}
                     controls
                     playsInline
-                    poster={ourStory.image || undefined}
+                    poster={storyImgSrc}
                     className="our-story-hero-video"
                   >
                     Your browser does not support HTML5 video.
                   </video>
                 )}
               </div>
-            ) : ourStory?.image ? (
-              <img src={ourStory.image} alt="Our Story" className="our-story-hero-image" />
-            ) : null}
+            ) : (
+              <img 
+                src={storyImgSrc} 
+                alt={ourStory?.title || 'Our Story'} 
+                className="our-story-hero-image"
+                loading="eager"
+                onError={(e) => {
+                  if (defaultImg && e.currentTarget.src !== defaultImg) {
+                    e.currentTarget.src = defaultImg;
+                  }
+                }}
+              />
+            )}
             
             <div className="our-story-full-text" style={{ color: theme.textColor }}>
               {ourStory?.content.split('\n').map((para, i) => {

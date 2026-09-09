@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSiteConfig } from '../../context/SiteConfigContext';
+import defaultConfig from '../../data/defaultConfig';
 import { svgToDataUrl, getYouTubeEmbedUrl } from '../../utils/imageOptimizer';
 import './OurStorySection.css';
 
@@ -11,7 +12,8 @@ export default function OurStorySection() {
 
   if (!ourStory) return null;
 
-  const storyImgSrc = ourStory.image ? svgToDataUrl(ourStory.image) : '/images/our-story.png';
+  const defaultImg = defaultConfig.ourStory?.image || '/images/our-story.png';
+  const storyImgSrc = ourStory.image ? svgToDataUrl(ourStory.image) : defaultImg;
   const hasVideo = Boolean(ourStory.video);
   const isVideoMode = ourStory.mediaType === 'video' || (hasVideo && ourStory.mediaType !== 'image');
   const isYouTubeOrVimeo = hasVideo && (
@@ -78,12 +80,18 @@ export default function OurStorySection() {
                 >
                   <img
                     src={storyImgSrc}
-                    alt={ourStory.title}
+                    alt={ourStory.title || 'Our Story'}
                     className="our-story-img"
-                    loading="lazy"
+                    loading="eager"
+                    fetchPriority="high"
                     decoding="async"
                     width="600"
                     height="400"
+                    onError={(e) => {
+                      if (defaultImg && e.currentTarget.src !== defaultImg) {
+                        e.currentTarget.src = defaultImg;
+                      }
+                    }}
                   />
                   <div className="our-story-play-overlay">
                     <svg width="50" height="50" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -97,12 +105,18 @@ export default function OurStorySection() {
               <div className="our-story-image-wrapper">
                 <img
                   src={storyImgSrc}
-                  alt={ourStory.title}
+                  alt={ourStory.title || 'Our Story'}
                   className="our-story-img"
-                  loading="lazy"
+                  loading="eager"
+                  fetchPriority="high"
                   decoding="async"
                   width="600"
                   height="400"
+                  onError={(e) => {
+                    if (defaultImg && e.currentTarget.src !== defaultImg) {
+                      e.currentTarget.src = defaultImg;
+                    }
+                  }}
                 />
               </div>
             ) : null}

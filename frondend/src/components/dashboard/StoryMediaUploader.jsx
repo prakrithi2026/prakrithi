@@ -11,6 +11,7 @@ import {
   FiLink 
 } from 'react-icons/fi';
 import { compressImage, getYouTubeEmbedUrl } from '../../utils/imageOptimizer';
+import defaultConfig from '../../data/defaultConfig';
 import './StoryMediaUploader.css';
 
 /**
@@ -28,8 +29,9 @@ export default function StoryMediaUploader({
   video = '',
   onVideoChange
 }) {
+  const displayImage = image || defaultConfig.ourStory?.image || '';
   const [activeTab, setActiveTab] = useState(
-    mediaType || (video && !image ? 'video' : 'image')
+    mediaType || (video && !displayImage ? 'video' : 'image')
   );
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadingVideo, setUploadingVideo] = useState(false);
@@ -198,14 +200,15 @@ export default function StoryMediaUploader({
       {/* ── IMAGE TAB CONTENT ── */}
       {activeTab === 'image' && (
         <div className="story-media-panel">
-          {image ? (
+          {displayImage ? (
             /* Active Image Preview Card */
             <div className="story-media-preview-card">
               <div className="story-media-img-container">
                 <img 
-                  src={image} 
+                  src={displayImage} 
                   alt="Our Story Preview" 
                   className="story-media-img-preview" 
+                  loading="eager"
                 />
               </div>
               <div className="story-media-preview-info">
@@ -214,7 +217,7 @@ export default function StoryMediaUploader({
                     <FiCheck size={13} /> Active Story Image
                   </span>
                   <span className="story-media-source-tag">
-                    {image.startsWith('data:') ? 'Uploaded File' : 'External Link'}
+                    {displayImage.startsWith('data:') ? 'Default / Uploaded Asset' : 'External Link'}
                   </span>
                 </div>
 
@@ -224,9 +227,9 @@ export default function StoryMediaUploader({
                   <input
                     type="url"
                     className="story-media-url-input"
-                    value={image}
+                    value={image.startsWith('data:') ? '' : (image || '')}
                     onChange={(e) => onImageChange(e.target.value)}
-                    placeholder="https://example.com/story.jpg"
+                    placeholder={displayImage.startsWith('data:') ? 'Embedded Asset (or paste image URL)' : displayImage}
                   />
                 </div>
 
