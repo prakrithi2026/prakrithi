@@ -6,12 +6,7 @@ export default function DeliverySection() {
   const { config } = useSiteConfig();
   const { delivery } = config;
 
-  if (!delivery) return null;
-
-  // Only render steps that have an SVG code or image URL added by the admin
-  const visibleSteps = (delivery.steps || []).filter(
-    (step) => Boolean(step.image && typeof step.image === 'string' && step.image.trim())
-  );
+  if (!delivery || !delivery.steps) return null;
 
   return (
     <section className="delivery-section">
@@ -20,32 +15,34 @@ export default function DeliverySection() {
           <h3>{delivery.title}<br/>{delivery.subtitle}</h3>
           {delivery.tcNote && <p className="tc-note">{delivery.tcNote}</p>}
         </div>
-        {visibleSteps.length > 0 && (
-          <div className="delivery-steps">
-            {visibleSteps.map((step, i) => {
-              const stepImage = svgToDataUrl(step.image);
-              return (
-                <div key={i} className="delivery-step-group">
-                  <div className="delivery-step">
-                    <div className="step-icon">
+        <div className="delivery-steps">
+          {delivery.steps.map((step, i) => {
+            const stepImage = step.image ? svgToDataUrl(step.image) : '';
+            return (
+              <div key={i} className="delivery-step-group">
+                <div className="delivery-step">
+                  <div className="step-icon">
+                    {stepImage ? (
                       <img
                         src={stepImage}
                         alt={step.label || `Step ${i + 1}`}
                         className="step-icon-img"
                         loading="lazy"
                       />
-                    </div>
+                    ) : (
+                      <span className="step-icon-dot">●</span>
+                    )}
                   </div>
-                  {i < visibleSteps.length - 1 && (
-                    <div className="step-arrow">
-                      <img src="/images/Arrow.png" alt="→" className="step-arrow-img" />
-                    </div>
-                  )}
                 </div>
-              );
-            })}
-          </div>
-        )}
+                {i < delivery.steps.length - 1 && (
+                  <div className="step-arrow">
+                    <img src="/images/Arrow.png" alt="→" className="step-arrow-img" />
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </section>
   );
