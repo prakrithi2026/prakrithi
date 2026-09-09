@@ -1,4 +1,5 @@
 import { useSiteConfig } from '../../context/SiteConfigContext';
+import defaultConfig from '../../data/defaultConfig';
 import { svgToDataUrl } from '../../utils/imageOptimizer';
 import './ReviewSection.css';
 
@@ -11,12 +12,13 @@ export default function ReviewSection() {
     background: `linear-gradient(90deg, #0D5130 0%, #9FBD58 100%)`
   };
 
-  // Only display image if admin provided an image URL or SVG code (legacy fallback removed)
+  // Only display image if admin provided an image URL or SVG code, or fallback to default
   const isLegacy = typeof image === 'string' && (
     image === '/images/rating.png' ||
     image.startsWith('data:image/webp;base64,UklGRsgMAAB')
   );
-  const reviewImage = (!image || isLegacy) ? '' : svgToDataUrl(image);
+  const rawImage = (!image || isLegacy) ? (defaultConfig.reviewsSection?.image || '') : image;
+  const reviewImage = rawImage ? svgToDataUrl(rawImage) : '';
 
   return (
     <section className="review-section" style={dynamicStyle}>

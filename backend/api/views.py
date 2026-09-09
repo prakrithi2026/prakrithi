@@ -1,3 +1,5 @@
+import json
+from pathlib import Path
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -111,19 +113,124 @@ def deep_merge(base, update):
         return update
     result = dict(base)
     for key, value in update.items():
-        if key in result and isinstance(result[key], dict) and isinstance(value, dict):
-            result[key] = deep_merge(result[key], value)
+        if key in result:
+            if isinstance(result[key], dict) and isinstance(value, dict):
+                result[key] = deep_merge(result[key], value)
+            elif isinstance(result[key], list) and isinstance(value, list):
+                # For lists of objects (like delivery steps, press logos, etc.)
+                merged_list = []
+                for i, item in enumerate(value):
+                    if i < len(result[key]) and isinstance(result[key][i], dict) and isinstance(item, dict):
+                        merged_item = dict(result[key][i])
+                        for k, v in item.items():
+                            # If updating an image/logo/icon field with empty string or None, preserve existing valid image
+                            if k in ('image', 'logo', 'icon') and (v is None or (isinstance(v, str) and not v.strip())):
+                                if merged_item.get(k):
+                                    continue
+                            merged_item[k] = v
+                        merged_list.append(merged_item)
+                    else:
+                        merged_list.append(item)
+                result[key] = merged_list
+            elif key in ('image', 'logo', 'icon') and (value is None or (isinstance(value, str) and not value.strip())):
+                # If updating a top-level image/logo with empty string, keep existing
+                if not result.get(key):
+                    result[key] = value
+            else:
+                result[key] = value
         else:
             result[key] = value
     return result
+
+def load_default_config():
+    try:
+        from django.conf import settings
+        default_file = getattr(settings, 'BASE_DIR', Path('.')) / 'default_config.json'
+        if default_file.exists():
+            with open(default_file, 'r', encoding='utf-8') as f:
+                return json.load(f)
+    except Exception as e:
+        print(f"Error loading default_config.json: {e}")
+    return {}
+
+def enforce_image_fallbacks(config_data, defaults=None):
+    if not defaults:
+        defaults = load_default_config()
+    if not defaults or not isinstance(config_data, dict):
+        return config_data, False
+
+    updated = False
+    # 1. Delivery steps
+    def_steps = defaults.get('delivery', {}).get('steps', [])
+    cur_steps = config_data.get('delivery', {}).get('steps', [])
+    if def_steps:
+        if not cur_steps:
+            config_data.setdefault('delivery', {})['steps'] = def_steps
+            updated = True
+        else:
+            for idx, d_step in enumerate(def_steps):
+                if idx < len(cur_steps):
+                    if not cur_steps[idx].get('image') and d_step.get('image'):
+                        cur_steps[idx]['image'] = d_step['image']
+                        updated = True
+                    if not cur_steps[idx].get('label') and d_step.get('label'):
+                        cur_steps[idx]['label'] = d_step['label']
+                        updated = True
+                else:
+                    cur_steps.append(d_step)
+                    updated = True
+
+    # 2. Press logos
+    def_press = defaults.get('press', {}).get('logos', [])
+    cur_press = config_data.get('press', {}).get('logos', [])
+    if def_press:
+        if not cur_press:
+            config_data.setdefault('press', {})['logos'] = def_press
+            updated = True
+        else:
+            for idx, d_logo in enumerate(def_press):
+                if idx < len(cur_press):
+                    if not cur_press[idx].get('image') and d_logo.get('image'):
+                        cur_press[idx]['image'] = d_logo['image']
+                        updated = True
+                else:
+                    cur_press.append(d_logo)
+                    updated = True
+
+    # 3. Reviews Section image
+    def_rev_img = defaults.get('reviewsSection', {}).get('image')
+    if def_rev_img and not config_data.get('reviewsSection', {}).get('image'):
+        config_data.setdefault('reviewsSection', {})['image'] = def_rev_img
+        updated = True
+
+    # 4. Navbar logo
+    def_logo = defaults.get('navbar', {}).get('logo')
+    if def_logo and not config_data.get('navbar', {}).get('logo'):
+        config_data.setdefault('navbar', {})['logo'] = def_logo
+        updated = True
+
+    return config_data, updated
 
 class SiteConfigView(APIView):
     def get(self, request):
         try:
             config, created = SiteConfig.objects.get_or_create(id=1)
+            config_data = config.config_data or {}
+            
+            defaults = load_default_config()
+            if created or not config_data:
+                config_data = defaults
+                config.config_data = config_data
+                config.save()
+            else:
+                config_data, updated = enforce_image_fallbacks(config_data, defaults)
+                if updated:
+                    config.config_data = config_data
+                    config.save()
+
             serializer = SiteConfigSerializer(config)
-            config_data = serializer.data.get('config_data') or {}
-            response = Response(config_data)
+            resp_data = serializer.data.get('config_data') or config_data
+            response = Response(resp_data)
             response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
             response['Pragma'] = 'no-cache'
             response['Expires'] = '0'
@@ -153,6 +260,7 @@ class SiteConfigView(APIView):
             with transaction.atomic():
                 config, created = SiteConfig.objects.get_or_create(id=1)
                 merged_config = deep_merge(config.config_data or {}, data)
+                merged_config, _ = enforce_image_fallbacks(merged_config)
                 config.config_data = merged_config
                 config.save()
                 

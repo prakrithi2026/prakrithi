@@ -18,11 +18,24 @@ export const COMPRESSION_PRESETS = {
  * Helper to encode UTF-8 string to Base64 across browser and Node.js environments
  */
 function utf8ToBase64(str) {
-  if (typeof window !== 'undefined' && typeof window.btoa === 'function') {
+  if (typeof window !== 'undefined') {
     try {
+      if (typeof TextEncoder !== 'undefined') {
+        const u8 = new TextEncoder().encode(str);
+        let binary = '';
+        const len = u8.byteLength;
+        for (let i = 0; i < len; i++) {
+          binary += String.fromCharCode(u8[i]);
+        }
+        return window.btoa(binary);
+      }
       return window.btoa(unescape(encodeURIComponent(str)));
     } catch {
-      return window.btoa(str);
+      try {
+        return window.btoa(str);
+      } catch {
+        return '';
+      }
     }
   }
   if (typeof Buffer !== 'undefined') {
@@ -68,16 +81,27 @@ export function isSvg(value) {
  * Ensures the required xmlns attribute is present.
  * Uses Base64 encoding for 100% universal browser and CSS url() compatibility.
  * @param {string} svgString
- * @returns {string} Standard data:image/svg+xml;base64,... or data:image/svg+xml;utf8,...
+ * @returns {string} Standard data:image/svg+xml;base64,...
  */
 export function svgToDataUrl(svgString) {
   if (!svgString || typeof svgString !== 'string') return '';
   let cleanSvg = svgString.trim();
 
-  // If already an SVG data URL or standard URL, return as is
-  if (cleanSvg.startsWith('data:image/svg+xml') || cleanSvg.startsWith('http://') || cleanSvg.startsWith('https://') || cleanSvg.startsWith('/')) {
+  // If already a valid base64 SVG data URL or standard URL, return as is
+  if (cleanSvg.startsWith('data:image/svg+xml;base64,') || cleanSvg.startsWith('http://') || cleanSvg.startsWith('https://') || cleanSvg.startsWith('/')) {
     return cleanSvg;
   }
+
+  // If legacy utf-8 SVG data URL, decode back to raw SVG first
+  if (cleanSvg.startsWith('data:image/svg+xml')) {
+    const raw = extractSvgCode(cleanSvg);
+    if (raw) {
+      cleanSvg = raw;
+    }
+  }
+
+  // Strip <?xml ...?> and <!DOCTYPE ...> headers if present
+  cleanSvg = cleanSvg.replace(/<\?xml[\s\S]*?\?>/i, '').replace(/<!DOCTYPE[\s\S]*?>/i, '').trim();
 
   // Ensure xmlns is present on <svg> tag for standalone <img> rendering
   if (!cleanSvg.includes('xmlns=')) {
@@ -101,7 +125,7 @@ export function svgToDataUrl(svgString) {
     // Fallback to URL-encoded UTF-8
   }
 
-  return `data:image/svg+xml;utf8,${encodeURIComponent(cleanSvg)}`;
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(cleanSvg)}`;
 }
 
 /**

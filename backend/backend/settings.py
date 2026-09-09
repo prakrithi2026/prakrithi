@@ -102,17 +102,35 @@ DATABASE_URL = os.environ.get("DATABASE_URL")
 if DATABASE_URL:
     try:
         import psycopg2
-        parsed_db = dj_database_url.parse(DATABASE_URL, conn_max_age=0, ssl_require=False)
-        # Test connection with short timeout to prevent hanging on dead DB instances
-        conn = psycopg2.connect(
-            dbname=parsed_db.get('NAME'),
-            user=parsed_db.get('USER'),
-            password=parsed_db.get('PASSWORD'),
-            host=parsed_db.get('HOST'),
-            port=parsed_db.get('PORT') or 5432,
-            connect_timeout=4,
-        )
-        conn.close()
+        # On Render and other cloud hosts, PostgreSQL requires SSL encryption
+        parsed_db = dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=True)
+        parsed_db.setdefault("OPTIONS", {})["sslmode"] = "require"
+        
+        # Test connection with sslmode='require' first
+        try:
+            conn = psycopg2.connect(
+                dbname=parsed_db.get('NAME'),
+                user=parsed_db.get('USER'),
+                password=parsed_db.get('PASSWORD'),
+                host=parsed_db.get('HOST'),
+                port=parsed_db.get('PORT') or 5432,
+                connect_timeout=5,
+                sslmode='require',
+            )
+            conn.close()
+        except Exception:
+            # If SSL fails (e.g. local PostgreSQL without SSL), fallback to connecting without forced sslmode
+            conn = psycopg2.connect(
+                dbname=parsed_db.get('NAME'),
+                user=parsed_db.get('USER'),
+                password=parsed_db.get('PASSWORD'),
+                host=parsed_db.get('HOST'),
+                port=parsed_db.get('PORT') or 5432,
+                connect_timeout=5,
+            )
+            conn.close()
+            parsed_db.get("OPTIONS", {}).pop("sslmode", None)
+
         DATABASES = {"default": parsed_db}
         print("Connected to primary PostgreSQL database.")
     except Exception as db_err:

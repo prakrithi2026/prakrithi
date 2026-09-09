@@ -38,10 +38,10 @@
   min-height: 240px;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  box-shadow: none;
   aspect-ratio: 4/3;
   display: block;
-  background-color: rgba(0, 0, 0, 0.08);
+  background-color: transparent;
   cursor: pointer;
 }
 
@@ -181,8 +181,8 @@
 @media (min-width: 768px) {
   .our-story-card {
     flex-direction: row;
-    gap: 48px;
-    padding: 16px 48px 16px 16px;
+    gap: 40px;
+    padding: 8px 48px 8px 8px;
     align-items: center;
     justify-content: space-between;
   }
@@ -200,9 +200,13 @@
   }
   
   .our-story-card {
-    padding: 16px 16px 32px 16px;
+    padding: 8px 8px 32px 8px;
     gap: 24px;
-    border-radius: 20px;
+    border-radius: 24px;
+  }
+
+  .our-story-text-col {
+    padding: 0 12px;
   }
   
   .our-story-heading {

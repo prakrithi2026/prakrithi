@@ -48,6 +48,34 @@ else:
     if not existing.get('navbar', {}).get('logo') and full_data.get('navbar', {}).get('logo'):
         existing.setdefault('navbar', {})['logo'] = full_data['navbar']['logo']
         
+    # Restore delivery step images if empty
+    if full_data.get('delivery', {}).get('steps'):
+        existing_steps = existing.get('delivery', {}).get('steps', [])
+        for i, default_step in enumerate(full_data['delivery']['steps']):
+            if i < len(existing_steps):
+                if not existing_steps[i].get('image') and default_step.get('image'):
+                    existing_steps[i]['image'] = default_step['image']
+                if not existing_steps[i].get('label') and default_step.get('label'):
+                    existing_steps[i]['label'] = default_step['label']
+            else:
+                existing_steps.append(default_step)
+        existing.setdefault('delivery', {})['steps'] = existing_steps
+
+    # Restore press logos if empty
+    if full_data.get('press', {}).get('logos'):
+        existing_logos = existing.get('press', {}).get('logos', [])
+        for i, default_logo in enumerate(full_data['press']['logos']):
+            if i < len(existing_logos):
+                if not existing_logos[i].get('image') and default_logo.get('image'):
+                    existing_logos[i]['image'] = default_logo['image']
+            else:
+                existing_logos.append(default_logo)
+        existing.setdefault('press', {})['logos'] = existing_logos
+
+    # Restore reviews image if empty
+    if not existing.get('reviewsSection', {}).get('image') and full_data.get('reviewsSection', {}).get('image'):
+        existing.setdefault('reviewsSection', {})['image'] = full_data['reviewsSection']['image']
+
     # Restore hero desktop and mobile images if empty
     if full_data.get('hero', {}).get('images'):
         if not existing.get('hero', {}).get('images') or len(existing.get('hero', {}).get('images', [])) == 0:
@@ -59,7 +87,7 @@ else:
         
     config_obj.config_data = existing
     config_obj.save()
-    print("SiteConfig updated.")
+    print("SiteConfig updated with complete section images.")
 
 # 3. Seed / Update Products
 print(f"Seeding/updating {len(products_data)} Products...")

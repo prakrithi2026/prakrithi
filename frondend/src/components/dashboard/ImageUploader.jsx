@@ -25,7 +25,8 @@ export default function ImageUploader({
   const [svgInput, setSvgInput] = useState('');
   const [svgError, setSvgError] = useState('');
   const [urlInput, setUrlInput] = useState('');
-  const [isEditingSvg, setIsEditingSvg] = useState(false);
+  const [isEditingSvg, setIsEditingSvg] = useState(!value);
+  const [previewTheme, setPreviewTheme] = useState('dark'); // 'dark' | 'light'
 
   // Detect whether current value is SVG
   const isCurrentSvg = isSvg(value);
@@ -38,12 +39,16 @@ export default function ImageUploader({
         setSvgInput(code);
       }
     }
+    if (!value) {
+      setIsEditingSvg(true);
+    }
   }, [value, isCurrentSvg, isEditingSvg]);
 
-  // Handle typing / pasting SVG code with automatic sync
+  // Handle typing / pasting SVG code
   const handleSvgChange = (text) => {
     setSvgInput(text);
     setSvgError('');
+    setIsEditingSvg(true);
     const trimmed = text.trim();
     if (!trimmed) {
       onChange('');
@@ -60,7 +65,7 @@ export default function ImageUploader({
     }
   };
 
-  // Handle blur on SVG textarea to ensure validity & sync
+  // Handle blur on SVG textarea to ensure validity
   const handleSvgBlur = () => {
     const trimmed = svgInput.trim();
     if (!trimmed) {
@@ -80,7 +85,7 @@ export default function ImageUploader({
     }
   };
 
-  // Handle explicit "Apply SVG Code" button (optional user action to close edit panel)
+  // Handle explicit "Apply SVG Code" button
   const handleApplySvg = () => {
     setSvgError('');
     const trimmed = svgInput.trim();
@@ -107,9 +112,7 @@ export default function ImageUploader({
   const handleUrlChange = (text) => {
     setUrlInput(text);
     const trimmed = text.trim();
-    if (!trimmed) {
-      return;
-    }
+    if (!trimmed) return;
     if (isSvg(trimmed)) {
       const dataUrl = svgToDataUrl(trimmed);
       onChange(dataUrl);
@@ -136,7 +139,7 @@ export default function ImageUploader({
     onChange('');
     setSvgInput('');
     setUrlInput('');
-    setIsEditingSvg(false);
+    setIsEditingSvg(true);
   };
 
   const handleStartEditSvg = () => {
@@ -160,15 +163,23 @@ export default function ImageUploader({
         {label && <label className="dash-field__label">{label}</label>}
 
         <div className="img-uploader__preview-wrap">
-          <div className="img-uploader__checkerboard">
+          <div className={`img-uploader__checkerboard ${previewTheme === 'dark' ? 'img-uploader__checkerboard--dark' : 'img-uploader__checkerboard--light'}`}>
             <img src={value} alt="Preview" className="img-uploader__preview-img" />
           </div>
 
           <div className="img-uploader__preview-info">
-            <div className="img-uploader__badge-row">
+            <div className="img-uploader__badge-row" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span className={`img-uploader__badge ${isCurrentSvg ? 'img-uploader__badge--svg' : 'img-uploader__badge--raster'}`}>
                 {isCurrentSvg ? 'SVG Vector' : 'Image URL'}
               </span>
+              <button
+                type="button"
+                className="img-uploader__theme-toggle"
+                onClick={() => setPreviewTheme(t => t === 'dark' ? 'light' : 'dark')}
+                title="Toggle preview background contrast (helpful for white SVGs)"
+              >
+                {previewTheme === 'dark' ? '🌙 Dark' : '☀️ Light'}
+              </button>
             </div>
 
             <div className="img-uploader__preview-actions">
@@ -259,13 +270,21 @@ export default function ImageUploader({
           {isSvg(svgInput) && (
             <div className="img-uploader__svg-live-preview">
               <span className="img-uploader__svg-preview-label">Live Preview:</span>
-              <div className="img-uploader__checkerboard img-uploader__checkerboard--mini">
+              <div className={`img-uploader__checkerboard img-uploader__checkerboard--mini ${previewTheme === 'dark' ? 'img-uploader__checkerboard--dark' : 'img-uploader__checkerboard--light'}`}>
                 <img
                   src={svgToDataUrl(svgInput)}
                   alt="SVG Preview"
                   className="img-uploader__svg-live-img"
                 />
               </div>
+              <button
+                type="button"
+                className="img-uploader__theme-toggle"
+                onClick={() => setPreviewTheme(t => t === 'dark' ? 'light' : 'dark')}
+                title="Toggle preview background contrast"
+              >
+                {previewTheme === 'dark' ? '🌙 Dark' : '☀️ Light'}
+              </button>
             </div>
           )}
 

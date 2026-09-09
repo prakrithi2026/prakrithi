@@ -4,7 +4,7 @@ import API_BASE_URL from '../utils/api';
 
 const SiteConfigContext = createContext(null);
 
-const CACHE_KEY = 'prakrithi_siteconfig_cache_v4';
+const CACHE_KEY = 'prakrithi_siteconfig_cache_v5';
 
 // Deep-merge defaults so new config keys always have fallback values
 function deepMerge(defaults, overrides) {
@@ -53,8 +53,34 @@ function getInitialConfig() {
   if (!Array.isArray(base.sections)) {
     base.sections = defaultConfig.sections || [];
   }
-  if (base.reviewsSection && (base.reviewsSection.image === '/images/rating.png' || (typeof base.reviewsSection.image === 'string' && base.reviewsSection.image.startsWith('data:image/webp;base64,UklGRsgMAAB')))) {
-    base.reviewsSection = { ...base.reviewsSection, image: '' };
+  // Ensure delivery steps have valid image fallback
+  if (base.delivery && Array.isArray(base.delivery.steps) && Array.isArray(defaultConfig.delivery?.steps)) {
+    base.delivery.steps = base.delivery.steps.map((step, i) => {
+      const defStep = defaultConfig.delivery.steps[i];
+      return {
+        ...defStep,
+        ...step,
+        image: step.image || defStep?.image || ''
+      };
+    });
+  }
+  // Ensure press logos have valid image fallback
+  if (base.press && Array.isArray(base.press.logos) && Array.isArray(defaultConfig.press?.logos)) {
+    base.press.logos = base.press.logos.map((logo, i) => {
+      const defLogo = defaultConfig.press.logos[i];
+      return {
+        ...defLogo,
+        ...logo,
+        image: logo.image || defLogo?.image || ''
+      };
+    });
+  }
+  // Ensure reviewsSection has valid image fallback
+  if (base.reviewsSection && (!base.reviewsSection.image || base.reviewsSection.image === '/images/rating.png' || (typeof base.reviewsSection.image === 'string' && base.reviewsSection.image.startsWith('data:image/webp;base64,UklGRsgMAAB')))) {
+    base.reviewsSection = {
+      ...base.reviewsSection,
+      image: defaultConfig.reviewsSection?.image || ''
+    };
   }
   // Ensure ourStory has valid image
   if (!base.ourStory || !base.ourStory.image) {
@@ -173,9 +199,35 @@ export function SiteConfigProvider({ children }) {
         }
 
 
-        // Ensure reviewsSection does not retain legacy /images/rating.png or legacy base64
-        if (mergedConfig.reviewsSection && (mergedConfig.reviewsSection.image === '/images/rating.png' || (typeof mergedConfig.reviewsSection.image === 'string' && mergedConfig.reviewsSection.image.startsWith('data:image/webp;base64,UklGRsgMAAB')))) {
-          mergedConfig.reviewsSection.image = '';
+        // Ensure delivery steps have valid image fallback
+        if (mergedConfig.delivery && Array.isArray(mergedConfig.delivery.steps) && Array.isArray(defaultConfig.delivery?.steps)) {
+          mergedConfig.delivery.steps = mergedConfig.delivery.steps.map((step, i) => {
+            const defStep = defaultConfig.delivery.steps[i];
+            return {
+              ...defStep,
+              ...step,
+              image: step.image || defStep?.image || ''
+            };
+          });
+        }
+
+        // Ensure press logos have valid image fallback
+        if (mergedConfig.press && Array.isArray(mergedConfig.press.logos) && Array.isArray(defaultConfig.press?.logos)) {
+          mergedConfig.press.logos = mergedConfig.press.logos.map((logo, i) => {
+            const defLogo = defaultConfig.press.logos[i];
+            return {
+              ...defLogo,
+              ...logo,
+              image: logo.image || defLogo?.image || ''
+            };
+          });
+        }
+
+        // Ensure reviewsSection does not retain legacy /images/rating.png or legacy base64, and fall back to defaultConfig.reviewsSection.image
+        if (mergedConfig.reviewsSection) {
+          if (!mergedConfig.reviewsSection.image || mergedConfig.reviewsSection.image === '/images/rating.png' || (typeof mergedConfig.reviewsSection.image === 'string' && mergedConfig.reviewsSection.image.startsWith('data:image/webp;base64,UklGRsgMAAB'))) {
+            mergedConfig.reviewsSection.image = defaultConfig.reviewsSection?.image || '';
+          }
         }
 
         // Ensure ourStory has a valid image fallback
@@ -340,7 +392,27 @@ export function SiteConfigProvider({ children }) {
   );
 
   const saveConfig = useCallback(async (configOverride) => {
-    const configToSave = configOverride || config;
+    const rawConfig = configOverride || config;
+    // Deep clone and ensure fallback images are preserved so saving never sends empty images
+    const configToSave = JSON.parse(JSON.stringify(rawConfig));
+    if (configToSave.delivery && Array.isArray(configToSave.delivery.steps) && Array.isArray(defaultConfig.delivery?.steps)) {
+      configToSave.delivery.steps = configToSave.delivery.steps.map((step, i) => ({
+        ...defaultConfig.delivery.steps[i],
+        ...step,
+        image: step.image || defaultConfig.delivery.steps[i]?.image || ''
+      }));
+    }
+    if (configToSave.press && Array.isArray(configToSave.press.logos) && Array.isArray(defaultConfig.press?.logos)) {
+      configToSave.press.logos = configToSave.press.logos.map((logo, i) => ({
+        ...defaultConfig.press.logos[i],
+        ...logo,
+        image: logo.image || defaultConfig.press.logos[i]?.image || ''
+      }));
+    }
+    if (configToSave.reviewsSection && !configToSave.reviewsSection.image && defaultConfig.reviewsSection?.image) {
+      configToSave.reviewsSection.image = defaultConfig.reviewsSection.image;
+    }
+
     try {
       let response = await fetch(`${API_BASE_URL}/config/`, {
         method: 'PUT',
