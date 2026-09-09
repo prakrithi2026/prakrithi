@@ -84,6 +84,14 @@ export function svgToDataUrl(svgString) {
     cleanSvg = cleanSvg.replace(/<svg\b/i, '<svg xmlns="http://www.w3.org/2000/svg"');
   }
 
+  // Ensure viewBox is present for scalable <img> rendering if width and height exist
+  if (!cleanSvg.includes('viewBox=') && /<svg[^>]*\bwidth=["']?(\d+(?:\.\d+)?)(?:px)?["']?[^>]*\bheight=["']?(\d+(?:\.\d+)?)(?:px)?/i.test(cleanSvg)) {
+    const match = cleanSvg.match(/<svg[^>]*\bwidth=["']?(\d+(?:\.\d+)?)(?:px)?["']?[^>]*\bheight=["']?(\d+(?:\.\d+)?)(?:px)?/i);
+    if (match && match[1] && match[2]) {
+      cleanSvg = cleanSvg.replace(/<svg\b/i, `<svg viewBox="0 0 ${match[1]} ${match[2]}"`);
+    }
+  }
+
   try {
     const b64 = utf8ToBase64(cleanSvg);
     if (b64) {

@@ -270,8 +270,16 @@ export default function SectionManager() {
           {config.delivery.steps.map((step, i) => (
             <div key={i} className="delivery-step-card">
               {/* Step label + delete */}
-              <div className="delivery-step-card__header">
-                <span className="delivery-step-card__title">Step {i + 1}</span>
+              <div className="delivery-step-card__header" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span className="delivery-step-card__title" style={{ minWidth: '55px', fontWeight: 700 }}>Step {i + 1}</span>
+                <input
+                  type="text"
+                  className="dash-field__input"
+                  style={{ margin: 0, padding: '5px 10px', fontSize: '0.82rem', flex: 1 }}
+                  value={step.label || ''}
+                  onChange={(e) => updateDeliveryStep(i, 'label', e.target.value)}
+                  placeholder="Step Label (e.g. ORDER, PACKING...)"
+                />
                 <button className="crud-list__delete" onClick={() => removeDeliveryStep(i)} title="Delete step">
                   <FiTrash2 size={13} />
                 </button>
@@ -279,11 +287,13 @@ export default function SectionManager() {
 
               <ImageUploader
                 compact
+                label="Step Icon / SVG Code"
                 value={step.image || ''}
                 onChange={(val) => updateDeliveryStep(i, 'image', val)}
-                placeholder="https://example.com/icon.svg"
+                placeholder="Paste SVG code (<svg>...</svg>) or image URL"
                 maxWidth={160}
                 maxHeight={160}
+                helperText="Paste raw SVG code or enter an icon URL."
               />
             </div>
           ))}
