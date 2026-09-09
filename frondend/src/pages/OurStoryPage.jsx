@@ -4,6 +4,7 @@ import Navbar from '../components/storefront/Navbar';
 import Footer from '../components/storefront/Footer';
 import CartModal from '../components/storefront/CartModal';
 import AnnouncementBar from '../components/storefront/AnnouncementBar';
+import { getYouTubeEmbedUrl } from '../utils/imageOptimizer';
 import './OurStoryPage.css';
 
 export default function OurStoryPage() {
@@ -14,6 +15,15 @@ export default function OurStoryPage() {
     document.title = `Our Story - ${config.navbar?.brandName || 'Prakrithi'}`;
     window.scrollTo(0, 0);
   }, [config.navbar?.brandName]);
+
+  const hasVideo = Boolean(ourStory?.video);
+  const isVideoMode = ourStory?.mediaType === 'video' || (hasVideo && ourStory?.mediaType !== 'image');
+  const isYouTubeOrVimeo = hasVideo && (
+    ourStory.video.includes('youtube.com') ||
+    ourStory.video.includes('youtu.be') ||
+    ourStory.video.includes('vimeo.com')
+  );
+  const embedUrl = isYouTubeOrVimeo ? getYouTubeEmbedUrl(ourStory.video) : '';
 
   const themeStyle = {
     '--primary': theme.primaryColor,
@@ -38,9 +48,31 @@ export default function OurStoryPage() {
 
         <div className="storefront-container">
           <div className="our-story-page-content">
-            {ourStory?.image && (
+            {isVideoMode && hasVideo ? (
+              <div className="our-story-hero-video-wrapper">
+                {isYouTubeOrVimeo && embedUrl ? (
+                  <iframe
+                    src={embedUrl}
+                    title={ourStory?.title || 'Our Story Video'}
+                    className="our-story-hero-iframe"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                ) : (
+                  <video
+                    src={ourStory.video}
+                    controls
+                    playsInline
+                    poster={ourStory.image || undefined}
+                    className="our-story-hero-video"
+                  >
+                    Your browser does not support HTML5 video.
+                  </video>
+                )}
+              </div>
+            ) : ourStory?.image ? (
               <img src={ourStory.image} alt="Our Story" className="our-story-hero-image" />
-            )}
+            ) : null}
             
             <div className="our-story-full-text" style={{ color: theme.textColor }}>
               {ourStory?.content.split('\n').map((para, i) => {

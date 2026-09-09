@@ -221,7 +221,9 @@ const defaultConfig = {
     "title": "Its Online, Not a Physicalstore",
     "subtitle": "",
     "content": "From the lush hills of kerala to your kitchen, every product is selected with care. we work closely with trusted farmers and producers to source authentic spices and natural products at their finest. each batch is carefully checked for purity, freshness, and quality, then hygienically packed to preserve its natural aroma and flavor until it reaches your home",
+    "mediaType": "image",
     "image": "",
+    "video": "",
     "founderName": "Anjana KA",
     "founderTitle": "Founder Prakrithi India"
   },

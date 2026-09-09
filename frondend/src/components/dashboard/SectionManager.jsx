@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { FiPlus, FiTrash2, FiCopy, FiCheck, FiX, FiSave, FiRefreshCw } from 'react-icons/fi';
 import { useSiteConfig } from '../../context/SiteConfigContext';
 import ImageUploader from './ImageUploader';
+import StoryMediaUploader from './StoryMediaUploader';
 import './SectionManager.css';
 
 export default function SectionManager() {
@@ -391,18 +392,30 @@ export default function SectionManager() {
             onChange={(e) => updateConfig('ourStory.content', e.target.value)} />
         </div>
 
-        {/* Image upload */}
-        <div style={{ marginTop: '16px' }}>
-          <ImageUploader
-            label="Story Image"
-            value={config.ourStory?.image || ''}
-            onChange={(val) => updateConfig('ourStory.image', val)}
-            placeholder="https://example.com/story.jpg or /images/..."
-            maxWidth={700}
-            maxHeight={700}
-            helperText="Upload an SVG, PNG, JPG or paste raw SVG code."
-          />
+        <div className="dash-row">
+          <div className="dash-field">
+            <label className="dash-field__label">Founder Name</label>
+            <input className="dash-field__input" value={config.ourStory?.founderName || ''}
+              onChange={(e) => updateConfig('ourStory.founderName', e.target.value)}
+              placeholder="e.g. Anjana KA" />
+          </div>
+          <div className="dash-field">
+            <label className="dash-field__label">Founder Title</label>
+            <input className="dash-field__input" value={config.ourStory?.founderTitle || ''}
+              onChange={(e) => updateConfig('ourStory.founderTitle', e.target.value)}
+              placeholder="e.g. Founder Prakrithi India" />
+          </div>
         </div>
+
+        {/* Media Uploader: Image or Video */}
+        <StoryMediaUploader
+          mediaType={config.ourStory?.mediaType || (config.ourStory?.video ? 'video' : 'image')}
+          onMediaTypeChange={(type) => updateConfig('ourStory.mediaType', type)}
+          image={config.ourStory?.image || ''}
+          onImageChange={(val) => updateConfig('ourStory.image', val)}
+          video={config.ourStory?.video || ''}
+          onVideoChange={(val) => updateConfig('ourStory.video', val)}
+        />
       </div>
 
       {/* ── Review Section Settings ── */}

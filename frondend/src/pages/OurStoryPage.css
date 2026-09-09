@@ -38,6 +38,30 @@
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
 }
 
+.our-story-hero-video-wrapper {
+  width: 100%;
+  aspect-ratio: 16/9;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 60px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  background: #000000;
+}
+
+.our-story-hero-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+.our-story-hero-video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
 .our-story-full-text {
   font-size: 1.125rem;
   line-height: 1.8;

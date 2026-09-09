@@ -263,3 +263,34 @@ export function compressImagePreset(file, presetName = 'general') {
   const preset = COMPRESSION_PRESETS[presetName] || COMPRESSION_PRESETS.general;
   return compressImage(file, preset.maxWidth, preset.maxHeight, preset.quality);
 }
+
+/**
+ * Converts a YouTube or Vimeo URL into an embeddable URL.
+ * Returns the original URL if not recognized as YouTube/Vimeo.
+ */
+export function getYouTubeEmbedUrl(url) {
+  if (!url || typeof url !== 'string') return '';
+  const trimmed = url.trim();
+  const ytMatch = trimmed.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/);
+  if (ytMatch && ytMatch[1]) {
+    return `https://www.youtube.com/embed/${ytMatch[1]}`;
+  }
+  const vimeoMatch = trimmed.match(/vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/[^\/]*\/videos\/|album\/\d+\/video\/|video\/|)(\d+)/);
+  if (vimeoMatch && vimeoMatch[1]) {
+    return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+  }
+  return trimmed;
+}
+
+/**
+ * Checks if a string is a video URL (YouTube, Vimeo, MP4, WebM, or video data URL).
+ */
+export function isVideoUrl(url) {
+  if (!url || typeof url !== 'string') return false;
+  const trimmed = url.trim().toLowerCase();
+  if (trimmed.startsWith('data:video/')) return true;
+  if (trimmed.includes('youtube.com') || trimmed.includes('youtu.be') || trimmed.includes('vimeo.com')) return true;
+  if (/\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(trimmed)) return true;
+  return false;
+}
+

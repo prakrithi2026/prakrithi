@@ -1,15 +1,26 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSiteConfig } from '../../context/SiteConfigContext';
-import { svgToDataUrl } from '../../utils/imageOptimizer';
+import { svgToDataUrl, getYouTubeEmbedUrl } from '../../utils/imageOptimizer';
 import './OurStorySection.css';
 
 export default function OurStorySection() {
   const { config } = useSiteConfig();
   const { ourStory, theme } = config;
+  const [isPlaying, setIsPlaying] = useState(false);
 
   if (!ourStory) return null;
 
   const storyImgSrc = ourStory.image ? svgToDataUrl(ourStory.image) : '';
+  const hasVideo = Boolean(ourStory.video);
+  const isVideoMode = ourStory.mediaType === 'video' || (hasVideo && ourStory.mediaType !== 'image');
+  const isYouTubeOrVimeo = hasVideo && (
+    ourStory.video.includes('youtube.com') ||
+    ourStory.video.includes('youtu.be') ||
+    ourStory.video.includes('vimeo.com')
+  );
+  const embedUrl = isYouTubeOrVimeo ? getYouTubeEmbedUrl(ourStory.video) : '';
+  const hasMedia = isVideoMode ? hasVideo || Boolean(storyImgSrc) : Boolean(storyImgSrc);
 
   // Extract the main paragraph content
   const paragraphs = ourStory.content.split('\n').filter(p => p.trim() && !p.startsWith('## '));
@@ -30,28 +41,73 @@ export default function OurStorySection() {
     >
       <div className="our-story-card" style={{ backgroundColor: theme.primaryColor || '#00472A' }}>
         
-        {/* Left Column: Image with Play Button */}
-        {storyImgSrc ? (
+        {/* Left Column: Media (Video or Image) */}
+        {hasMedia && (
           <div className="our-story-media-col">
-            <div className="our-story-image-wrapper">
-              <img
-                src={storyImgSrc}
-                alt={ourStory.title}
-                className="our-story-img"
-                loading="lazy"
-                decoding="async"
-                width="600"
-                height="400"
-              />
-              <div className="our-story-play-overlay">
-                <svg width="50" height="50" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="30" cy="30" r="30" fill="#EF1C1C" />
-                  <path d="M40 30L24 40V20L40 30Z" fill="white" />
-                </svg>
+            {isVideoMode && hasVideo ? (
+              isPlaying || !storyImgSrc ? (
+                <div className="our-story-video-wrapper">
+                  {isYouTubeOrVimeo && embedUrl ? (
+                    <iframe
+                      src={`${embedUrl}${embedUrl.includes('?') ? '&' : '?'}autoplay=1`}
+                      title={ourStory.title || 'Our Story Video'}
+                      className="our-story-iframe"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  ) : (
+                    <video
+                      src={ourStory.video}
+                      controls
+                      autoPlay={isPlaying}
+                      playsInline
+                      className="our-story-video"
+                    >
+                      Your browser does not support HTML5 video.
+                    </video>
+                  )}
+                </div>
+              ) : (
+                <div
+                  className="our-story-image-wrapper our-story-image-wrapper--clickable"
+                  onClick={() => setIsPlaying(true)}
+                  role="button"
+                  tabIndex={0}
+                  aria-label="Play video"
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setIsPlaying(true); }}
+                >
+                  <img
+                    src={storyImgSrc}
+                    alt={ourStory.title}
+                    className="our-story-img"
+                    loading="lazy"
+                    decoding="async"
+                    width="600"
+                    height="400"
+                  />
+                  <div className="our-story-play-overlay">
+                    <svg width="50" height="50" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="30" cy="30" r="30" fill="#EF1C1C" />
+                      <path d="M40 30L24 40V20L40 30Z" fill="white" />
+                    </svg>
+                  </div>
+                </div>
+              )
+            ) : storyImgSrc ? (
+              <div className="our-story-image-wrapper">
+                <img
+                  src={storyImgSrc}
+                  alt={ourStory.title}
+                  className="our-story-img"
+                  loading="lazy"
+                  decoding="async"
+                  width="600"
+                  height="400"
+                />
               </div>
-            </div>
+            ) : null}
           </div>
-        ) : null}
+        )}
 
         {/* Right Column: Content */}
         <div className="our-story-text-col">
