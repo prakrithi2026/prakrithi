@@ -1,3 +1,4 @@
+import { useRef, useState } from 'react';
 import { useSiteConfig } from '../../context/SiteConfigContext';
 import defaultConfig from '../../data/defaultConfig';
 import { svgToDataUrl } from '../../utils/imageOptimizer';
@@ -5,18 +6,62 @@ import './PressSection.css';
 
 export default function PressSection() {
   const { config } = useSiteConfig();
-  const { press } = config;
+  const press = config?.press;
+  const containerRef = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+
+  if (!press || !Array.isArray(press.logos) || press.logos.length === 0) {
+    return null;
+  }
+
+  const handleMouseDown = (e) => {
+    if (!containerRef.current) return;
+    setIsDragging(true);
+    setStartX(e.pageX - containerRef.current.offsetLeft);
+    setScrollLeft(containerRef.current.scrollLeft);
+  };
+
+  const handleMouseLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging || !containerRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - containerRef.current.offsetLeft;
+    const walk = (x - startX) * 1.5;
+    containerRef.current.scrollLeft = scrollLeft - walk;
+  };
 
   return (
     <section className="press-section" style={{ backgroundColor: press.bgColor || '#BDD681' }}>
-      <div className="press-container">
+      <div
+        ref={containerRef}
+        className="press-container"
+        onMouseDown={handleMouseDown}
+        onMouseLeave={handleMouseLeave}
+        onMouseUp={handleMouseUp}
+        onMouseMove={handleMouseMove}
+      >
         {press.logos.map((logo, i) => {
           const rawImage = logo.image || defaultConfig.press?.logos?.[i]?.image || '';
           const logoImage = rawImage ? svgToDataUrl(rawImage) : '';
           return (
             <div key={i} className="press-logo">
               {logoImage ? (
-                <img src={logoImage} alt={logo.name} className="press-logo-img" loading="lazy" />
+                <img
+                  src={logoImage}
+                  alt={logo.name}
+                  className="press-logo-img"
+                  loading="lazy"
+                  draggable={false}
+                />
               ) : (
               <span className={`press-text press-${logo.style || 'default'}`}>
                 {logo.style === 'thehindu' && (

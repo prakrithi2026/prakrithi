@@ -107,20 +107,65 @@
 }
 
 @media (max-width: 768px) {
+  .press-section {
+    margin-top: 32px;
+    padding: 24px 0;
+    overflow: hidden;
+  }
+
   .press-container {
     height: auto;
-    padding: 30px 20px;
-    flex-wrap: wrap;
+    width: 100%;
+    max-width: 100%;
+    padding: 4px 20px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
     gap: 24px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .press-container:active {
+    cursor: grabbing;
+  }
+
+  .press-container::-webkit-scrollbar {
+    display: none;
+  }
+
+  .press-logo {
+    flex: 0 0 auto;
+    scroll-snap-align: center;
+    display: flex;
+    align-items: center;
     justify-content: center;
   }
 
+  .press-logo:last-child {
+    padding-right: 20px;
+  }
+
   .press-logo-img {
-    max-height: 55px;
+    max-height: 54px;
     max-width: 160px;
+    width: auto;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
   }
 
   .press-text {
-    font-size: 18px !important;
+    font-size: 20px !important;
+    white-space: nowrap;
   }
 }
