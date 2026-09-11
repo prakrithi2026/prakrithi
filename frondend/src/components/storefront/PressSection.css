@@ -110,7 +110,7 @@
 @media (max-width: 768px) {
   .press-section {
     margin-top: 32px;
-    padding: 24px 0;
+    padding: 28px 0;
     overflow: hidden;
   }
 
@@ -118,13 +118,13 @@
     height: auto;
     width: 100%;
     max-width: 100%;
-    padding: 4px 20px;
+    padding: 6px 20px;
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: center;
-    gap: 24px;
+    gap: 28px;
     overflow-x: auto;
     overflow-y: hidden;
     scroll-snap-type: x proximity;
@@ -153,20 +153,41 @@
   }
 
   .press-logo:last-child {
-    padding-right: 20px;
+    padding-right: 24px;
   }
 
   .press-logo-img {
-    max-height: 54px;
-    max-width: 160px;
+    max-height: 82px;
+    max-width: 215px;
     width: auto;
+    height: auto;
     user-select: none;
     -webkit-user-select: none;
     -webkit-user-drag: none;
   }
 
   .press-text {
-    font-size: 20px !important;
+    font-size: 26px !important;
     white-space: nowrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .press-section {
+    padding: 24px 0;
+  }
+
+  .press-container {
+    gap: 24px;
+    padding: 4px 16px;
+  }
+
+  .press-logo-img {
+    max-height: 76px;
+    max-width: 195px;
+  }
+
+  .press-text {
+    font-size: 24px !important;
   }
 }
