@@ -6,9 +6,17 @@
 }
 
 .footer-container {
-  max-width: 1194px;
+  width: 100%;
+  max-width: 1440px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 123px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1024px) {
+  .footer-container {
+    padding: 0 20px;
+  }
 }
 
 /* Title */
@@ -130,6 +138,10 @@
 }
 
 @media (max-width: 768px) {
+  .footer-container {
+    padding: 0 12px;
+  }
+
   .site-footer {
     padding: 40px 0 30px;
   }

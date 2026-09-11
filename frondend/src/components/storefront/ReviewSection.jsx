@@ -21,41 +21,43 @@ export default function ReviewSection() {
   const reviewImage = rawImage ? svgToDataUrl(rawImage) : '';
 
   return (
-    <section className="review-section" style={dynamicStyle}>
-      <div className={`review-container ${!reviewImage ? 'review-container--no-image' : ''}`}>
-        
-        {/* Left Image Column - Only displayed if admin added an image URL or SVG code */}
-        {reviewImage ? (
-          <div className="review-laurel-col">
-            <img src={reviewImage} alt="Reviews Graphic" className="review-left-uploaded-img" />
-          </div>
-        ) : null}
-
-        {/* Right Google Rating Column */}
-        <div className="review-rating-col">
-          <div className="google-rating-card" style={{ backgroundColor: '#0D5130' }}>
-            <div className="google-info">
-              <p className="google-label">Google Rating</p>
-              <div className="google-score-row">
-                <span className="google-score">{googleRating || 4.9}</span>
-                <span className="google-stars">★★★★★</span>
-                <span className="google-count">
-                  {Number(totalReviews || 1183).toLocaleString('en-IN')} Reviews
-                </span>
-              </div>
+    <div className="review-section-wrap">
+      <section className="review-section" style={dynamicStyle}>
+        <div className={`review-container ${!reviewImage ? 'review-container--no-image' : ''}`}>
+          
+          {/* Left Image Column - Only displayed if admin added an image URL or SVG code */}
+          {reviewImage ? (
+            <div className="review-laurel-col">
+              <img src={reviewImage} alt="Reviews Graphic" className="review-left-uploaded-img" />
             </div>
-            <a 
-              href="https://g.page/r/search" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="btn-write-review-link"
-            >
-              Write a review
-            </a>
-          </div>
-        </div>
+          ) : null}
 
-      </div>
-    </section>
+          {/* Right Google Rating Column */}
+          <div className="review-rating-col">
+            <div className="google-rating-card" style={{ backgroundColor: '#0D5130' }}>
+              <div className="google-info">
+                <p className="google-label">Google Rating</p>
+                <div className="google-score-row">
+                  <span className="google-score">{googleRating || 4.9}</span>
+                  <span className="google-stars">★★★★★</span>
+                  <span className="google-count">
+                    {Number(totalReviews || 1183).toLocaleString('en-IN')} Reviews
+                  </span>
+                </div>
+              </div>
+              <a 
+                href="https://g.page/r/search" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="btn-write-review-link"
+              >
+                Write a review
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </section>
+    </div>
   );
 }

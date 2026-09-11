@@ -1,11 +1,12 @@
 /* Premium Dark Green Card Story Section */
 .our-story-section {
   width: 100%;
+  max-width: 1440px;
   height: auto !important;
   min-height: 100% !important;
   overflow: visible !important;
-  margin: 0;
-  padding: 0 20px 60px 20px;
+  margin: 0 auto;
+  padding: 0 123px 60px 123px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -14,7 +15,7 @@
 
 .our-story-card {
   width: 100%;
-  max-width: 1154px;
+  max-width: none;
   border-radius: 24px;
   padding: 40px 48px;
   display: flex;
@@ -192,11 +193,17 @@
   }
 }
 
+@media (max-width: 1024px) {
+  .our-story-section {
+    padding: 0 20px 40px 20px;
+  }
+}
+
 @media (max-width: 767px) {
   .our-story-section {
     width: 100%;
-    margin: 0;
-    padding: 0 16px 40px 16px;
+    margin: 0 auto;
+    padding: 0 12px 40px 12px;
   }
   
   .our-story-card {

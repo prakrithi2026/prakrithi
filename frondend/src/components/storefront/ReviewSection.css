@@ -1,8 +1,29 @@
+.review-section-wrap {
+  width: 100%;
+  max-width: 1440px;
+  margin: 58px auto 0;
+  padding: 0 123px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1024px) {
+  .review-section-wrap {
+    padding: 0 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .review-section-wrap {
+    margin-top: 40px;
+    padding: 0 12px;
+  }
+}
+
 /* Premium Google Rating Trust Banner */
 .review-section {
-  max-width: 1154px;
-  width: calc(100% - 40px);
-  margin: 58px auto 0;
+  width: 100%;
+  max-width: none;
+  margin: 0;
   padding: 48px;
   border-radius: 12px;
   display: flex;
@@ -182,8 +203,8 @@
 
 @media (max-width: 767px) {
   .review-section {
-    width: calc(100% - 32px);
-    margin: 40px auto 0;
+    width: 100%;
+    margin: 0;
     padding: 30px 20px;
     border-radius: 12px;
     background: linear-gradient(90deg, #0D5130 0%, #9FBD58 100%) !important;

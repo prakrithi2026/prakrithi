@@ -1,7 +1,21 @@
 .delivery-section {
-  max-width: 1194px;
+  width: 100%;
+  max-width: 1440px;
   margin: 58px auto 0;
-  padding: 0 20px;
+  padding: 0 123px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1024px) {
+  .delivery-section {
+    padding: 0 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .delivery-section {
+    padding: 0 12px;
+  }
 }
 
 .delivery-banner {
