@@ -5,8 +5,8 @@
   height: auto !important;
   min-height: 100% !important;
   overflow: visible !important;
-  margin: 0 auto;
-  padding: 0 123px 60px 123px;
+  margin: var(--section-spacing, 48px) auto 0;
+  padding: 0 123px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -195,15 +195,15 @@
 
 @media (max-width: 1024px) {
   .our-story-section {
-    padding: 0 20px 40px 20px;
+    padding: 0 20px;
   }
 }
 
 @media (max-width: 767px) {
   .our-story-section {
     width: 100%;
-    margin: 0 auto;
-    padding: 0 12px 40px 12px;
+    margin: var(--section-spacing, 32px) auto 0;
+    padding: 0 12px;
   }
   
   .our-story-card {

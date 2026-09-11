@@ -1,6 +1,6 @@
 .press-section {
   width: 100%;
-  margin-top: 60px;
+  margin-top: var(--section-spacing, 48px);
   padding: 60px 0 50px 0;
   box-sizing: border-box;
   background-color: var(--accent, #BDD681);

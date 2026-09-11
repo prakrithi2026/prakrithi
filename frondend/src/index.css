@@ -44,6 +44,7 @@
   --font-sans: 'Jost', 'Poppins', sans-serif;
   --font-heading: 'Jost', 'Poppins', sans-serif;
   --font-serif: 'Playfair Display', serif;
+  --section-spacing: 48px;
   --transition-fast: 150ms ease;
   --transition-base: 250ms ease;
   --transition-slow: 400ms ease;
@@ -160,6 +161,10 @@ ul {
 }
 
 @media (max-width: 768px) {
+  :root {
+    --section-spacing: 32px;
+  }
+
   .container {
     padding: 0 12px;
   }

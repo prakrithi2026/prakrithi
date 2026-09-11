@@ -2,7 +2,7 @@
   width: 100%;
   padding: 40px 0 24px;
   color: #fff;
-  margin-top: 58px;
+  margin-top: var(--section-spacing, 48px);
 }
 
 .footer-container {
@@ -144,6 +144,7 @@
 
   .site-footer {
     padding: 40px 0 30px;
+    margin-top: var(--section-spacing, 32px);
   }
 
   .footer-title {

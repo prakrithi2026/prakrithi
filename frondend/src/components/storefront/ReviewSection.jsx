@@ -6,10 +6,10 @@ import './ReviewSection.css';
 export default function ReviewSection() {
   const { config } = useSiteConfig();
   const { reviewsSection = {}, theme } = config;
-  const { image = '', googleRating = 0, totalReviews = 0 } = reviewsSection;
+  const { image = '', googleRating = 0, totalReviews = 0, bgGradient, bgColor } = reviewsSection;
 
   const dynamicStyle = {
-    background: `linear-gradient(90deg, #0D5130 0%, #9FBD58 100%)`
+    background: bgGradient || (bgColor ? bgColor : 'linear-gradient(90deg, #0D5130 0%, #9FBD58 100%)')
   };
 
   // Only display image if admin provided an image URL or SVG code, or fallback to default
@@ -34,7 +34,7 @@ export default function ReviewSection() {
 
           {/* Right Google Rating Column */}
           <div className="review-rating-col">
-            <div className="google-rating-card" style={{ backgroundColor: '#0D5130' }}>
+            <div className="google-rating-card">
               <div className="google-info">
                 <p className="google-label">Google Rating</p>
                 <div className="google-score-row">

@@ -1,14 +1,17 @@
 .shop-section {
   width: 100%;
   max-width: 1440px;
-  margin: 36px auto 0;
+  margin: var(--section-spacing, 48px) auto 0;
   padding: 0 123px;
   box-sizing: border-box;
   overflow: hidden;
 }
 
-.section-container {
+.shop-section .section-container {
   width: 100%;
+  max-width: 100%;
+  padding: 0;
+  margin: 0;
 }
 
 /* Filter tabs */
@@ -125,7 +128,7 @@
 
 @media (max-width: 768px) {
   .shop-section {
-    margin-top: 30px;
+    margin-top: var(--section-spacing, 32px);
     padding: 0 12px;
   }
 
