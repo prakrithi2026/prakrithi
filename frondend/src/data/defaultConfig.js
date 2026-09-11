@@ -180,8 +180,8 @@ const defaultConfig = {
     }
   ],
   "delivery": {
-    "title": "How we deliver",
-    "subtitle": "fresh natural products",
+    "title": "How We Deliver",
+    "subtitle": "Fresh Natural Products",
     "tcNote": "*T&C Apply.",
     "steps": [
       {
