@@ -82,12 +82,20 @@ function getInitialConfig() {
       image: defaultConfig.reviewsSection?.image || ''
     };
   }
-  // Ensure ourStory has valid image
-  if (!base.ourStory || !base.ourStory.image) {
+  // Ensure ourStory has high clarity image fallback
+  if (
+    !base.ourStory ||
+    !base.ourStory.image ||
+    base.ourStory.image === '/images/our-story.png' ||
+    (typeof base.ourStory.image === 'string' && (
+      base.ourStory.image.startsWith('data:image/webp;base64,UklGR') ||
+      (base.ourStory.image.includes('images.unsplash.com') && base.ourStory.image.includes('w=800'))
+    ))
+  ) {
     base.ourStory = {
       ...(defaultConfig.ourStory || {}),
       ...(base.ourStory || {}),
-      image: base.ourStory?.image || defaultConfig.ourStory?.image || '/images/our-story.png'
+      image: defaultConfig.ourStory?.image || 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&q=95&w=1800'
     };
   }
   if (!Array.isArray(base.hero?.images) || base.hero.images.length === 0) {
@@ -230,12 +238,20 @@ export function SiteConfigProvider({ children }) {
           }
         }
 
-        // Ensure ourStory has a valid image fallback
-        if (!mergedConfig.ourStory || !mergedConfig.ourStory.image) {
+        // Ensure ourStory has high clarity image fallback
+        if (
+          !mergedConfig.ourStory ||
+          !mergedConfig.ourStory.image ||
+          mergedConfig.ourStory.image === '/images/our-story.png' ||
+          (typeof mergedConfig.ourStory.image === 'string' && (
+            mergedConfig.ourStory.image.startsWith('data:image/webp;base64,UklGR') ||
+            (mergedConfig.ourStory.image.includes('images.unsplash.com') && mergedConfig.ourStory.image.includes('w=800'))
+          ))
+        ) {
           mergedConfig.ourStory = {
             ...(defaultConfig.ourStory || {}),
             ...(mergedConfig.ourStory || {}),
-            image: mergedConfig.ourStory?.image || defaultConfig.ourStory?.image || '/images/our-story.png'
+            image: defaultConfig.ourStory?.image || 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&q=95&w=1800'
           };
         }
 

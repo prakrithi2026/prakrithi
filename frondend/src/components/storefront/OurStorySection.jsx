@@ -5,6 +5,28 @@ import defaultConfig from '../../data/defaultConfig';
 import { svgToDataUrl, getYouTubeEmbedUrl } from '../../utils/imageOptimizer';
 import './OurStorySection.css';
 
+function getHighClarityImage(src) {
+  if (!src || typeof src !== 'string') return src;
+  if (src.includes('images.unsplash.com')) {
+    let high = src;
+    if (high.includes('w=')) {
+      high = high.replace(/w=\d+/, 'w=1800');
+    } else {
+      high += '&w=1800';
+    }
+    if (high.includes('q=')) {
+      high = high.replace(/q=\d+/, 'q=95');
+    } else {
+      high += '&q=95';
+    }
+    if (high.includes('fm=webp')) {
+      high = high.replace('fm=webp', 'auto=format');
+    }
+    return high;
+  }
+  return src;
+}
+
 export default function OurStorySection() {
   const { config } = useSiteConfig();
   const { ourStory, theme } = config;
@@ -14,6 +36,17 @@ export default function OurStorySection() {
 
   const defaultImg = defaultConfig.ourStory?.image || '/images/our-story.png';
   const storyImgSrc = ourStory.image ? svgToDataUrl(ourStory.image) : defaultImg;
+  const highResStoryImg = getHighClarityImage(storyImgSrc);
+  const isUnsplash = typeof storyImgSrc === 'string' && storyImgSrc.includes('images.unsplash.com');
+  const storySrcSet = isUnsplash
+    ? [
+        `${highResStoryImg.replace(/w=\d+/, 'w=800').replace(/q=\d+/, 'q=90')} 800w`,
+        `${highResStoryImg.replace(/w=\d+/, 'w=1200').replace(/q=\d+/, 'q=92')} 1200w`,
+        `${highResStoryImg.replace(/w=\d+/, 'w=1800').replace(/q=\d+/, 'q=95')} 1800w`,
+        `${highResStoryImg.replace(/w=\d+/, 'w=2400').replace(/q=\d+/, 'q=95')} 2400w`,
+      ].join(', ')
+    : undefined;
+
   const hasVideo = Boolean(ourStory.video);
   const isVideoMode = ourStory.mediaType === 'video' || (hasVideo && ourStory.mediaType !== 'image');
   const isYouTubeOrVimeo = hasVideo && (
@@ -22,7 +55,7 @@ export default function OurStorySection() {
     ourStory.video.includes('vimeo.com')
   );
   const embedUrl = isYouTubeOrVimeo ? getYouTubeEmbedUrl(ourStory.video) : '';
-  const hasMedia = isVideoMode ? hasVideo || Boolean(storyImgSrc) : Boolean(storyImgSrc);
+  const hasMedia = isVideoMode ? hasVideo || Boolean(highResStoryImg) : Boolean(highResStoryImg);
 
   // Extract the main paragraph content
   const paragraphs = ourStory.content.split('\n').filter(p => p.trim() && !p.startsWith('## '));
@@ -79,7 +112,9 @@ export default function OurStorySection() {
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setIsPlaying(true); }}
                 >
                   <img
-                    src={storyImgSrc}
+                    src={highResStoryImg}
+                    srcSet={storySrcSet}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
                     alt={ourStory.title || 'Our Story'}
                     className="our-story-img"
                     loading="eager"
@@ -101,10 +136,12 @@ export default function OurStorySection() {
                   </div>
                 </div>
               )
-            ) : storyImgSrc ? (
+            ) : highResStoryImg ? (
               <div className="our-story-image-wrapper">
                 <img
-                  src={storyImgSrc}
+                  src={highResStoryImg}
+                  srcSet={storySrcSet}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
                   alt={ourStory.title || 'Our Story'}
                   className="our-story-img"
                   loading="eager"
