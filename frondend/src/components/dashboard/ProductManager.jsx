@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { FiPlus, FiEdit2, FiTrash2, FiX, FiSave } from 'react-icons/fi';
 import { useSiteConfig } from '../../context/SiteConfigContext';
-import ImageUploader from './ImageUploader';
+import ProductImageUploader from './ProductImageUploader';
 import './ProductManager.css';
 
 const emptyProduct = {
@@ -238,15 +238,14 @@ export default function ProductManager() {
 
               {/* ── Product Image Upload ── */}
               <div className="dash-field">
-                <ImageUploader
+                <ProductImageUploader
                   label="Product Image"
                   value={editing.image}
                   onChange={(val) => setEditing({ ...editing, image: val })}
-                  placeholder="https://example.com/product.jpg or /images/..."
-                  maxWidth={600}
-                  maxHeight={600}
-                  quality={0.80}
-                  helperText="Upload an SVG/image or paste raw SVG code for crisp vector rendering."
+                  maxWidth={800}
+                  maxHeight={800}
+                  quality={0.85}
+                  helperText="Upload a product image (PNG, JPG, WEBP) or enter an image URL."
                 />
               </div>
 
