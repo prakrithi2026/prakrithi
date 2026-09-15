@@ -21,19 +21,35 @@ export default function HeroSection() {
     Array.isArray(hero.mobileImages) ? hero.mobileImages : []
   ).filter(Boolean), [hero.mobileImages]);
 
+  // If one device view is empty, fall back cleanly to the other view
+  const effectiveDesktopImages = useMemo(() => (
+    desktopImages.length > 0 ? desktopImages : mobileImages
+  ), [desktopImages, mobileImages]);
+
+  const effectiveMobileImages = useMemo(() => (
+    mobileImages.length > 0 ? mobileImages : desktopImages
+  ), [desktopImages, mobileImages]);
+
+  // Total slides count is determined by configured banners
   const slideCount = Math.max(desktopImages.length, mobileImages.length);
   const enabled = hero.enabled !== false && slideCount > 0;
 
-  // Pre-construct slides pairing desktop and mobile images for pure HTML5 <picture> responsive rendering
+  // Pre-construct slides pairing desktop and mobile images cleanly
   const slides = useMemo(() => {
+    if (slideCount === 0) return [];
     const list = [];
     for (let i = 0; i < slideCount; i++) {
-      const desktop = desktopImages[i] || mobileImages[i] || '';
-      const mobile = mobileImages[i] || desktopImages[i] || '';
+      // Never leak mismatched slides: if desktop has fewer slides, loop its primary slides
+      const desktop = effectiveDesktopImages.length > 0
+        ? effectiveDesktopImages[i % effectiveDesktopImages.length]
+        : '';
+      const mobile = effectiveMobileImages.length > 0
+        ? effectiveMobileImages[i % effectiveMobileImages.length]
+        : desktop;
       list.push({ desktop, mobile });
     }
     return list;
-  }, [desktopImages, mobileImages, slideCount]);
+  }, [effectiveDesktopImages, effectiveMobileImages, slideCount]);
 
   // Set up automatic scrolling interval if there are 2 or more images
   useEffect(() => {

@@ -98,22 +98,18 @@ function getInitialConfig() {
       image: defaultConfig.ourStory?.image || 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&q=95&w=1800'
     };
   }
-  if (!Array.isArray(base.hero?.images) || base.hero.images.length === 0) {
-    if (Array.isArray(defaultConfig.hero?.images) && defaultConfig.hero.images.length > 0) {
-      base.hero = {
-        ...(base.hero || {}),
-        images: defaultConfig.hero.images,
-        bgImage: defaultConfig.hero.bgImage || defaultConfig.hero.images[0]
-      };
-    }
+  if (!Array.isArray(base.hero?.images)) {
+    base.hero = {
+      ...(base.hero || {}),
+      images: base.hero?.bgImage ? [base.hero.bgImage] : (defaultConfig.hero?.images || []),
+      bgImage: base.hero?.bgImage || defaultConfig.hero?.bgImage || ''
+    };
   }
-  if (!Array.isArray(base.hero?.mobileImages) || base.hero.mobileImages.length === 0) {
-    if (Array.isArray(defaultConfig.hero?.mobileImages) && defaultConfig.hero.mobileImages.length > 0) {
-      base.hero = {
-        ...(base.hero || {}),
-        mobileImages: defaultConfig.hero.mobileImages
-      };
-    }
+  if (!Array.isArray(base.hero?.mobileImages)) {
+    base.hero = {
+      ...(base.hero || {}),
+      mobileImages: []
+    };
   }
   return base;
 }
@@ -255,23 +251,19 @@ export function SiteConfigProvider({ children }) {
           };
         }
 
-        // Ensure hero banners fallback to defaultConfig if backend returns empty images
-        if (!Array.isArray(mergedConfig.hero?.images) || mergedConfig.hero.images.length === 0) {
-          if (Array.isArray(defaultConfig.hero?.images) && defaultConfig.hero.images.length > 0) {
-            mergedConfig.hero = {
-              ...(mergedConfig.hero || {}),
-              images: defaultConfig.hero.images,
-              bgImage: defaultConfig.hero.bgImage || defaultConfig.hero.images[0]
-            };
-          }
+        // Ensure hero images are valid arrays without forcing default banners when user removed them
+        if (!Array.isArray(mergedConfig.hero?.images)) {
+          mergedConfig.hero = {
+            ...(mergedConfig.hero || {}),
+            images: mergedConfig.hero?.bgImage ? [mergedConfig.hero.bgImage] : (defaultConfig.hero?.images || []),
+            bgImage: mergedConfig.hero?.bgImage || defaultConfig.hero?.bgImage || ''
+          };
         }
-        if (!Array.isArray(mergedConfig.hero?.mobileImages) || mergedConfig.hero.mobileImages.length === 0) {
-          if (Array.isArray(defaultConfig.hero?.mobileImages) && defaultConfig.hero.mobileImages.length > 0) {
-            mergedConfig.hero = {
-              ...(mergedConfig.hero || {}),
-              mobileImages: defaultConfig.hero.mobileImages
-            };
-          }
+        if (!Array.isArray(mergedConfig.hero?.mobileImages)) {
+          mergedConfig.hero = {
+            ...(mergedConfig.hero || {}),
+            mobileImages: []
+          };
         }
 
         // Merge backend products with defaultConfig products so catalog items are not lost, but respecting valid images

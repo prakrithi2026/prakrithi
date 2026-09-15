@@ -1,19 +1,21 @@
 import { useState, useRef } from 'react';
 import { 
   FiUpload, FiImage, FiPlus, FiTrash2, FiMonitor, FiSmartphone, 
-  FiInfo, FiChevronLeft, FiChevronRight, FiStar
+  FiInfo, FiChevronLeft, FiChevronRight, FiStar, FiSave, FiCheck, FiRefreshCw, FiCopy
 } from 'react-icons/fi';
 import { useSiteConfig } from '../../context/SiteConfigContext';
 import { compressImage, normalizeImageInput } from '../../utils/imageOptimizer';
 import './HeroEditor.css';
 
 export default function HeroEditor() {
-  const { config, updateConfig } = useSiteConfig();
+  const { config, updateConfig, saveConfig } = useSiteConfig();
   const { hero } = config;
   const [deviceView, setDeviceView] = useState('desktop'); // 'desktop' | 'mobile'
   const [uploadMode, setUploadMode] = useState('file'); // 'file' | 'url'
   const [dragActive, setDragActive] = useState(false);
   const [urlInput, setUrlInput] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const fileInputRef = useRef(null);
 
   const desktopImages = Array.isArray(hero.images) 
@@ -22,6 +24,16 @@ export default function HeroEditor() {
   const mobileImages = Array.isArray(hero.mobileImages) ? hero.mobileImages : [];
 
   const currentImages = deviceView === 'desktop' ? desktopImages : mobileImages;
+
+  const handleSaveHero = async () => {
+    setSaving(true);
+    const res = await saveConfig();
+    setSaving(false);
+    if (res?.success) {
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 2500);
+    }
+  };
 
   // Helper to update images and keep legacy bgImage in sync
   const setImagesForDevice = (view, newImagesList) => {
@@ -34,6 +46,13 @@ export default function HeroEditor() {
     }
 
     updateConfig('hero', nextHero);
+  };
+
+  const copyDesktopToMobile = () => {
+    if (window.confirm('Sync current Desktop banners to Mobile view? This will replace mobile banners with desktop banners.')) {
+      const nextHero = { ...hero, mobileImages: [...desktopImages] };
+      updateConfig('hero', nextHero);
+    }
   };
 
   const handleFilesUpload = async (files) => {
@@ -305,15 +324,29 @@ export default function HeroEditor() {
 
             {/* Uploaded Images List for Active View */}
             <div style={{ marginTop: '28px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
                 <h3 style={{ fontSize: '1rem', fontWeight: 600, color: '#1e293b', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
                   {deviceView === 'desktop' ? '💻 Desktop Banners' : '📱 Mobile Banners'} ({currentImages.length})
                 </h3>
-                {currentImages.length > 0 && (
-                  <button className="hero-editor-preview__btn hero-editor-preview__btn--remove" onClick={clearAllImages}>
-                    Clear All ({deviceView === 'desktop' ? 'Desktop' : 'Mobile'})
-                  </button>
-                )}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  {desktopImages.length > 0 && (
+                    <button
+                      type="button"
+                      className="dash-btn dash-btn--secondary"
+                      onClick={copyDesktopToMobile}
+                      title="Sync current Desktop banners to Mobile view"
+                      style={{ fontSize: '0.78rem', padding: '5px 12px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+                    >
+                      <FiCopy size={13} />
+                      <span>Sync Desktop to Mobile</span>
+                    </button>
+                  )}
+                  {currentImages.length > 0 && (
+                    <button className="hero-editor-preview__btn hero-editor-preview__btn--remove" onClick={clearAllImages}>
+                      Clear All ({deviceView === 'desktop' ? 'Desktop' : 'Mobile'})
+                    </button>
+                  )}
+                </div>
               </div>
 
               {currentImages.length === 0 ? (
@@ -402,6 +435,29 @@ export default function HeroEditor() {
                   })}
                 </div>
               )}
+            </div>
+
+            {/* ── Save Hero Banner Changes Bottom Bar ── */}
+            <div style={{ marginTop: '30px', display: 'flex', justifyContent: 'flex-end', gap: '12px', padding: '20px 20px 10px', borderTop: '1px solid #eee' }}>
+              <button
+                type="button"
+                className={`dash-btn dash-btn--primary ${saveSuccess ? 'dash-btn--success' : ''}`}
+                onClick={handleSaveHero}
+                disabled={saving}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '12px 28px',
+                  borderRadius: '10px',
+                  fontSize: '0.95rem',
+                  fontWeight: 600,
+                  cursor: 'pointer'
+                }}
+              >
+                {saving ? <FiRefreshCw className="spin" size={16} /> : (saveSuccess ? <FiCheck size={16} /> : <FiSave size={16} />)}
+                <span>{saving ? 'Saving...' : (saveSuccess ? 'Saved to Server!' : 'Save Hero Banner Changes')}</span>
+              </button>
             </div>
           </>
         )}
