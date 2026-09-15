@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { 
   FiUploadCloud, 
   FiImage, 
@@ -31,7 +31,12 @@ export default function ProductImageUploader({
   const [isUploading, setIsUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isDragOver, setIsDragOver] = useState(false);
+  const [imgError, setImgError] = useState(false);
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    setImgError(false);
+  }, [value]);
 
   const processFile = async (file) => {
     if (!file) return;
@@ -82,28 +87,68 @@ export default function ProductImageUploader({
     setIsDragOver(false);
   };
 
-  const handleApplyUrl = () => {
+  const applyUrlString = (rawUrl) => {
+    const trimmed = (rawUrl || '').trim();
+    if (!trimmed) return false;
+
+    if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://') && !trimmed.startsWith('/') && !trimmed.startsWith('data:image/')) {
+      setErrorMessage('URL must begin with http://, https://, /, or data:image/');
+      return false;
+    }
+
     setErrorMessage('');
+    const formatted = normalizeImageInput(trimmed);
+    onChange(formatted);
+    setUrlInput('');
+    return true;
+  };
+
+  const handleApplyUrl = () => {
     const trimmed = urlInput.trim();
     if (!trimmed) {
       setErrorMessage('Please enter a valid image URL.');
       return;
     }
+    applyUrlString(trimmed);
+  };
 
-    if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://') && !trimmed.startsWith('/')) {
-      setErrorMessage('URL must begin with http://, https://, or /');
-      return;
+  const handleUrlInputChange = (e) => {
+    const val = e.target.value;
+    setUrlInput(val);
+    const trimmed = val.trim();
+    // Auto-apply immediately if user pasted or finished typing a standard image URL
+    if (
+      (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('/')) &&
+      trimmed.length > 10 &&
+      /\.(jpg|jpeg|png|webp|gif|svg)(\?.*)?$/i.test(trimmed)
+    ) {
+      applyUrlString(trimmed);
     }
+  };
 
-    const formatted = normalizeImageInput(trimmed);
-    onChange(formatted);
-    setUrlInput('');
+  const handleUrlPaste = (e) => {
+    const pasted = e.clipboardData?.getData('text');
+    if (pasted) {
+      const trimmed = pasted.trim();
+      if (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('/') || trimmed.startsWith('data:image/')) {
+        e.preventDefault();
+        applyUrlString(trimmed);
+      }
+    }
+  };
+
+  const handleUrlBlur = () => {
+    const trimmed = urlInput.trim();
+    if (trimmed) {
+      applyUrlString(trimmed);
+    }
   };
 
   const handleRemove = () => {
     onChange('');
     setErrorMessage('');
     setUrlInput('');
+    setImgError(false);
   };
 
   return (
@@ -114,13 +159,18 @@ export default function ProductImageUploader({
       {value ? (
         <div className="product-img-preview-card">
           <div className="product-img-preview-thumb">
-            <img 
-              src={value} 
-              alt="Product Preview" 
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-              }} 
-            />
+            {!imgError ? (
+              <img 
+                src={value} 
+                alt="Product Preview" 
+                onError={() => setImgError(true)} 
+              />
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#d97706', padding: '4px', textAlign: 'center' }} title="Preview could not be rendered from this URL, but URL is saved">
+                <FiAlertCircle size={22} />
+                <span style={{ fontSize: '9px', marginTop: '2px', fontWeight: 600 }}>URL Saved</span>
+              </div>
+            )}
           </div>
 
           <div className="product-img-preview-info">
@@ -128,8 +178,13 @@ export default function ProductImageUploader({
               <span className="product-img-badge">
                 <FiCheck size={12} /> Image Ready
               </span>
+              {imgError && (
+                <span style={{ fontSize: '0.72rem', color: '#b45309', background: '#fef3c7', padding: '1px 6px', borderRadius: '4px' }}>
+                  Preview not loaded, but link is saved
+                </span>
+              )}
             </div>
-            <p className="product-img-url-text">
+            <p className="product-img-url-text" title={value}>
               {value.startsWith('data:') 
                 ? 'Uploaded Image File (Optimized WebP)' 
                 : value.length > 50 ? value.substring(0, 47) + '...' : value}
@@ -143,7 +198,21 @@ export default function ProductImageUploader({
                 disabled={isUploading}
               >
                 <FiRefreshCw size={13} className={isUploading ? 'spin' : ''} />
-                {isUploading ? 'Uploading...' : 'Replace Image'}
+                {isUploading ? 'Uploading...' : 'Replace File'}
+              </button>
+
+              <button
+                type="button"
+                className="dash-btn dash-btn--secondary product-img-btn"
+                onClick={() => {
+                  setActiveTab('url');
+                  setUrlInput(value.startsWith('http') || value.startsWith('/') ? value : '');
+                  onChange('');
+                }}
+                disabled={isUploading}
+              >
+                <FiLink size={13} />
+                Enter URL
               </button>
 
               <button
@@ -227,7 +296,9 @@ export default function ProductImageUploader({
                   className="dash-field__input product-img-url-input"
                   placeholder="https://example.com/product-photo.jpg"
                   value={urlInput}
-                  onChange={(e) => setUrlInput(e.target.value)}
+                  onChange={handleUrlInputChange}
+                  onPaste={handleUrlPaste}
+                  onBlur={handleUrlBlur}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();

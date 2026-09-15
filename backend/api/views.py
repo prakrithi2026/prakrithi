@@ -282,7 +282,14 @@ class SiteConfigView(APIView):
                 # Sync Products efficiently
                 if products is not None and isinstance(products, list) and len(products) > 0:
                     category_map = {c.category_id: c for c in Category.objects.all()}
-                    existing_ids = [p['id'] for p in products if isinstance(p, dict) and 'id' in p and p['id']]
+                    existing_ids = []
+                    for p in products:
+                        if isinstance(p, dict) and p.get('id'):
+                            try:
+                                existing_ids.append(int(p['id']))
+                            except (ValueError, TypeError):
+                                pass
+
                     if existing_ids:
                         Product.objects.exclude(id__in=existing_ids).delete()
                     
@@ -318,7 +325,10 @@ class SiteConfigView(APIView):
                         except (ValueError, TypeError):
                             reviews_num = 0
 
-                        prod_id = prod.get('id')
+                        try:
+                            prod_id = int(prod.get('id')) if prod.get('id') else None
+                        except (ValueError, TypeError):
+                            prod_id = None
                         name = prod.get('name', '')
                         description = prod.get('description', '')
                         image = prod.get('image', '')

@@ -274,15 +274,21 @@ export function SiteConfigProvider({ children }) {
           }
         }
 
-        // Merge backend products with defaultConfig products so catalog items are not lost, but respecting removed images
+        // Merge backend products with defaultConfig products so catalog items are not lost, but respecting valid images
         let finalProducts = [];
         if (Array.isArray(productsData) && productsData.length > 0) {
           finalProducts = productsData.map((p) => {
-            const def = defaultConfig.products?.find((dp) => dp.id === p.id || dp.name === p.name);
+            // Strictly match by ID to avoid collisions with repeated default product names
+            const def = defaultConfig.products?.find((dp) => dp.id === p.id);
+            const validImage = (p.image !== undefined && p.image !== null && p.image !== '') 
+              ? p.image 
+              : (def?.image || '');
             return {
               ...p,
-              image: p.image !== undefined ? p.image : (def?.image || ''),
-              description: p.description !== undefined ? p.description : (def?.description || ''),
+              image: validImage,
+              description: (p.description !== undefined && p.description !== null) 
+                ? p.description 
+                : (def?.description || ''),
             };
           });
           const existingIds = new Set(finalProducts.map((p) => p.id));
@@ -389,8 +395,9 @@ export function SiteConfigProvider({ children }) {
     (product) => {
       sourceRef.current = 'user';
       setConfig((prev) => {
-        const maxId = prev.products.reduce((max, p) => Math.max(max, p.id || 0), 0);
-        return { ...prev, products: [...prev.products, { ...product, id: maxId + 1 }] };
+        const maxId = prev.products.reduce((max, p) => Math.max(max, Number(p.id) || 0), 0);
+        const assignedId = product.id || (maxId + 1);
+        return { ...prev, products: [...prev.products, { ...product, id: assignedId }] };
       });
     },
     []

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FiPlus, FiEdit2, FiTrash2, FiX, FiSave } from 'react-icons/fi';
+import { FiPlus, FiEdit2, FiTrash2, FiX, FiSave, FiRefreshCw, FiCheck } from 'react-icons/fi';
 import { useSiteConfig } from '../../context/SiteConfigContext';
 import ProductImageUploader from './ProductImageUploader';
 import './ProductManager.css';
@@ -20,13 +20,15 @@ const emptyProduct = {
 };
 
 export default function ProductManager() {
-  const { config, addProduct, updateProduct, deleteProduct } = useSiteConfig();
+  const { config, addProduct, updateProduct, deleteProduct, saveConfig } = useSiteConfig();
   const products = Array.isArray(config.products) ? config.products : [];
   const categories = Array.isArray(config.categories) ? config.categories : [];
   const [editing, setEditing] = useState(null); // null or product object
   const [isNew, setIsNew] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
+  const [saving, setSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   const openNew = (isConcern) => {
     setEditing({ 
@@ -46,44 +48,90 @@ export default function ProductManager() {
     setIsNew(false);
   };
 
-  const save = () => {
-    if (!editing.name.trim()) return alert('Product name is required');
+  const save = async () => {
+    if (!editing || !editing.name.trim()) return alert('Product name is required');
+    const productToSave = { ...editing };
+
+    let updatedProducts;
     if (isNew) {
-      addProduct(editing);
+      const maxId = products.reduce((max, p) => Math.max(max, Number(p.id) || 0), 0);
+      const newProd = { ...productToSave, id: maxId + 1 };
+      updatedProducts = [...products, newProd];
+      addProduct(newProd);
     } else {
-      updateProduct(editing.id, editing);
+      updatedProducts = products.map((p) => (p.id === productToSave.id ? productToSave : p));
+      updateProduct(productToSave.id, productToSave);
     }
     close();
+
+    // Directly persist to server so added product & image are never lost
+    try {
+      await saveConfig({ ...config, products: updatedProducts });
+    } catch (err) {
+      console.warn('Auto-save product failed:', err);
+    }
   };
 
-  const handleDelete = (id) => {
+  const handleManualSave = async () => {
+    setSaving(true);
+    const res = await saveConfig();
+    setSaving(false);
+    if (res?.success) {
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 2500);
+    }
+  };
+
+  const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       deleteProduct(id);
+      const updatedProducts = products.filter((p) => p.id !== id);
+      try {
+        await saveConfig({ ...config, products: updatedProducts });
+      } catch (err) {
+        console.warn('Delete save failed:', err);
+      }
     }
   };
 
   const toggleTag = (tag) => {
-    const tags = editing.tags.includes(tag)
-      ? editing.tags.filter((t) => t !== tag)
-      : [...editing.tags, tag];
-    setEditing({ ...editing, tags });
+    setEditing((prev) => {
+      if (!prev) return prev;
+      const currentTags = prev.tags || [];
+      const tags = currentTags.includes(tag)
+        ? currentTags.filter((t) => t !== tag)
+        : [...currentTags, tag];
+      return { ...prev, tags };
+    });
   };
 
   const addVariant = () => {
-    setEditing({
-      ...editing,
-      variants: [...editing.variants, { color: '#8B4513', label: '' }],
+    setEditing((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        variants: [...(prev.variants || []), { color: '#8B4513', label: '' }],
+      };
     });
   };
 
   const updateVariant = (i, field, value) => {
-    const variants = [...editing.variants];
-    variants[i] = { ...variants[i], [field]: value };
-    setEditing({ ...editing, variants });
+    setEditing((prev) => {
+      if (!prev) return prev;
+      const variants = [...(prev.variants || [])];
+      variants[i] = { ...variants[i], [field]: value };
+      return { ...prev, variants };
+    });
   };
 
   const removeVariant = (i) => {
-    setEditing({ ...editing, variants: editing.variants.filter((_, idx) => idx !== i) });
+    setEditing((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        variants: (prev.variants || []).filter((_, idx) => idx !== i),
+      };
+    });
   };
 
   const baseFiltered = products.filter((p) => {
@@ -193,6 +241,29 @@ export default function ProductManager() {
             <p style={{ textAlign: 'center', color: '#9ca3af', padding: '20px 0' }}>No products found.</p>
           )}
         </div>
+
+        {/* ── Save Product Changes Bottom Bar ── */}
+        <div style={{ marginTop: '30px', display: 'flex', justifyContent: 'flex-end', gap: '12px', padding: '20px 20px 10px', borderTop: '1px solid #eee' }}>
+          <button
+            type="button"
+            className={`dash-btn dash-btn--primary ${saveSuccess ? 'dash-btn--success' : ''}`}
+            onClick={handleManualSave}
+            disabled={saving}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '12px 28px',
+              borderRadius: '10px',
+              fontSize: '0.95rem',
+              fontWeight: 600,
+              cursor: 'pointer'
+            }}
+          >
+            {saving ? <FiRefreshCw className="spin" size={16} /> : (saveSuccess ? <FiCheck size={16} /> : <FiSave size={16} />)}
+            <span>{saving ? 'Saving...' : (saveSuccess ? 'Saved to Server!' : 'Save Product Changes')}</span>
+          </button>
+        </div>
       </div>
 
       {/* Edit / Add Modal */}
@@ -210,7 +281,7 @@ export default function ProductManager() {
                   <input
                     className="dash-field__input"
                     value={editing.name}
-                    onChange={(e) => setEditing({ ...editing, name: e.target.value })}
+                    onChange={(e) => setEditing((prev) => ({ ...prev, name: e.target.value }))}
                   />
                 </div>
                 <div className="dash-field">
@@ -218,7 +289,7 @@ export default function ProductManager() {
                   <select
                     className="dash-field__input"
                     value={editing.category}
-                    onChange={(e) => setEditing({ ...editing, category: e.target.value })}
+                    onChange={(e) => setEditing((prev) => ({ ...prev, category: e.target.value }))}
                   >
                     {categories.filter(c => c.id !== 'all').map((c) => (
                       <option key={c.id} value={c.id}>{c.label}</option>
@@ -232,7 +303,7 @@ export default function ProductManager() {
                 <textarea
                   className="dash-field__textarea"
                   value={editing.description}
-                  onChange={(e) => setEditing({ ...editing, description: e.target.value })}
+                  onChange={(e) => setEditing((prev) => ({ ...prev, description: e.target.value }))}
                 />
               </div>
 
@@ -241,7 +312,7 @@ export default function ProductManager() {
                 <ProductImageUploader
                   label="Product Image"
                   value={editing.image}
-                  onChange={(val) => setEditing({ ...editing, image: val })}
+                  onChange={(val) => setEditing((prev) => ({ ...prev, image: val }))}
                   maxWidth={800}
                   maxHeight={800}
                   quality={0.85}
@@ -256,7 +327,7 @@ export default function ProductManager() {
                     className="dash-field__input"
                     type="number"
                     value={editing.price}
-                    onChange={(e) => setEditing({ ...editing, price: Number(e.target.value) })}
+                    onChange={(e) => setEditing((prev) => ({ ...prev, price: Number(e.target.value) }))}
                   />
                 </div>
                 <div className="dash-field">
@@ -265,7 +336,7 @@ export default function ProductManager() {
                     className="dash-field__input"
                     type="number"
                     value={editing.salePrice || 0}
-                    onChange={(e) => setEditing({ ...editing, salePrice: Number(e.target.value) || null })}
+                    onChange={(e) => setEditing((prev) => ({ ...prev, salePrice: Number(e.target.value) || null }))}
                   />
                 </div>
               </div>
@@ -280,7 +351,7 @@ export default function ProductManager() {
                     max="5"
                     step="0.1"
                     value={editing.rating}
-                    onChange={(e) => setEditing({ ...editing, rating: Number(e.target.value) })}
+                    onChange={(e) => setEditing((prev) => ({ ...prev, rating: Number(e.target.value) }))}
                   />
                 </div>
                 <div className="dash-field">
@@ -289,7 +360,7 @@ export default function ProductManager() {
                     className="dash-field__input"
                     type="number"
                     value={editing.reviews}
-                    onChange={(e) => setEditing({ ...editing, reviews: Number(e.target.value) })}
+                    onChange={(e) => setEditing((prev) => ({ ...prev, reviews: Number(e.target.value) }))}
                   />
                 </div>
               </div>
@@ -300,7 +371,7 @@ export default function ProductManager() {
                   <input
                     className="dash-field__input"
                     value={editing.badge || ''}
-                    onChange={(e) => setEditing({ ...editing, badge: e.target.value || null })}
+                    onChange={(e) => setEditing((prev) => ({ ...prev, badge: e.target.value || null }))}
                     placeholder="e.g. Sale 60% OFF"
                   />
                 </div>
@@ -309,7 +380,7 @@ export default function ProductManager() {
                   <input
                     className="dash-field__input"
                     value={editing.badgeColor || '#D32F2F'}
-                    onChange={(e) => setEditing({ ...editing, badgeColor: e.target.value })}
+                    onChange={(e) => setEditing((prev) => ({ ...prev, badgeColor: e.target.value }))}
                   />
                 </div>
               </div>
@@ -333,7 +404,7 @@ export default function ProductManager() {
               {/* Variants */}
               <div className="dash-field">
                 <label className="dash-field__label">Variants</label>
-                {editing.variants.map((v, i) => (
+                {(editing.variants || []).map((v, i) => (
                   <div key={i} className="pm-variant-row">
                     <input type="color" value={v.color} onChange={(e) => updateVariant(i, 'color', e.target.value)} />
                     <input
