@@ -111,8 +111,8 @@
 
 .badge-label {
   font-size: 8.5px;
-  padding: 1.5px 7px;
-  border-radius: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
   font-weight: 600;
   margin-bottom: 3px;
   white-space: nowrap;
