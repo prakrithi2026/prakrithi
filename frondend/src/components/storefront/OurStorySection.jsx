@@ -167,16 +167,16 @@ export default function OurStorySection() {
           </h2>
           <p className="our-story-description">
             {mainParagraphText}
+            {mainParagraphText && !mainParagraphText.trim().endsWith('.') ? '.' : ''}{' '}
+            <Link to="/our-story" className="our-story-link">
+              Read our Story
+            </Link>
           </p>
 
           <div className="our-story-founder">
             <h4 className="our-story-founder-name">{founderName}</h4>
             <p className="our-story-founder-title">{founderTitle}</p>
           </div>
-
-          <Link to="/our-story" className="our-story-btn">
-            Read our Story
-          </Link>
         </div>
 
       </div>

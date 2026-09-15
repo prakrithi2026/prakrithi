@@ -136,7 +136,7 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 2px;
-  margin-bottom: 18px;
+  margin-bottom: 0;
 }
 
 .our-story-founder-name {
@@ -154,29 +154,22 @@
   font-family: var(--font-sans);
 }
 
-/* Read our Story button matching uploaded design */
-.our-story-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #12704A;
+/* Read our Story inline text link */
+.our-story-link {
   color: #FFFFFF !important;
   font-family: var(--font-sans);
-  font-size: 0.84rem;
-  font-weight: 600;
-  padding: 8px 22px;
-  border-radius: 8px;
-  text-decoration: none;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  font-size: 0.94rem;
+  font-weight: 400;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  white-space: nowrap;
+  transition: opacity 0.2s ease;
   cursor: pointer;
 }
 
-.our-story-btn:hover {
-  background-color: #168457;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+.our-story-link:hover {
+  opacity: 0.8;
 }
 
 /* Desktop and Responsive Layouts */
