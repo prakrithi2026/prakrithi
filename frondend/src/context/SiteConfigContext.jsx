@@ -4,7 +4,7 @@ import API_BASE_URL from '../utils/api';
 
 const SiteConfigContext = createContext(null);
 
-const CACHE_KEY = 'prakrithi_siteconfig_cache_v6';
+const CACHE_KEY = 'prakrithi_siteconfig_cache_v7';
 
 // Deep-merge defaults so new config keys always have fallback values
 function deepMerge(defaults, overrides) {
@@ -435,6 +435,14 @@ export function SiteConfigProvider({ children }) {
     }
     if (configToSave.reviewsSection && !configToSave.reviewsSection.image && defaultConfig.reviewsSection?.image) {
       configToSave.reviewsSection.image = defaultConfig.reviewsSection.image;
+    }
+    if (configToSave.hero && Array.isArray(configToSave.hero.images)) {
+      if (configToSave.hero.images.length === 0) {
+        configToSave.hero.bgImage = '';
+        configToSave.hero.mobileImages = [];
+      } else {
+        configToSave.hero.bgImage = configToSave.hero.images[0];
+      }
     }
 
     try {

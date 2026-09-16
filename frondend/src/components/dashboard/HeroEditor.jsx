@@ -27,11 +27,16 @@ export default function HeroEditor() {
 
   const handleSaveHero = async () => {
     setSaving(true);
+    const curDesktop = Array.isArray(hero.images) 
+      ? hero.images 
+      : (hero.bgImage ? [hero.bgImage] : []);
+    const curMobile = curDesktop.length === 0 ? [] : (Array.isArray(hero.mobileImages) ? hero.mobileImages : []);
+
     const currentHero = {
       ...hero,
-      images: desktopImages,
-      mobileImages: mobileImages,
-      bgImage: desktopImages.length > 0 ? desktopImages[0] : ''
+      images: curDesktop,
+      mobileImages: curMobile,
+      bgImage: curDesktop.length > 0 ? curDesktop[0] : ''
     };
     const nextConfig = {
       ...config,
@@ -137,8 +142,10 @@ export default function HeroEditor() {
       const newDesktop = desktopImages.filter((_, idx) => idx !== indexToRemove);
       nextHero.images = newDesktop;
       nextHero.bgImage = newDesktop.length > 0 ? newDesktop[0] : '';
-      // If mobileImages has a matching slide at this index, remove it too so it doesn't linger on mobile
-      if (mobileImages.length > 0 && indexToRemove < mobileImages.length) {
+      // If all desktop banners are removed, also clear mobileImages so no phantom banners remain
+      if (newDesktop.length === 0) {
+        nextHero.mobileImages = [];
+      } else if (mobileImages.length > 0 && indexToRemove < mobileImages.length) {
         nextHero.mobileImages = mobileImages.filter((_, idx) => idx !== indexToRemove);
       }
     } else {

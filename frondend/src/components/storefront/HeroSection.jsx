@@ -21,27 +21,20 @@ export default function HeroSection() {
     Array.isArray(hero.mobileImages) ? hero.mobileImages : []
   ).filter(Boolean), [hero.mobileImages]);
 
-  // Desktop images are primary. Mobile images provide per-slide responsive override when available.
-  const slideCount = desktopImages.length > 0
-    ? desktopImages.length
-    : mobileImages.length;
+  // Desktop images are the primary banners for the storefront.
+  // If no desktop banners exist, the hero section is hidden everywhere.
+  const slideCount = desktopImages.length;
   const enabled = hero.enabled !== false && slideCount > 0;
 
   // Pre-construct slides pairing desktop and mobile images cleanly
   const slides = useMemo(() => {
     if (slideCount === 0) return [];
     const list = [];
-    if (desktopImages.length > 0) {
-      for (let i = 0; i < desktopImages.length; i++) {
-        const desktop = desktopImages[i];
-        // Use mobile-specific image if configured for this slide; otherwise fall back to desktop
-        const mobile = mobileImages[i] || desktop;
-        list.push({ desktop, mobile });
-      }
-    } else if (mobileImages.length > 0) {
-      for (let i = 0; i < mobileImages.length; i++) {
-        list.push({ desktop: mobileImages[i], mobile: mobileImages[i] });
-      }
+    for (let i = 0; i < desktopImages.length; i++) {
+      const desktop = desktopImages[i];
+      // Use mobile-specific image if configured for this slide; otherwise fall back to desktop
+      const mobile = mobileImages[i] || desktop;
+      list.push({ desktop, mobile });
     }
     return list;
   }, [desktopImages, mobileImages, slideCount]);

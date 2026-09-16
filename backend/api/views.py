@@ -261,11 +261,21 @@ class SiteConfigView(APIView):
                 config, created = SiteConfig.objects.get_or_create(id=1)
                 merged_config = deep_merge(config.config_data or {}, data)
                 if 'hero' in data and isinstance(data['hero'], dict):
-                    if 'images' in data['hero'] and isinstance(data['hero']['images'], list):
-                        merged_config.setdefault('hero', {})['images'] = data['hero']['images']
-                        merged_config.setdefault('hero', {})['bgImage'] = data['hero'].get('bgImage', '')
-                    if 'mobileImages' in data['hero'] and isinstance(data['hero']['mobileImages'], list):
-                        merged_config.setdefault('hero', {})['mobileImages'] = data['hero']['mobileImages']
+                    hero_data = data['hero']
+                    if 'images' in hero_data and isinstance(hero_data['images'], list):
+                        merged_config.setdefault('hero', {})['images'] = hero_data['images']
+                        if len(hero_data['images']) == 0:
+                            merged_config['hero']['bgImage'] = ''
+                            merged_config['hero']['mobileImages'] = []
+                        else:
+                            merged_config['hero']['bgImage'] = hero_data.get('bgImage') or hero_data['images'][0]
+                    if 'mobileImages' in hero_data and isinstance(hero_data['mobileImages'], list):
+                        if len(hero_data.get('images', [])) > 0:
+                            merged_config.setdefault('hero', {})['mobileImages'] = hero_data['mobileImages']
+                        else:
+                            merged_config.setdefault('hero', {})['mobileImages'] = []
+                    if 'bgImage' in hero_data and len(hero_data.get('images', [])) > 0:
+                        merged_config.setdefault('hero', {})['bgImage'] = hero_data['bgImage']
                 merged_config, _ = enforce_image_fallbacks(merged_config)
                 config.config_data = merged_config
                 config.save()
