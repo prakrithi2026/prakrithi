@@ -101,8 +101,8 @@ function getInitialConfig() {
   if (!Array.isArray(base.hero?.images)) {
     base.hero = {
       ...(base.hero || {}),
-      images: base.hero?.bgImage ? [base.hero.bgImage] : (defaultConfig.hero?.images || []),
-      bgImage: base.hero?.bgImage || defaultConfig.hero?.bgImage || ''
+      images: base.hero?.bgImage ? [base.hero.bgImage] : [],
+      bgImage: base.hero?.bgImage || ''
     };
   }
   if (!Array.isArray(base.hero?.mobileImages)) {
@@ -251,18 +251,27 @@ export function SiteConfigProvider({ children }) {
           };
         }
 
-        // Ensure hero images are valid arrays without forcing default banners when user removed them
-        if (!Array.isArray(mergedConfig.hero?.images)) {
+        // Ensure hero images are valid arrays respecting backend user data without forcing default banners
+        if (configData.hero && typeof configData.hero === 'object') {
           mergedConfig.hero = {
-            ...(mergedConfig.hero || {}),
-            images: mergedConfig.hero?.bgImage ? [mergedConfig.hero.bgImage] : (defaultConfig.hero?.images || []),
-            bgImage: mergedConfig.hero?.bgImage || defaultConfig.hero?.bgImage || ''
+            ...mergedConfig.hero,
+            ...configData.hero,
+            images: Array.isArray(configData.hero.images)
+              ? configData.hero.images
+              : (configData.hero.bgImage ? [configData.hero.bgImage] : []),
+            mobileImages: Array.isArray(configData.hero.mobileImages)
+              ? configData.hero.mobileImages
+              : [],
+            bgImage: (Array.isArray(configData.hero.images) && configData.hero.images.length > 0)
+              ? configData.hero.images[0]
+              : (configData.hero.bgImage || '')
           };
-        }
-        if (!Array.isArray(mergedConfig.hero?.mobileImages)) {
+        } else if (!Array.isArray(mergedConfig.hero?.images)) {
           mergedConfig.hero = {
             ...(mergedConfig.hero || {}),
-            mobileImages: []
+            images: [],
+            mobileImages: [],
+            bgImage: ''
           };
         }
 

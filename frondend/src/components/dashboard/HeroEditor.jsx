@@ -27,7 +27,17 @@ export default function HeroEditor() {
 
   const handleSaveHero = async () => {
     setSaving(true);
-    const res = await saveConfig();
+    const currentHero = {
+      ...hero,
+      images: desktopImages,
+      mobileImages: mobileImages,
+      bgImage: desktopImages.length > 0 ? desktopImages[0] : ''
+    };
+    const nextConfig = {
+      ...config,
+      hero: currentHero
+    };
+    const res = await saveConfig(nextConfig);
     setSaving(false);
     if (res?.success) {
       setSaveSuccess(true);
@@ -115,32 +125,82 @@ export default function HeroEditor() {
   };
 
   const removeImage = (indexToRemove) => {
-    const updated = currentImages.filter((_, idx) => idx !== indexToRemove);
-    setImagesForDevice(deviceView, updated);
+    const nextHero = { ...hero };
+    if (deviceView === 'desktop') {
+      const newDesktop = desktopImages.filter((_, idx) => idx !== indexToRemove);
+      nextHero.images = newDesktop;
+      nextHero.bgImage = newDesktop.length > 0 ? newDesktop[0] : '';
+      // If mobileImages has a matching slide at this index, remove it too so it doesn't linger on mobile
+      if (mobileImages.length > 0 && indexToRemove < mobileImages.length) {
+        nextHero.mobileImages = mobileImages.filter((_, idx) => idx !== indexToRemove);
+      }
+    } else {
+      nextHero.mobileImages = mobileImages.filter((_, idx) => idx !== indexToRemove);
+    }
+    updateConfig('hero', nextHero);
   };
 
   const setAsPrimary = (index) => {
     if (index === 0 || index >= currentImages.length) return;
-    const updated = [...currentImages];
-    const [selected] = updated.splice(index, 1);
-    updated.unshift(selected); // Put at index 0
-    setImagesForDevice(deviceView, updated);
+    const nextHero = { ...hero };
+    if (deviceView === 'desktop') {
+      const updatedD = [...desktopImages];
+      const [selectedD] = updatedD.splice(index, 1);
+      updatedD.unshift(selectedD);
+      nextHero.images = updatedD;
+      nextHero.bgImage = updatedD[0] || '';
+      if (mobileImages.length > index) {
+        const updatedM = [...mobileImages];
+        const [selectedM] = updatedM.splice(index, 1);
+        updatedM.unshift(selectedM);
+        nextHero.mobileImages = updatedM;
+      }
+    } else {
+      const updated = [...currentImages];
+      const [selected] = updated.splice(index, 1);
+      updated.unshift(selected);
+      nextHero.mobileImages = updated;
+    }
+    updateConfig('hero', nextHero);
   };
 
   const moveImage = (index, direction) => {
     const newIndex = index + direction;
     if (newIndex < 0 || newIndex >= currentImages.length) return;
-    const updated = [...currentImages];
-    const temp = updated[index];
-    updated[index] = updated[newIndex];
-    updated[newIndex] = temp;
-    setImagesForDevice(deviceView, updated);
+    const nextHero = { ...hero };
+    if (deviceView === 'desktop') {
+      const updatedD = [...desktopImages];
+      const tempD = updatedD[index];
+      updatedD[index] = updatedD[newIndex];
+      updatedD[newIndex] = tempD;
+      nextHero.images = updatedD;
+      nextHero.bgImage = updatedD[0] || '';
+      if (mobileImages.length > Math.max(index, newIndex)) {
+        const updatedM = [...mobileImages];
+        const tempM = updatedM[index];
+        updatedM[index] = updatedM[newIndex];
+        updatedM[newIndex] = tempM;
+        nextHero.mobileImages = updatedM;
+      }
+    } else {
+      const updatedM = [...mobileImages];
+      const tempM = updatedM[index];
+      updatedM[index] = updatedM[newIndex];
+      updatedM[newIndex] = tempM;
+      nextHero.mobileImages = updatedM;
+    }
+    updateConfig('hero', nextHero);
   };
 
   const clearAllImages = () => {
-    const viewName = deviceView === 'desktop' ? 'Desktop / Laptop' : 'Mobile';
-    if (window.confirm(`Are you sure you want to remove all ${viewName} banners?`)) {
-      setImagesForDevice(deviceView, []);
+    if (window.confirm('Are you sure you want to remove ALL hero banners from your storefront?')) {
+      const nextHero = {
+        ...hero,
+        images: [],
+        mobileImages: [],
+        bgImage: ''
+      };
+      updateConfig('hero', nextHero);
     }
   };
 
@@ -341,9 +401,9 @@ export default function HeroEditor() {
                       <span>Sync Desktop to Mobile</span>
                     </button>
                   )}
-                  {currentImages.length > 0 && (
-                    <button className="hero-editor-preview__btn hero-editor-preview__btn--remove" onClick={clearAllImages}>
-                      Clear All ({deviceView === 'desktop' ? 'Desktop' : 'Mobile'})
+                  {(desktopImages.length > 0 || mobileImages.length > 0) && (
+                    <button className="hero-editor-preview__btn hero-editor-preview__btn--remove" onClick={clearAllImages} title="Remove all hero banners from storefront">
+                      Clear All Banners
                     </button>
                   )}
                 </div>

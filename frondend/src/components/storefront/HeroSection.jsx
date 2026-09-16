@@ -21,35 +21,30 @@ export default function HeroSection() {
     Array.isArray(hero.mobileImages) ? hero.mobileImages : []
   ).filter(Boolean), [hero.mobileImages]);
 
-  // If one device view is empty, fall back cleanly to the other view
-  const effectiveDesktopImages = useMemo(() => (
-    desktopImages.length > 0 ? desktopImages : mobileImages
-  ), [desktopImages, mobileImages]);
-
-  const effectiveMobileImages = useMemo(() => (
-    mobileImages.length > 0 ? mobileImages : desktopImages
-  ), [desktopImages, mobileImages]);
-
-  // Total slides count is determined by configured banners
-  const slideCount = Math.max(desktopImages.length, mobileImages.length);
+  // Desktop images are primary. Mobile images provide per-slide responsive override when available.
+  const slideCount = desktopImages.length > 0
+    ? desktopImages.length
+    : mobileImages.length;
   const enabled = hero.enabled !== false && slideCount > 0;
 
   // Pre-construct slides pairing desktop and mobile images cleanly
   const slides = useMemo(() => {
     if (slideCount === 0) return [];
     const list = [];
-    for (let i = 0; i < slideCount; i++) {
-      // Never leak mismatched slides: if desktop has fewer slides, loop its primary slides
-      const desktop = effectiveDesktopImages.length > 0
-        ? effectiveDesktopImages[i % effectiveDesktopImages.length]
-        : '';
-      const mobile = effectiveMobileImages.length > 0
-        ? effectiveMobileImages[i % effectiveMobileImages.length]
-        : desktop;
-      list.push({ desktop, mobile });
+    if (desktopImages.length > 0) {
+      for (let i = 0; i < desktopImages.length; i++) {
+        const desktop = desktopImages[i];
+        // Use mobile-specific image if configured for this slide; otherwise fall back to desktop
+        const mobile = mobileImages[i] || desktop;
+        list.push({ desktop, mobile });
+      }
+    } else if (mobileImages.length > 0) {
+      for (let i = 0; i < mobileImages.length; i++) {
+        list.push({ desktop: mobileImages[i], mobile: mobileImages[i] });
+      }
     }
     return list;
-  }, [effectiveDesktopImages, effectiveMobileImages, slideCount]);
+  }, [desktopImages, mobileImages, slideCount]);
 
   // Set up automatic scrolling interval if there are 2 or more images
   useEffect(() => {

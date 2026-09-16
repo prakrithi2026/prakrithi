@@ -260,6 +260,12 @@ class SiteConfigView(APIView):
             with transaction.atomic():
                 config, created = SiteConfig.objects.get_or_create(id=1)
                 merged_config = deep_merge(config.config_data or {}, data)
+                if 'hero' in data and isinstance(data['hero'], dict):
+                    if 'images' in data['hero'] and isinstance(data['hero']['images'], list):
+                        merged_config.setdefault('hero', {})['images'] = data['hero']['images']
+                        merged_config.setdefault('hero', {})['bgImage'] = data['hero'].get('bgImage', '')
+                    if 'mobileImages' in data['hero'] and isinstance(data['hero']['mobileImages'], list):
+                        merged_config.setdefault('hero', {})['mobileImages'] = data['hero']['mobileImages']
                 merged_config, _ = enforce_image_fallbacks(merged_config)
                 config.config_data = merged_config
                 config.save()
