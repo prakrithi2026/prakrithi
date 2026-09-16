@@ -4,7 +4,7 @@ import API_BASE_URL from '../utils/api';
 
 const SiteConfigContext = createContext(null);
 
-const CACHE_KEY = 'prakrithi_siteconfig_cache_v5';
+const CACHE_KEY = 'prakrithi_siteconfig_cache_v6';
 
 // Deep-merge defaults so new config keys always have fallback values
 function deepMerge(defaults, overrides) {

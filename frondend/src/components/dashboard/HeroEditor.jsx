@@ -58,10 +58,17 @@ export default function HeroEditor() {
     updateConfig('hero', nextHero);
   };
 
-  const copyDesktopToMobile = () => {
+  const copyDesktopToMobile = async () => {
     if (window.confirm('Sync current Desktop banners to Mobile view? This will replace mobile banners with desktop banners.')) {
       const nextHero = { ...hero, mobileImages: [...desktopImages] };
       updateConfig('hero', nextHero);
+      setSaving(true);
+      const res = await saveConfig({ ...config, hero: nextHero });
+      setSaving(false);
+      if (res?.success) {
+        setSaveSuccess(true);
+        setTimeout(() => setSaveSuccess(false), 2000);
+      }
     }
   };
 
@@ -124,7 +131,7 @@ export default function HeroEditor() {
     setUrlInput('');
   };
 
-  const removeImage = (indexToRemove) => {
+  const removeImage = async (indexToRemove) => {
     const nextHero = { ...hero };
     if (deviceView === 'desktop') {
       const newDesktop = desktopImages.filter((_, idx) => idx !== indexToRemove);
@@ -138,6 +145,19 @@ export default function HeroEditor() {
       nextHero.mobileImages = mobileImages.filter((_, idx) => idx !== indexToRemove);
     }
     updateConfig('hero', nextHero);
+
+    // Auto-save immediately to database so reload won't bring back the deleted banner
+    setSaving(true);
+    const nextConfig = {
+      ...config,
+      hero: nextHero
+    };
+    const res = await saveConfig(nextConfig);
+    setSaving(false);
+    if (res?.success) {
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 2000);
+    }
   };
 
   const setAsPrimary = (index) => {
@@ -192,7 +212,7 @@ export default function HeroEditor() {
     updateConfig('hero', nextHero);
   };
 
-  const clearAllImages = () => {
+  const clearAllImages = async () => {
     if (window.confirm('Are you sure you want to remove ALL hero banners from your storefront?')) {
       const nextHero = {
         ...hero,
@@ -201,6 +221,36 @@ export default function HeroEditor() {
         bgImage: ''
       };
       updateConfig('hero', nextHero);
+
+      setSaving(true);
+      const nextConfig = {
+        ...config,
+        hero: nextHero
+      };
+      const res = await saveConfig(nextConfig);
+      setSaving(false);
+      if (res?.success) {
+        setSaveSuccess(true);
+        setTimeout(() => setSaveSuccess(false), 2000);
+      }
+    }
+  };
+
+  const handleToggleVisibility = async () => {
+    const nextEnabled = hero.enabled === false ? true : false;
+    const nextHero = { ...hero, enabled: nextEnabled };
+    updateConfig('hero.enabled', nextEnabled);
+
+    setSaving(true);
+    const nextConfig = {
+      ...config,
+      hero: nextHero
+    };
+    const res = await saveConfig(nextConfig);
+    setSaving(false);
+    if (res?.success) {
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 2000);
     }
   };
 
@@ -208,23 +258,45 @@ export default function HeroEditor() {
     <div>
       <div className="dash-panel">
         {/* Header Bar */}
-        <div className="section-manager-header" style={{ marginBottom: '16px' }}>
+        <div className="section-manager-header" style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
           <div>
             <h2 className="dash-panel__title">🖼️ Hero Banner</h2>
             <p className="dash-panel__subtitle">Upload, replace, or reorder responsive banners for Desktop and Mobile views</p>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginLeft: 'auto' }}>
-            <span style={{ fontSize: '0.82rem', color: hero.enabled !== false ? '#16a34a' : '#9ca3af', fontWeight: 600 }}>
-              {hero.enabled !== false ? 'Visible' : 'Hidden'}
-            </span>
-            <label className="section-item__toggle">
-              <input
-                type="checkbox"
-                checked={hero.enabled !== false}
-                onChange={() => updateConfig('hero.enabled', hero.enabled === false ? true : false)}
-              />
-              <span className="section-item__toggle-slider"></span>
-            </label>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '0.82rem', color: hero.enabled !== false ? '#16a34a' : '#9ca3af', fontWeight: 600 }}>
+                {hero.enabled !== false ? 'Visible' : 'Hidden'}
+              </span>
+              <label className="section-item__toggle">
+                <input
+                  type="checkbox"
+                  checked={hero.enabled !== false}
+                  onChange={handleToggleVisibility}
+                  disabled={saving}
+                />
+                <span className="section-item__toggle-slider"></span>
+              </label>
+            </div>
+            <button
+              type="button"
+              className={`dash-btn dash-btn--primary ${saveSuccess ? 'dash-btn--success' : ''}`}
+              onClick={handleSaveHero}
+              disabled={saving}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '8px 18px',
+                borderRadius: '8px',
+                fontSize: '0.85rem',
+                fontWeight: 600,
+                cursor: 'pointer'
+              }}
+            >
+              {saving ? <FiRefreshCw className="spin" size={14} /> : (saveSuccess ? <FiCheck size={14} /> : <FiSave size={14} />)}
+              <span>{saving ? 'Saving...' : (saveSuccess ? 'Saved!' : 'Save Changes')}</span>
+            </button>
           </div>
         </div>
 
@@ -394,16 +466,22 @@ export default function HeroEditor() {
                       type="button"
                       className="dash-btn dash-btn--secondary"
                       onClick={copyDesktopToMobile}
+                      disabled={saving}
                       title="Sync current Desktop banners to Mobile view"
                       style={{ fontSize: '0.78rem', padding: '5px 12px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
                     >
                       <FiCopy size={13} />
-                      <span>Sync Desktop to Mobile</span>
+                      <span>{saving ? 'Syncing...' : 'Sync Desktop to Mobile'}</span>
                     </button>
                   )}
                   {(desktopImages.length > 0 || mobileImages.length > 0) && (
-                    <button className="hero-editor-preview__btn hero-editor-preview__btn--remove" onClick={clearAllImages} title="Remove all hero banners from storefront">
-                      Clear All Banners
+                    <button 
+                      className="hero-editor-preview__btn hero-editor-preview__btn--remove" 
+                      onClick={clearAllImages} 
+                      disabled={saving}
+                      title="Remove all hero banners from storefront"
+                    >
+                      {saving ? 'Clearing...' : 'Clear All Banners'}
                     </button>
                   )}
                 </div>
@@ -485,9 +563,10 @@ export default function HeroEditor() {
                             type="button"
                             className="hero-slide-card__delete-btn"
                             onClick={() => removeImage(index)}
+                            disabled={saving}
                             title="Remove this banner"
                           >
-                            <FiTrash2 size={14} /> Remove
+                            <FiTrash2 size={14} /> {saving ? 'Saving...' : 'Remove'}
                           </button>
                         </div>
                       </div>

@@ -3,7 +3,7 @@ import { useSiteConfig } from '../../context/SiteConfigContext';
 import './HeroSection.css';
 
 export default function HeroSection() {
-  const { config } = useSiteConfig();
+  const { config, isLoading } = useSiteConfig();
   const hero = config?.hero || {};
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -89,7 +89,7 @@ export default function HeroSection() {
   };
 
   // If the hero section is disabled or has no images, render nothing
-  if (!enabled) return null;
+  if (!enabled || (isLoading && slideCount === 0)) return null;
 
   return (
     <section
