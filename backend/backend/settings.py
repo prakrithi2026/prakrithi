@@ -211,7 +211,11 @@ CORS_ALLOW_HEADERS = [
     'user-agent',
     'x-csrftoken',
     'x-requested-with',
+    'if-none-match',
+    'if-match',
 ]
+CORS_EXPOSE_HEADERS = ['ETag']
+
 
 # Allow large JSON payloads (needed for base64 image uploads in config)
 DATA_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024   # 20 MB

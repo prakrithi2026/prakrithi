@@ -113,11 +113,25 @@ export async function setStoredConfig(config) {
  * first-frame rendering on page load/reload.
  */
 export function getInitialLocalConfig() {
-  cleanupLegacyStorage();
   if (typeof window === 'undefined' || !window.localStorage) return null;
   try {
-    const cached = localStorage.getItem(LOCAL_CACHE_KEY);
+    let cached = localStorage.getItem(LOCAL_CACHE_KEY);
+    if (!cached) {
+      // Migrate from previous cache versions (v7, v6, v5...) so user never experiences cold cache
+      for (let v = 7; v >= 1; v--) {
+        const prevKey = `prakrithi_siteconfig_cache_v${v}`;
+        const prevData = localStorage.getItem(prevKey);
+        if (prevData) {
+          cached = prevData;
+          try {
+            localStorage.setItem(LOCAL_CACHE_KEY, prevData);
+          } catch {}
+          break;
+        }
+      }
+    }
     if (cached) {
+      cleanupLegacyStorage();
       return JSON.parse(cached);
     }
   } catch (err) {

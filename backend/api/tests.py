@@ -72,8 +72,17 @@ class ProductConfigPersistenceTests(TestCase):
         self.assertFalse(Product.objects.filter(id=1).exists())
         self.assertTrue(Product.objects.filter(id=2).exists())
 
-    def test_product_list_no_cache_headers(self):
-        """Product list must return no-cache headers to prevent proxy staleness."""
+    def test_cache_control_and_etag_headers(self):
+        """Product list and config must return Cache-Control headers and ETag for fast reloads."""
         res = self.client.get('/api/products/')
         self.assertEqual(res.status_code, 200)
-        self.assertIn('no-cache', res.headers.get('Cache-Control', ''))
+        self.assertIn('max-age', res.headers.get('Cache-Control', ''))
+
+        res_cfg = self.client.get('/api/config/')
+        self.assertEqual(res_cfg.status_code, 200)
+        self.assertIn('ETag', res_cfg.headers)
+        etag = res_cfg.headers['ETag']
+
+        # Conditional request with ETag must return 304 Not Modified
+        res_304 = self.client.get('/api/config/', HTTP_IF_NONE_MATCH=etag)
+        self.assertEqual(res_304.status_code, 304)

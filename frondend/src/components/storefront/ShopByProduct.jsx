@@ -5,7 +5,7 @@ import ProductCard from './ProductCard';
 import './ShopByProduct.css';
 
 export default function ShopByProduct() {
-  const { config, isLoading } = useSiteConfig();
+  const { config } = useSiteConfig();
   const products = Array.isArray(config.products) ? config.products : [];
   const theme = config.theme || {};
   const [activeFilter, setActiveFilter] = useState('all');
@@ -77,21 +77,9 @@ export default function ShopByProduct() {
           onScroll={handleScroll}
         >
           <div className="products-row">
-            {isLoading && filteredProducts.length === 0 ? (
-              [1, 2, 3, 4].map((n) => (
-                <div key={n} className="product-card product-card--skeleton">
-                  <div className="card-image skeleton-box" style={{ height: '240px' }} />
-                  <div className="card-body" style={{ padding: '12px' }}>
-                    <div className="skeleton-box" style={{ height: '18px', width: '75%', marginBottom: '8px' }} />
-                    <div className="skeleton-box" style={{ height: '14px', width: '40%' }} />
-                  </div>
-                </div>
-              ))
-            ) : (
-              filteredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))
-            )}
+            {filteredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
           </div>
         </div>
 

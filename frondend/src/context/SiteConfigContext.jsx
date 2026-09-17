@@ -203,24 +203,34 @@ export function SiteConfigProvider({ children }) {
     }
   }, [config, isLoading]);
 
-  // Load data from API (Stale-While-Revalidate pattern)
+  // Load data from API (Stale-While-Revalidate pattern with single-flight fetch)
   useEffect(() => {
     async function loadData() {
       try {
-        const [configRes, productsRes, categoriesRes] = await Promise.all([
-          fetch(`${API_BASE_URL}/config/`).catch(() => null),
-          fetch(`${API_BASE_URL}/products/`).catch(() => null),
-          fetch(`${API_BASE_URL}/categories/`).catch(() => null)
-        ]);
-        
-        const [configData, productsData, categoriesData] = await Promise.all([
-          configRes && configRes.ok ? configRes.json().catch(() => null) : null,
-          productsRes && productsRes.ok ? productsRes.json().catch(() => null) : null,
-          categoriesRes && categoriesRes.ok ? categoriesRes.json().catch(() => null) : null
-        ]);
+        const configRes = await fetch(`${API_BASE_URL}/config/`).catch(() => null);
 
-        if (!configData && !productsData) {
-          throw new Error('Server returned no configuration or product data');
+        // If backend returned 304 Not Modified, cached client data is already up to date
+        if (configRes && configRes.status === 304) {
+          setIsLoading(false);
+          return;
+        }
+
+        const configData = (configRes && configRes.ok) ? await configRes.json().catch(() => null) : null;
+
+        if (!configData) {
+          throw new Error('Server returned no configuration');
+        }
+
+        // Check if products or categories are missing (e.g. older backend version fallback)
+        let productsData = configData.products;
+        let categoriesData = configData.categories;
+        if (!Array.isArray(productsData) || !Array.isArray(categoriesData)) {
+          const [pRes, cRes] = await Promise.all([
+            !Array.isArray(productsData) ? fetch(`${API_BASE_URL}/products/`).catch(() => null) : null,
+            !Array.isArray(categoriesData) ? fetch(`${API_BASE_URL}/categories/`).catch(() => null) : null
+          ]);
+          if (pRes && pRes.ok) productsData = await pRes.json().catch(() => null);
+          if (cRes && cRes.ok) categoriesData = await cRes.json().catch(() => null);
         }
 
         const validConfigData = configData || {};
@@ -375,7 +385,9 @@ export function SiteConfigProvider({ children }) {
         // Only set config if we haven't already received unsaved changes from sync
         if (sourceRef.current === 'init' || sourceRef.current === 'storage' || sourceRef.current === 'api') {
           sourceRef.current = 'api';
-          setConfig(fullConfig);
+          if (JSON.stringify(configRef.current) !== JSON.stringify(fullConfig)) {
+            setConfig(fullConfig);
+          }
         }
       } catch (error) {
         console.error("Failed to load config from API, using cached or default data", error);

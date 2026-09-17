@@ -3,7 +3,7 @@ import { useSiteConfig } from '../../context/SiteConfigContext';
 import './HeroSection.css';
 
 export default function HeroSection() {
-  const { config, isLoading } = useSiteConfig();
+  const { config } = useSiteConfig();
   const hero = config?.hero || {};
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -81,20 +81,8 @@ export default function HeroSection() {
     }
   };
 
-  // If explicitly disabled, render nothing
-  if (hero.enabled === false) return null;
-
-  // If loading and no cached banners yet, render skeleton placeholder to prevent layout shift
-  if (isLoading && slideCount === 0) {
-    return (
-      <section className="hero-section hero-skeleton" aria-label="Loading banner">
-        <div className="hero-skeleton__placeholder" />
-      </section>
-    );
-  }
-
-  // If not enabled or no banners, render nothing
-  if (!enabled) return null;
+  // If explicitly disabled or no banners, render nothing
+  if (hero.enabled === false || !enabled) return null;
 
   return (
     <section

@@ -242,10 +242,21 @@ class SiteConfigView(APIView):
             resp_data['products'] = ProductSerializer(Product.objects.all().order_by('id'), many=True).data
             resp_data['categories'] = CategorySerializer(Category.objects.all(), many=True).data
 
+            # HTTP 304 ETag Support: If client already has this version, return 0-byte 304 in 50ms
+            prod_count = Product.objects.count()
+            cat_count = Category.objects.count()
+            updated_ts = int(config.updated_at.timestamp()) if config.updated_at else 0
+            etag = f'W/"{updated_ts}-{prod_count}-{cat_count}"'
+            if_none_match = request.headers.get('If-None-Match')
+            if if_none_match and if_none_match.strip() == etag:
+                not_modified = Response(status=status.HTTP_304_NOT_MODIFIED)
+                not_modified['ETag'] = etag
+                not_modified['Cache-Control'] = 'public, max-age=15, stale-while-revalidate=120'
+                return not_modified
+
             response = Response(resp_data)
-            response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-            response['Pragma'] = 'no-cache'
-            response['Expires'] = '0'
+            response['ETag'] = etag
+            response['Cache-Control'] = 'public, max-age=15, stale-while-revalidate=120'
             return response
         except Exception as e:
             import traceback
@@ -447,9 +458,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         try:
             response = super().list(request, *args, **kwargs)
-            response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-            response['Pragma'] = 'no-cache'
-            response['Expires'] = '0'
+            response['Cache-Control'] = 'public, max-age=15, stale-while-revalidate=120'
             return response
         except Exception as e:
             return Response([], status=status.HTTP_200_OK)
@@ -461,9 +470,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         try:
             response = super().list(request, *args, **kwargs)
-            response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-            response['Pragma'] = 'no-cache'
-            response['Expires'] = '0'
+            response['Cache-Control'] = 'public, max-age=15, stale-while-revalidate=120'
             return response
         except Exception as e:
             return Response([], status=status.HTTP_200_OK)
