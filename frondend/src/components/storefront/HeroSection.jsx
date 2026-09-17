@@ -81,8 +81,20 @@ export default function HeroSection() {
     }
   };
 
-  // If the hero section is disabled or has no images, render nothing
-  if (!enabled || (isLoading && slideCount === 0)) return null;
+  // If explicitly disabled, render nothing
+  if (hero.enabled === false) return null;
+
+  // If loading and no cached banners yet, render skeleton placeholder to prevent layout shift
+  if (isLoading && slideCount === 0) {
+    return (
+      <section className="hero-section hero-skeleton" aria-label="Loading banner">
+        <div className="hero-skeleton__placeholder" />
+      </section>
+    );
+  }
+
+  // If not enabled or no banners, render nothing
+  if (!enabled) return null;
 
   return (
     <section

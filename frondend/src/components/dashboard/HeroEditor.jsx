@@ -78,14 +78,15 @@ export default function HeroEditor() {
   const handleFilesUpload = async (files) => {
     const newImages = [];
     const isDesktop = deviceView === 'desktop';
-    const maxWidth = isDesktop ? 2560 : 1080;
-    const maxHeight = isDesktop ? 1440 : 1920;
+    const maxWidth = isDesktop ? 1920 : 750;
+    const maxHeight = isDesktop ? 800 : 1334;
+    const quality = 0.80;
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       if (file && file.type.startsWith('image/')) {
         try {
-          const compressed = await compressImage(file, maxWidth, maxHeight, 0.85);
+          const compressed = await compressImage(file, maxWidth, maxHeight, quality);
           newImages.push(compressed);
         } catch (err) {
           console.error(`Error compressing hero ${deviceView} image:`, err);

@@ -5,9 +5,9 @@
  */
 
 export const COMPRESSION_PRESETS = {
-  product: { maxWidth: 600, maxHeight: 600, quality: 0.75 },
-  hero: { maxWidth: 2560, maxHeight: 1440, quality: 0.90 },
-  heroMobile: { maxWidth: 1080, maxHeight: 1920, quality: 0.90 },
+  product: { maxWidth: 600, maxHeight: 600, quality: 0.80 },
+  hero: { maxWidth: 1920, maxHeight: 800, quality: 0.80 },
+  heroMobile: { maxWidth: 750, maxHeight: 1334, quality: 0.80 },
   logo: { maxWidth: 400, maxHeight: 400, quality: 0.85 },
   icon: { maxWidth: 120, maxHeight: 120, quality: 0.85 },
   section: { maxWidth: 1200, maxHeight: 1200, quality: 0.75 },

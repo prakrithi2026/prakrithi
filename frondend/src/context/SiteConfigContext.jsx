@@ -1,10 +1,9 @@
 import { createContext, useContext, useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import defaultConfig from '../data/defaultConfig';
 import API_BASE_URL from '../utils/api';
+import { getStoredConfig, setStoredConfig, getInitialLocalConfig, saveLocalConfig } from '../utils/storage';
 
 const SiteConfigContext = createContext(null);
-
-const CACHE_KEY = 'prakrithi_siteconfig_cache_v7';
 
 // Deep-merge defaults so new config keys always have fallback values
 function deepMerge(defaults, overrides) {
@@ -30,10 +29,9 @@ function deepMerge(defaults, overrides) {
 function getInitialConfig() {
   let base = { ...defaultConfig };
   try {
-    const cached = localStorage.getItem(CACHE_KEY);
-    if (cached) {
-      const parsed = JSON.parse(cached);
-      base = deepMerge(defaultConfig, parsed);
+    const cached = getInitialLocalConfig();
+    if (cached && typeof cached === 'object') {
+      base = deepMerge(defaultConfig, cached);
     }
   } catch (e) {
     console.warn('Failed to parse cached site configuration', e);
@@ -118,13 +116,7 @@ export function SiteConfigProvider({ children }) {
   const [config, setConfig] = useState(getInitialConfig);
   const [savedConfig, setSavedConfig] = useState(getInitialConfig);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [isLoading, setIsLoading] = useState(() => {
-    try {
-      return !localStorage.getItem(CACHE_KEY);
-    } catch {
-      return true;
-    }
-  });
+  const [isLoading, setIsLoading] = useState(() => !getInitialLocalConfig());
   const channelRef = useRef(null);
   const sourceRef = useRef('init');
   const configRef = useRef(config);
@@ -137,6 +129,42 @@ export function SiteConfigProvider({ children }) {
   useEffect(() => {
     hasUnsavedChangesRef.current = hasUnsavedChanges;
   }, [hasUnsavedChanges]);
+
+  // IndexedDB Fast Path: Query high-capacity storage on mount (<15ms)
+  // Ensures banners and products are immediately visible even if LocalStorage was evicted
+  useEffect(() => {
+    let isMounted = true;
+    async function hydrateFromIndexedDB() {
+      try {
+        const stored = await getStoredConfig();
+        if (!isMounted || !stored) return;
+
+        // If IndexedDB has valid data and we haven't received unsaved edits from user
+        if (sourceRef.current === 'init' || sourceRef.current === 'storage') {
+          const merged = deepMerge(defaultConfig, stored);
+          if (Array.isArray(stored.products) && stored.products.length > 0) {
+            merged.products = stored.products;
+          }
+          if (Array.isArray(stored.categories) && stored.categories.length > 0) {
+            merged.categories = stored.categories;
+          }
+          if (stored.hero && Array.isArray(stored.hero.images) && stored.hero.images.length > 0) {
+            merged.hero = { ...merged.hero, ...stored.hero };
+          }
+          sourceRef.current = 'storage';
+          setConfig(merged);
+          setSavedConfig(merged);
+          setIsLoading(false);
+        }
+      } catch (err) {
+        console.warn('IndexedDB initial hydration warning:', err);
+      }
+    }
+    hydrateFromIndexedDB();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Setup BroadcastChannel for cross-context (iframe/tabs) live preview sync
   useEffect(() => {
@@ -180,18 +208,23 @@ export function SiteConfigProvider({ children }) {
     async function loadData() {
       try {
         const [configRes, productsRes, categoriesRes] = await Promise.all([
-          fetch(`${API_BASE_URL}/config/`),
-          fetch(`${API_BASE_URL}/products/`),
-          fetch(`${API_BASE_URL}/categories/`)
+          fetch(`${API_BASE_URL}/config/`).catch(() => null),
+          fetch(`${API_BASE_URL}/products/`).catch(() => null),
+          fetch(`${API_BASE_URL}/categories/`).catch(() => null)
         ]);
         
         const [configData, productsData, categoriesData] = await Promise.all([
-          configRes.json(),
-          productsRes.json(),
-          categoriesRes.json()
+          configRes && configRes.ok ? configRes.json().catch(() => null) : null,
+          productsRes && productsRes.ok ? productsRes.json().catch(() => null) : null,
+          categoriesRes && categoriesRes.ok ? categoriesRes.json().catch(() => null) : null
         ]);
 
-        const mergedConfig = deepMerge(defaultConfig, configData);
+        if (!configData && !productsData) {
+          throw new Error('Server returned no configuration or product data');
+        }
+
+        const validConfigData = configData || {};
+        const mergedConfig = deepMerge(defaultConfig, validConfigData);
         
         // Ensure new sections added to defaultConfig are present even if backend has an older sections array
         if (configData.sections && Array.isArray(configData.sections)) {
@@ -275,10 +308,14 @@ export function SiteConfigProvider({ children }) {
           };
         }
 
-        // Backend products are authoritative. Map them and only use defaultConfig image if product image is empty
+        // Backend products are authoritative. Check both standalone productsData and bundled configData.products
+        const rawProducts = (Array.isArray(productsData) && productsData.length > 0)
+          ? productsData
+          : (Array.isArray(validConfigData.products) && validConfigData.products.length > 0 ? validConfigData.products : null);
+
         let finalProducts = [];
-        if (Array.isArray(productsData) && productsData.length > 0) {
-          finalProducts = productsData.map((p) => {
+        if (rawProducts && rawProducts.length > 0) {
+          finalProducts = rawProducts.map((p) => {
             const def = defaultConfig.products?.find((dp) => dp.id === p.id);
             const validImage = (p.image !== undefined && p.image !== null && p.image !== '') 
               ? p.image 
@@ -296,9 +333,13 @@ export function SiteConfigProvider({ children }) {
         }
 
         // Merge backend categories with default categories
+        const rawCategories = (Array.isArray(categoriesData) && categoriesData.length > 0)
+          ? categoriesData
+          : (Array.isArray(validConfigData.categories) && validConfigData.categories.length > 0 ? validConfigData.categories : null);
+
         let finalCategories = [];
-        if (Array.isArray(categoriesData) && categoriesData.length > 0) {
-          finalCategories = categoriesData.map((c) => ({ id: c.category_id, label: c.label }));
+        if (rawCategories && rawCategories.length > 0) {
+          finalCategories = rawCategories.map((c) => ({ id: c.category_id || c.id, label: c.label }));
           const existingCatIds = new Set(finalCategories.map((c) => c.id));
           const defaultCats = defaultConfig.categories || [
             { id: 'all', label: 'All' },
@@ -328,14 +369,11 @@ export function SiteConfigProvider({ children }) {
         };
 
         setSavedConfig(fullConfig);
-        try {
-          localStorage.setItem(CACHE_KEY, JSON.stringify(fullConfig));
-        } catch (storageErr) {
-          console.warn('LocalStorage quota or write error on cache save:', storageErr);
-        }
+        saveLocalConfig(fullConfig);
+        setStoredConfig(fullConfig);
 
         // Only set config if we haven't already received unsaved changes from sync
-        if (sourceRef.current === 'init' || sourceRef.current === 'api') {
+        if (sourceRef.current === 'init' || sourceRef.current === 'storage' || sourceRef.current === 'api') {
           sourceRef.current = 'api';
           setConfig(fullConfig);
         }
@@ -489,11 +527,14 @@ export function SiteConfigProvider({ children }) {
 
       setConfig(updatedConfig);
       setSavedConfig(updatedConfig);
-      try {
-        localStorage.setItem(CACHE_KEY, JSON.stringify(updatedConfig));
-      } catch (storageErr) {
-        console.warn('LocalStorage quota or write error on saveConfig:', storageErr);
+      saveLocalConfig(updatedConfig);
+      setStoredConfig(updatedConfig);
+
+      // Broadcast immediately across open tabs and preview iframe
+      if (channelRef.current) {
+        channelRef.current.postMessage({ type: 'SYNC_CONFIG', payload: updatedConfig });
       }
+
       return { success: true };
     } catch (error) {
       console.error("Error saving config:", error);
@@ -512,7 +553,8 @@ export function SiteConfigProvider({ children }) {
     setConfig(defaultConfig);
     setSavedConfig(defaultConfig);
     try {
-      localStorage.removeItem(CACHE_KEY);
+      saveLocalConfig(defaultConfig);
+      setStoredConfig(defaultConfig);
     } catch {}
   }, []);
 

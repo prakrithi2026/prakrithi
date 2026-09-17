@@ -7,6 +7,18 @@
   padding: 0;
 }
 
+.hero-skeleton {
+  background: linear-gradient(90deg, #f1f5f9 0%, #e2e8f0 50%, #f1f5f9 100%);
+  background-size: 200% 100%;
+  animation: heroSkeletonShimmer 1.8s ease-in-out infinite;
+  min-height: 280px;
+}
+
+@keyframes heroSkeletonShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
 /* Desktop (> 768px): matches standard 2560x907 banner ratio */
 @media (min-width: 769px) {
   .hero-section {

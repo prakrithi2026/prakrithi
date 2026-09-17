@@ -142,13 +142,19 @@ def deep_merge(base, update):
             result[key] = value
     return result
 
+_CACHED_DEFAULT_CONFIG = None
+
 def load_default_config():
+    global _CACHED_DEFAULT_CONFIG
+    if _CACHED_DEFAULT_CONFIG is not None:
+        return _CACHED_DEFAULT_CONFIG
     try:
         from django.conf import settings
         default_file = getattr(settings, 'BASE_DIR', Path('.')) / 'default_config.json'
         if default_file.exists():
             with open(default_file, 'r', encoding='utf-8') as f:
-                return json.load(f)
+                _CACHED_DEFAULT_CONFIG = json.load(f)
+                return _CACHED_DEFAULT_CONFIG
     except Exception as e:
         print(f"Error loading default_config.json: {e}")
     return {}
@@ -229,7 +235,13 @@ class SiteConfigView(APIView):
                     config.save()
 
             serializer = SiteConfigSerializer(config)
-            resp_data = serializer.data.get('config_data') or config_data
+            raw_data = serializer.data.get('config_data') or config_data
+            resp_data = dict(raw_data) if isinstance(raw_data, dict) else {}
+
+            # Embed authoritative products and categories for single-flight instant loading
+            resp_data['products'] = ProductSerializer(Product.objects.all().order_by('id'), many=True).data
+            resp_data['categories'] = CategorySerializer(Category.objects.all(), many=True).data
+
             response = Response(resp_data)
             response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
             response['Pragma'] = 'no-cache'
@@ -414,10 +426,14 @@ class SiteConfigView(APIView):
                                 couponNote=couponNote
                             )
                     
+            all_products = ProductSerializer(Product.objects.all().order_by('id'), many=True).data
+            all_categories = CategorySerializer(Category.objects.all(), many=True).data
             return Response({
                 "status": "success",
                 "message": "Configuration updated",
-                "config_data": merged_config
+                "config_data": merged_config,
+                "products": all_products,
+                "categories": all_categories
             })
         except Exception as e:
             import traceback

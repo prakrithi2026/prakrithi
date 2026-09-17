@@ -263,3 +263,21 @@
     font-size: 13px;
   }
 }
+
+/* Skeleton Loading State */
+.product-card--skeleton {
+  pointer-events: none;
+  background: #ffffff;
+}
+
+.product-card--skeleton .skeleton-box {
+  background: linear-gradient(90deg, #f1f5f9 0%, #e2e8f0 50%, #f1f5f9 100%);
+  background-size: 200% 100%;
+  animation: cardSkeletonShimmer 1.8s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+@keyframes cardSkeletonShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
