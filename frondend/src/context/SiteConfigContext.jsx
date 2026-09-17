@@ -275,11 +275,10 @@ export function SiteConfigProvider({ children }) {
           };
         }
 
-        // Merge backend products with defaultConfig products so catalog items are not lost, but respecting valid images
+        // Backend products are authoritative. Map them and only use defaultConfig image if product image is empty
         let finalProducts = [];
         if (Array.isArray(productsData) && productsData.length > 0) {
           finalProducts = productsData.map((p) => {
-            // Strictly match by ID to avoid collisions with repeated default product names
             const def = defaultConfig.products?.find((dp) => dp.id === p.id);
             const validImage = (p.image !== undefined && p.image !== null && p.image !== '') 
               ? p.image 
@@ -292,11 +291,6 @@ export function SiteConfigProvider({ children }) {
                 : (def?.description || ''),
             };
           });
-          const existingIds = new Set(finalProducts.map((p) => p.id));
-          const missingDefaults = (defaultConfig.products || []).filter((dp) => !existingIds.has(dp.id));
-          if (missingDefaults.length > 0) {
-            finalProducts = [...finalProducts, ...missingDefaults];
-          }
         } else {
           finalProducts = defaultConfig.products || [];
         }
@@ -484,12 +478,14 @@ export function SiteConfigProvider({ children }) {
       }
       
       const result = await response.json();
-      const updatedConfig = (result && result.config_data) ? {
+      const backendData = result?.config_data || {};
+      const updatedConfig = {
+        ...config,
         ...configToSave,
-        ...result.config_data,
-        products: configToSave.products,
-        categories: configToSave.categories
-      } : configToSave;
+        ...backendData,
+        products: configToSave.products !== undefined ? configToSave.products : config.products,
+        categories: configToSave.categories !== undefined ? configToSave.categories : config.categories
+      };
 
       setConfig(updatedConfig);
       setSavedConfig(updatedConfig);

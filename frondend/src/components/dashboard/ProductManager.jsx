@@ -64,9 +64,9 @@ export default function ProductManager() {
     }
     close();
 
-    // Directly persist to server so added product & image are never lost
+    // Directly persist to server in isolation so added product & image are never lost
     try {
-      await saveConfig({ ...config, products: updatedProducts });
+      await saveConfig({ products: updatedProducts });
     } catch (err) {
       console.warn('Auto-save product failed:', err);
     }
@@ -74,7 +74,7 @@ export default function ProductManager() {
 
   const handleManualSave = async () => {
     setSaving(true);
-    const res = await saveConfig();
+    const res = await saveConfig({ products });
     setSaving(false);
     if (res?.success) {
       setSaveSuccess(true);
@@ -87,7 +87,7 @@ export default function ProductManager() {
       deleteProduct(id);
       const updatedProducts = products.filter((p) => p.id !== id);
       try {
-        await saveConfig({ ...config, products: updatedProducts });
+        await saveConfig({ delete_product_id: id, products: updatedProducts });
       } catch (err) {
         console.warn('Delete save failed:', err);
       }

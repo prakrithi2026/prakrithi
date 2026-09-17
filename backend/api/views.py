@@ -247,6 +247,7 @@ class SiteConfigView(APIView):
             data = request.data.copy()
             products = data.pop('products', None)
             categories = data.pop('categories', None)
+            deleted_product_id = data.pop('delete_product_id', None)
             
             # Ensure hero.bgImage stays in sync with hero.images if hero.images is provided
             if 'hero' in data and isinstance(data['hero'], dict):
@@ -279,6 +280,13 @@ class SiteConfigView(APIView):
                 merged_config, _ = enforce_image_fallbacks(merged_config)
                 config.config_data = merged_config
                 config.save()
+
+                # Handle explicit single product deletion safely
+                if deleted_product_id is not None:
+                    try:
+                        Product.objects.filter(id=int(deleted_product_id)).delete()
+                    except (ValueError, TypeError):
+                        pass
                 
                 # Sync Categories efficiently
                 if categories is not None and isinstance(categories, list) and len(categories) > 0:
@@ -295,7 +303,7 @@ class SiteConfigView(APIView):
                             else:
                                 Category.objects.create(category_id=cat_id, label=cat_label)
                     
-                # Sync Products efficiently
+                # Sync Products without deleting unspecified products (preserves all catalog items)
                 if products is not None and isinstance(products, list) and len(products) > 0:
                     category_map = {c.category_id: c for c in Category.objects.all()}
                     existing_ids = []
@@ -306,9 +314,6 @@ class SiteConfigView(APIView):
                             except (ValueError, TypeError):
                                 pass
 
-                    if existing_ids:
-                        Product.objects.exclude(id__in=existing_ids).delete()
-                    
                     existing_prods = {p.id: p for p in Product.objects.filter(id__in=existing_ids)}
                     
                     for prod in products:
@@ -426,19 +431,23 @@ class CategoryViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         try:
             response = super().list(request, *args, **kwargs)
-            response['Cache-Control'] = 'public, max-age=60, stale-while-revalidate=300'
+            response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response['Pragma'] = 'no-cache'
+            response['Expires'] = '0'
             return response
         except Exception as e:
             return Response([], status=status.HTTP_200_OK)
 
 class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.all()
+    queryset = Product.objects.all().order_by('id')
     serializer_class = ProductSerializer
 
     def list(self, request, *args, **kwargs):
         try:
             response = super().list(request, *args, **kwargs)
-            response['Cache-Control'] = 'public, max-age=60, stale-while-revalidate=300'
+            response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response['Pragma'] = 'no-cache'
+            response['Expires'] = '0'
             return response
         except Exception as e:
             return Response([], status=status.HTTP_200_OK)

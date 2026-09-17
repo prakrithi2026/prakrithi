@@ -25,29 +25,32 @@ export default function HeroEditor() {
 
   const currentImages = deviceView === 'desktop' ? desktopImages : mobileImages;
 
-  const handleSaveHero = async () => {
+  // Dedicated helper to save hero banner in isolation without transmitting products
+  const saveHeroToBackend = async (heroToSave) => {
     setSaving(true);
-    const curDesktop = Array.isArray(hero.images) 
-      ? hero.images 
-      : (hero.bgImage ? [hero.bgImage] : []);
-    const curMobile = curDesktop.length === 0 ? [] : (Array.isArray(hero.mobileImages) ? hero.mobileImages : []);
+    const curDesktop = Array.isArray(heroToSave.images) 
+      ? heroToSave.images 
+      : (heroToSave.bgImage ? [heroToSave.bgImage] : []);
+    const curMobile = curDesktop.length === 0 ? [] : (Array.isArray(heroToSave.mobileImages) ? heroToSave.mobileImages : []);
 
     const currentHero = {
-      ...hero,
+      ...heroToSave,
       images: curDesktop,
       mobileImages: curMobile,
       bgImage: curDesktop.length > 0 ? curDesktop[0] : ''
     };
-    const nextConfig = {
-      ...config,
-      hero: currentHero
-    };
-    const res = await saveConfig(nextConfig);
+    // Send ONLY hero to prevent any crosstalk or accidental product catalog deletion
+    const res = await saveConfig({ hero: currentHero });
     setSaving(false);
     if (res?.success) {
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 2500);
     }
+    return res;
+  };
+
+  const handleSaveHero = async () => {
+    await saveHeroToBackend(hero);
   };
 
   // Helper to update images and keep legacy bgImage in sync
@@ -61,19 +64,14 @@ export default function HeroEditor() {
     }
 
     updateConfig('hero', nextHero);
+    return nextHero;
   };
 
   const copyDesktopToMobile = async () => {
     if (window.confirm('Sync current Desktop banners to Mobile view? This will replace mobile banners with desktop banners.')) {
       const nextHero = { ...hero, mobileImages: [...desktopImages] };
       updateConfig('hero', nextHero);
-      setSaving(true);
-      const res = await saveConfig({ ...config, hero: nextHero });
-      setSaving(false);
-      if (res?.success) {
-        setSaveSuccess(true);
-        setTimeout(() => setSaveSuccess(false), 2000);
-      }
+      await saveHeroToBackend(nextHero);
     }
   };
 
@@ -87,7 +85,7 @@ export default function HeroEditor() {
       const file = files[i];
       if (file && file.type.startsWith('image/')) {
         try {
-          const compressed = await compressImage(file, maxWidth, maxHeight, 0.90);
+          const compressed = await compressImage(file, maxWidth, maxHeight, 0.85);
           newImages.push(compressed);
         } catch (err) {
           console.error(`Error compressing hero ${deviceView} image:`, err);
@@ -97,7 +95,9 @@ export default function HeroEditor() {
 
     if (newImages.length > 0) {
       const updated = [...currentImages, ...newImages];
-      setImagesForDevice(deviceView, updated);
+      const nextHero = setImagesForDevice(deviceView, updated);
+      // Auto-save immediately to database so newly uploaded banners are never lost
+      await saveHeroToBackend(nextHero);
     }
   };
 
@@ -127,13 +127,15 @@ export default function HeroEditor() {
     setDragActive(false);
   };
 
-  const addImageUrl = () => {
+  const addImageUrl = async () => {
     if (!urlInput.trim()) return;
     const trimmed = urlInput.trim();
     const formatted = normalizeImageInput(trimmed);
     const updated = [...currentImages, formatted];
-    setImagesForDevice(deviceView, updated);
+    const nextHero = setImagesForDevice(deviceView, updated);
     setUrlInput('');
+    // Auto-save immediately to database
+    await saveHeroToBackend(nextHero);
   };
 
   const removeImage = async (indexToRemove) => {
@@ -154,20 +156,10 @@ export default function HeroEditor() {
     updateConfig('hero', nextHero);
 
     // Auto-save immediately to database so reload won't bring back the deleted banner
-    setSaving(true);
-    const nextConfig = {
-      ...config,
-      hero: nextHero
-    };
-    const res = await saveConfig(nextConfig);
-    setSaving(false);
-    if (res?.success) {
-      setSaveSuccess(true);
-      setTimeout(() => setSaveSuccess(false), 2000);
-    }
+    await saveHeroToBackend(nextHero);
   };
 
-  const setAsPrimary = (index) => {
+  const setAsPrimary = async (index) => {
     if (index === 0 || index >= currentImages.length) return;
     const nextHero = { ...hero };
     if (deviceView === 'desktop') {
@@ -189,9 +181,10 @@ export default function HeroEditor() {
       nextHero.mobileImages = updated;
     }
     updateConfig('hero', nextHero);
+    await saveHeroToBackend(nextHero);
   };
 
-  const moveImage = (index, direction) => {
+  const moveImage = async (index, direction) => {
     const newIndex = index + direction;
     if (newIndex < 0 || newIndex >= currentImages.length) return;
     const nextHero = { ...hero };
@@ -217,6 +210,7 @@ export default function HeroEditor() {
       nextHero.mobileImages = updatedM;
     }
     updateConfig('hero', nextHero);
+    await saveHeroToBackend(nextHero);
   };
 
   const clearAllImages = async () => {
@@ -228,18 +222,7 @@ export default function HeroEditor() {
         bgImage: ''
       };
       updateConfig('hero', nextHero);
-
-      setSaving(true);
-      const nextConfig = {
-        ...config,
-        hero: nextHero
-      };
-      const res = await saveConfig(nextConfig);
-      setSaving(false);
-      if (res?.success) {
-        setSaveSuccess(true);
-        setTimeout(() => setSaveSuccess(false), 2000);
-      }
+      await saveHeroToBackend(nextHero);
     }
   };
 

@@ -102,11 +102,11 @@ DATABASE_URL = os.environ.get("DATABASE_URL")
 if DATABASE_URL:
     try:
         import psycopg2
-        # On Render and other cloud hosts, PostgreSQL requires SSL encryption
+        # On Render, Neon, Supabase, etc., PostgreSQL requires SSL encryption
         parsed_db = dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=True)
         parsed_db.setdefault("OPTIONS", {})["sslmode"] = "require"
         
-        # Test connection with sslmode='require' first
+        # Test connection with sslmode='require' first (10s timeout to allow cold starts)
         try:
             conn = psycopg2.connect(
                 dbname=parsed_db.get('NAME'),
@@ -114,7 +114,7 @@ if DATABASE_URL:
                 password=parsed_db.get('PASSWORD'),
                 host=parsed_db.get('HOST'),
                 port=parsed_db.get('PORT') or 5432,
-                connect_timeout=5,
+                connect_timeout=10,
                 sslmode='require',
             )
             conn.close()
@@ -126,15 +126,15 @@ if DATABASE_URL:
                 password=parsed_db.get('PASSWORD'),
                 host=parsed_db.get('HOST'),
                 port=parsed_db.get('PORT') or 5432,
-                connect_timeout=5,
+                connect_timeout=10,
             )
             conn.close()
             parsed_db.get("OPTIONS", {}).pop("sslmode", None)
 
         DATABASES = {"default": parsed_db}
-        print("Connected to primary PostgreSQL database.")
+        print("Successfully connected to primary PostgreSQL database.")
     except Exception as db_err:
-        print(f"Warning: Primary PostgreSQL connection failed ({db_err}). Falling back to local SQLite database.")
+        print(f"CRITICAL WARNING: Primary PostgreSQL connection failed ({db_err}). Falling back to local SQLite database.")
         DATABASES = {
             "default": {
                 "ENGINE": "django.db.backends.sqlite3",
@@ -142,6 +142,7 @@ if DATABASE_URL:
             }
         }
 else:
+    print("Notice: No DATABASE_URL provided. Using local SQLite database.")
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
