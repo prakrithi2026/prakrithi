@@ -93,30 +93,35 @@ export default function HeroSection() {
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      <div className="hero-slides-container">
-        {slides.map((slide, index) => {
-          const isActive = index === currentSlide || slideCount === 1;
-          return (
-            <div
-              key={index}
-              className={`hero-slide ${isActive ? 'active' : ''}`}
-            >
-              <picture className="hero-picture">
-                {slide.mobile && (
-                  <source media="(max-width: 768px)" srcSet={slide.mobile} />
-                )}
-                <img
-                  src={slide.desktop || slide.mobile}
-                  alt={`Banner ${index + 1}`}
-                  className="hero-img"
-                  loading={index === 0 ? 'eager' : 'lazy'}
-                  decoding="async"
-                  fetchPriority={index === 0 ? 'high' : 'low'}
-                />
-              </picture>
-            </div>
-          );
-        })}
+      <div className="hero-slider-viewport">
+        <div 
+          className="hero-slides-container"
+          style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+        >
+          {slides.map((slide, index) => {
+            const isActive = index === currentSlide || slideCount === 1;
+            return (
+              <div
+                key={index}
+                className={`hero-slide ${isActive ? 'active' : ''}`}
+              >
+                <picture className="hero-picture">
+                  {slide.mobile && (
+                    <source media="(max-width: 768px)" srcSet={slide.mobile} />
+                  )}
+                  <img
+                    src={slide.desktop || slide.mobile}
+                    alt={`Banner ${index + 1}`}
+                    className="hero-img"
+                    loading={index === 0 ? 'eager' : 'lazy'}
+                    decoding="async"
+                    fetchPriority={index === 0 ? 'high' : 'low'}
+                  />
+                </picture>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Render navigation indicators (dots) only if 2 or more images */}
