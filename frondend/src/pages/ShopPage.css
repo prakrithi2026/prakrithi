@@ -4,9 +4,17 @@
 }
 
 .shop-main {
-  max-width: 1320px;
+  width: 100%;
+  max-width: 1440px;
   margin: 0 auto;
-  padding: 24px 20px 60px;
+  padding: 24px 123px 60px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1024px) {
+  .shop-main {
+    padding: 24px 20px 60px;
+  }
 }
 
 /* Breadcrumb */
