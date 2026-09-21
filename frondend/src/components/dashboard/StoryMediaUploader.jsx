@@ -29,7 +29,7 @@ export default function StoryMediaUploader({
   video = '',
   onVideoChange
 }) {
-  const displayImage = image || defaultConfig.ourStory?.image || '';
+  const displayImage = image || '';
   const [activeTab, setActiveTab] = useState('image');
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadingVideo, setUploadingVideo] = useState(false);

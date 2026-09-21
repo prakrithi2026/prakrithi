@@ -38,8 +38,8 @@ function utf8ToBase64(str) {
       }
     }
   }
-  if (typeof Buffer !== 'undefined') {
-    return Buffer.from(str, 'utf-8').toString('base64');
+  if (typeof globalThis !== 'undefined' && globalThis.Buffer) {
+    return globalThis.Buffer.from(str, 'utf-8').toString('base64');
   }
   return '';
 }
@@ -55,8 +55,8 @@ function base64ToUtf8(b64) {
       return window.atob(b64);
     }
   }
-  if (typeof Buffer !== 'undefined') {
-    return Buffer.from(b64, 'base64').toString('utf-8');
+  if (typeof globalThis !== 'undefined' && globalThis.Buffer) {
+    return globalThis.Buffer.from(b64, 'base64').toString('utf-8');
   }
   return '';
 }
@@ -87,8 +87,25 @@ export function svgToDataUrl(svgString) {
   if (!svgString || typeof svgString !== 'string') return '';
   let cleanSvg = svgString.trim();
 
-  // If already a valid base64 SVG data URL or standard URL, return as is
-  if (cleanSvg.startsWith('data:image/svg+xml;base64,') || cleanSvg.startsWith('http://') || cleanSvg.startsWith('https://') || cleanSvg.startsWith('/')) {
+  // If already a valid raster image data URL, base64 SVG data URL, or standard URL, return as is
+  if (
+    cleanSvg.startsWith('data:image/webp') ||
+    cleanSvg.startsWith('data:image/jpeg') ||
+    cleanSvg.startsWith('data:image/jpg') ||
+    cleanSvg.startsWith('data:image/png') ||
+    cleanSvg.startsWith('data:image/gif') ||
+    cleanSvg.startsWith('data:image/avif') ||
+    cleanSvg.startsWith('data:image/svg+xml;base64,') ||
+    cleanSvg.startsWith('http://') ||
+    cleanSvg.startsWith('https://') ||
+    cleanSvg.startsWith('/') ||
+    cleanSvg.startsWith('blob:')
+  ) {
+    return cleanSvg;
+  }
+
+  // If not SVG content, return as is
+  if (!isSvg(cleanSvg)) {
     return cleanSvg;
   }
 
@@ -307,7 +324,7 @@ export function getYouTubeEmbedUrl(url) {
   if (ytMatch && ytMatch[1]) {
     return `https://www.youtube.com/embed/${ytMatch[1]}`;
   }
-  const vimeoMatch = trimmed.match(/vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/[^\/]*\/videos\/|album\/\d+\/video\/|video\/|)(\d+)/);
+  const vimeoMatch = trimmed.match(/vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/[^/]*\/videos\/|album\/\d+\/video\/|video\/|)(\d+)/);
   if (vimeoMatch && vimeoMatch[1]) {
     return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
   }

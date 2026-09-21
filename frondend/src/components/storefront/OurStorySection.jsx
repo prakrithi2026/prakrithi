@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSiteConfig } from '../../context/SiteConfigContext';
 import defaultConfig from '../../data/defaultConfig';
-import { svgToDataUrl, getYouTubeEmbedUrl } from '../../utils/imageOptimizer';
+import { isSvg, svgToDataUrl } from '../../utils/imageOptimizer';
 import './OurStorySection.css';
 
 function getHighClarityImage(src) {
@@ -48,10 +48,12 @@ export default function OurStorySection() {
   if (!ourStory) return null;
 
   const defaultImg = defaultConfig.ourStory?.image || '/images/our-story.png';
-  const storyImgSrc = ourStory.image ? svgToDataUrl(ourStory.image) : defaultImg;
-  const highResStoryImg = getHighClarityImage(storyImgSrc);
+  const hasExplicitImage = ourStory.image !== undefined && ourStory.image !== null;
+  const rawImg = hasExplicitImage ? ourStory.image : defaultImg;
+  const storyImgSrc = rawImg ? (isSvg(rawImg) ? svgToDataUrl(rawImg) : rawImg) : '';
+  const highResStoryImg = storyImgSrc ? getHighClarityImage(storyImgSrc) : '';
   const isUnsplash = typeof storyImgSrc === 'string' && storyImgSrc.includes('images.unsplash.com');
-  const storySrcSet = isUnsplash
+  const storySrcSet = isUnsplash && highResStoryImg
     ? [
         `${highResStoryImg.replace(/w=\d+/, 'w=800').replace(/q=\d+/, 'q=90')} 800w`,
         `${highResStoryImg.replace(/w=\d+/, 'w=1200').replace(/q=\d+/, 'q=92')} 1200w`,

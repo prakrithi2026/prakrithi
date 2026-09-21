@@ -300,6 +300,11 @@ class SiteConfigView(APIView):
                             merged_config.setdefault('hero', {})['mobileImages'] = []
                     if 'bgImage' in hero_data and len(hero_data.get('images', [])) > 0:
                         merged_config.setdefault('hero', {})['bgImage'] = hero_data['bgImage']
+                if 'ourStory' in data and isinstance(data['ourStory'], dict):
+                    if 'image' in data['ourStory']:
+                        merged_config.setdefault('ourStory', {})['image'] = data['ourStory']['image']
+                    if 'video' in data['ourStory']:
+                        merged_config.setdefault('ourStory', {})['video'] = data['ourStory']['video']
                 merged_config, _ = enforce_image_fallbacks(merged_config)
                 config.config_data = merged_config
                 config.save()

@@ -422,7 +422,7 @@ export default function SectionManager() {
         <StoryMediaUploader
           mediaType={config.ourStory?.mediaType || (config.ourStory?.video ? 'video' : 'image')}
           onMediaTypeChange={(type) => updateConfig('ourStory.mediaType', type)}
-          image={config.ourStory?.image || defaultConfig.ourStory?.image || ''}
+          image={config.ourStory?.image ?? ''}
           onImageChange={(val) => updateConfig('ourStory.image', val)}
           video={config.ourStory?.video || ''}
           onVideoChange={(val) => updateConfig('ourStory.video', val)}

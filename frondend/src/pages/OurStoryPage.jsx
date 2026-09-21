@@ -5,7 +5,6 @@ import Navbar from '../components/storefront/Navbar';
 import Footer from '../components/storefront/Footer';
 import CartModal from '../components/storefront/CartModal';
 import AnnouncementBar from '../components/storefront/AnnouncementBar';
-import { getYouTubeEmbedUrl } from '../utils/imageOptimizer';
 import './OurStoryPage.css';
 
 function normalizeVideoUrl(url) {
@@ -32,7 +31,8 @@ export default function OurStoryPage() {
   }, [config.navbar?.brandName]);
 
   const defaultImg = defaultConfig.ourStory?.image || '/images/our-story.png';
-  const storyImgSrc = ourStory?.image || defaultImg;
+  const hasExplicitImage = ourStory?.image !== undefined && ourStory?.image !== null;
+  const storyImgSrc = hasExplicitImage ? ourStory.image : defaultImg;
   const rawVideoLink = ourStory?.video ? ourStory.video.trim() : '';
   const hasVideoLink = Boolean(rawVideoLink);
   const isDirectUploadedVideo = rawVideoLink.startsWith('data:video') || rawVideoLink.startsWith('blob:');
@@ -127,7 +127,7 @@ export default function OurStoryPage() {
                   </svg>
                 </div>
               </a>
-            ) : (
+            ) : storyImgSrc ? (
               <div className="our-story-hero-media">
                 <img 
                   src={storyImgSrc} 
@@ -147,7 +147,7 @@ export default function OurStoryPage() {
                   </svg>
                 </div>
               </div>
-            )}
+            ) : null}
             
             <div className="our-story-full-text" style={{ color: theme.textColor }}>
               {ourStory?.content.split('\n').map((para, i) => {
