@@ -68,11 +68,12 @@
   align-items: center;
   justify-content: center;
   transition: transform 0.25s ease, filter 0.25s ease;
+  pointer-events: none;
 }
 
 .our-story-image-wrapper:hover .our-story-play-overlay {
   transform: translate(-50%, -50%) scale(1.1);
-  filter: drop-shadow(0 4px 12px rgba(239, 28, 28, 0.4));
+  filter: drop-shadow(0 4px 14px rgba(255, 24, 24, 0.45));
 }
 
 .our-story-image-wrapper--clickable {

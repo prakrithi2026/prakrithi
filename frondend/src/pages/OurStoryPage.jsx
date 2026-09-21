@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSiteConfig } from '../context/SiteConfigContext';
 import defaultConfig from '../data/defaultConfig';
 import Navbar from '../components/storefront/Navbar';
@@ -8,9 +8,23 @@ import AnnouncementBar from '../components/storefront/AnnouncementBar';
 import { getYouTubeEmbedUrl } from '../utils/imageOptimizer';
 import './OurStoryPage.css';
 
+function normalizeVideoUrl(url) {
+  if (!url || typeof url !== 'string') return '';
+  const trimmed = url.trim();
+  if (!trimmed) return '';
+  if (/^https?:\/\//i.test(trimmed) || trimmed.startsWith('//')) {
+    return trimmed;
+  }
+  if (trimmed.startsWith('/')) {
+    return trimmed;
+  }
+  return `https://${trimmed}`;
+}
+
 export default function OurStoryPage() {
   const { config } = useSiteConfig();
   const { ourStory, theme } = config;
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     document.title = `Our Story - ${config.navbar?.brandName || 'Prakrithi'}`;
@@ -19,14 +33,11 @@ export default function OurStoryPage() {
 
   const defaultImg = defaultConfig.ourStory?.image || '/images/our-story.png';
   const storyImgSrc = ourStory?.image || defaultImg;
-  const hasVideo = Boolean(ourStory?.video);
-  const isVideoMode = ourStory?.mediaType === 'video' || (hasVideo && ourStory?.mediaType !== 'image');
-  const isYouTubeOrVimeo = hasVideo && (
-    ourStory.video.includes('youtube.com') ||
-    ourStory.video.includes('youtu.be') ||
-    ourStory.video.includes('vimeo.com')
-  );
-  const embedUrl = isYouTubeOrVimeo ? getYouTubeEmbedUrl(ourStory.video) : '';
+  const rawVideoLink = ourStory?.video ? ourStory.video.trim() : '';
+  const hasVideoLink = Boolean(rawVideoLink);
+  const isDirectUploadedVideo = rawVideoLink.startsWith('data:video') || rawVideoLink.startsWith('blob:');
+  const videoUrl = normalizeVideoUrl(rawVideoLink);
+  const isExternalVideo = /^https?:\/\//i.test(videoUrl) || videoUrl.startsWith('//');
 
   const themeStyle = {
     '--primary': theme.primaryColor,
@@ -51,40 +62,91 @@ export default function OurStoryPage() {
 
         <div className="storefront-container">
           <div className="our-story-page-content">
-            {isVideoMode && hasVideo ? (
+            {isDirectUploadedVideo && isPlaying ? (
               <div className="our-story-hero-video-wrapper">
-                {isYouTubeOrVimeo && embedUrl ? (
-                  <iframe
-                    src={embedUrl}
-                    title={ourStory?.title || 'Our Story Video'}
-                    className="our-story-hero-iframe"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                ) : (
-                  <video
-                    src={ourStory.video}
-                    controls
-                    playsInline
-                    poster={storyImgSrc}
-                    className="our-story-hero-video"
-                  >
-                    Your browser does not support HTML5 video.
-                  </video>
-                )}
+                <video
+                  src={rawVideoLink}
+                  controls
+                  autoPlay
+                  playsInline
+                  className="our-story-hero-video"
+                >
+                  Your browser does not support HTML5 video.
+                </video>
               </div>
+            ) : isDirectUploadedVideo ? (
+              <div
+                className="our-story-hero-media"
+                onClick={() => setIsPlaying(true)}
+                role="button"
+                tabIndex={0}
+                aria-label="Play video"
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setIsPlaying(true); }}
+              >
+                <img 
+                  src={storyImgSrc} 
+                  alt={ourStory?.title || 'Our Story'} 
+                  className="our-story-hero-image"
+                  loading="eager"
+                  onError={(e) => {
+                    if (defaultImg && e.currentTarget.src !== defaultImg) {
+                      e.currentTarget.src = defaultImg;
+                    }
+                  }}
+                />
+                <div className="our-story-hero-play-overlay">
+                  <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="56" height="56" rx="28" fill="#FF1818"/>
+                    <path d="M22 38.7633L40.0937 28.3817L22 18V38.7633Z" fill="white"/>
+                  </svg>
+                </div>
+              </div>
+            ) : hasVideoLink && isExternalVideo ? (
+              <a
+                href={videoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="our-story-hero-media"
+                aria-label="Watch story video"
+              >
+                <img 
+                  src={storyImgSrc} 
+                  alt={ourStory?.title || 'Our Story'} 
+                  className="our-story-hero-image"
+                  loading="eager"
+                  onError={(e) => {
+                    if (defaultImg && e.currentTarget.src !== defaultImg) {
+                      e.currentTarget.src = defaultImg;
+                    }
+                  }}
+                />
+                <div className="our-story-hero-play-overlay">
+                  <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="56" height="56" rx="28" fill="#FF1818"/>
+                    <path d="M22 38.7633L40.0937 28.3817L22 18V38.7633Z" fill="white"/>
+                  </svg>
+                </div>
+              </a>
             ) : (
-              <img 
-                src={storyImgSrc} 
-                alt={ourStory?.title || 'Our Story'} 
-                className="our-story-hero-image"
-                loading="eager"
-                onError={(e) => {
-                  if (defaultImg && e.currentTarget.src !== defaultImg) {
-                    e.currentTarget.src = defaultImg;
-                  }
-                }}
-              />
+              <div className="our-story-hero-media">
+                <img 
+                  src={storyImgSrc} 
+                  alt={ourStory?.title || 'Our Story'} 
+                  className="our-story-hero-image"
+                  loading="eager"
+                  onError={(e) => {
+                    if (defaultImg && e.currentTarget.src !== defaultImg) {
+                      e.currentTarget.src = defaultImg;
+                    }
+                  }}
+                />
+                <div className="our-story-hero-play-overlay">
+                  <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="56" height="56" rx="28" fill="#FF1818"/>
+                    <path d="M22 38.7633L40.0937 28.3817L22 18V38.7633Z" fill="white"/>
+                  </svg>
+                </div>
+              </div>
             )}
             
             <div className="our-story-full-text" style={{ color: theme.textColor }}>

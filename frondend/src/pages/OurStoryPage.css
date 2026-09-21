@@ -29,13 +29,44 @@
   padding: 0 20px;
 }
 
+.our-story-hero-media {
+  position: relative;
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 60px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  display: block;
+  cursor: pointer;
+}
+
 .our-story-hero-image {
   width: 100%;
   max-height: 500px;
   object-fit: cover;
-  border-radius: 16px;
-  margin-bottom: 60px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.our-story-hero-media:hover .our-story-hero-image {
+  transform: scale(1.02);
+}
+
+.our-story-hero-play-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  transition: transform 0.25s ease, filter 0.25s ease;
+}
+
+.our-story-hero-media:hover .our-story-hero-play-overlay {
+  transform: translate(-50%, -50%) scale(1.1);
+  filter: drop-shadow(0 4px 14px rgba(255, 24, 24, 0.45));
 }
 
 .our-story-hero-video-wrapper {

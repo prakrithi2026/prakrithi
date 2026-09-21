@@ -30,9 +30,7 @@ export default function StoryMediaUploader({
   onVideoChange
 }) {
   const displayImage = image || defaultConfig.ourStory?.image || '';
-  const [activeTab, setActiveTab] = useState(
-    mediaType || (video && !displayImage ? 'video' : 'image')
-  );
+  const [activeTab, setActiveTab] = useState('image');
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadingVideo, setUploadingVideo] = useState(false);
   const [imageError, setImageError] = useState('');
@@ -165,35 +163,10 @@ export default function StoryMediaUploader({
 
   return (
     <div className="story-media-uploader">
-      {/* Header with Type Selector */}
+      {/* Header */}
       <div className="story-media-header">
         <div className="story-media-title-group">
-          <label className="story-media-label">Media Type</label>
-          <span className="story-media-hint">Choose whether to display a feature image or video</span>
-        </div>
-        <div className="story-media-tabs" role="tablist">
-          <button
-            type="button"
-            role="tab"
-            aria-selected={activeTab === 'image'}
-            className={`story-media-tab ${activeTab === 'image' ? 'story-media-tab--active' : ''}`}
-            onClick={() => handleTabSwitch('image')}
-          >
-            <FiImage size={15} />
-            <span>Image</span>
-            {image && <span className="story-media-tab-badge"><FiCheck size={11} /></span>}
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={activeTab === 'video'}
-            className={`story-media-tab ${activeTab === 'video' ? 'story-media-tab--active' : ''}`}
-            onClick={() => handleTabSwitch('video')}
-          >
-            <FiVideo size={15} />
-            <span>Video</span>
-            {video && <span className="story-media-tab-badge"><FiCheck size={11} /></span>}
-          </button>
+          <label className="story-media-label">Story Image</label>
         </div>
       </div>
 
@@ -210,27 +183,18 @@ export default function StoryMediaUploader({
                   className="story-media-img-preview" 
                   loading="eager"
                 />
+                <div className="story-media-play-overlay">
+                  <svg width="44" height="44" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="56" height="56" rx="28" fill="#FF1818"/>
+                    <path d="M22 38.7633L40.0937 28.3817L22 18V38.7633Z" fill="white"/>
+                  </svg>
+                </div>
               </div>
               <div className="story-media-preview-info">
                 <div className="story-media-preview-status">
                   <span className="story-media-status-badge">
                     <FiCheck size={13} /> Active Story Image
                   </span>
-                  <span className="story-media-source-tag">
-                    {displayImage.startsWith('data:') ? 'Default / Uploaded Asset' : 'External Link'}
-                  </span>
-                </div>
-
-                {/* Direct URL Editing */}
-                <div className="story-media-url-row">
-                  <FiLink className="story-media-url-icon" size={14} />
-                  <input
-                    type="url"
-                    className="story-media-url-input"
-                    value={image.startsWith('data:') ? '' : (image || '')}
-                    onChange={(e) => onImageChange(e.target.value)}
-                    placeholder={displayImage.startsWith('data:') ? 'Embedded Asset (or paste image URL)' : displayImage}
-                  />
                 </div>
 
                 <div className="story-media-btn-group">
@@ -314,6 +278,54 @@ export default function StoryMediaUploader({
               <span>{imageError}</span>
             </div>
           )}
+
+          {/* Video Link Option for Story Image */}
+          <div className="story-media-field-block story-media-video-link-block">
+            <div className="story-media-poster-header">
+              <label className="story-media-mini-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <FiPlay size={14} style={{ color: '#FF1818' }} />
+                <span>Play Button Video Link</span>
+              </label>
+              {video && (
+                <button
+                  type="button"
+                  className="story-media-mini-clear"
+                  onClick={() => onVideoChange('')}
+                >
+                  Clear Link
+                </button>
+              )}
+            </div>
+            <span className="story-media-hint">
+              Paste a video URL (YouTube, Vimeo, or direct link). When visitors click the play button on the image, they will go to this video link.
+            </span>
+            <div className="story-media-url-row">
+              <FiLink className="story-media-url-icon" size={14} />
+              <input
+                type="url"
+                className="story-media-url-input"
+                value={video || ''}
+                onChange={(e) => onVideoChange(e.target.value)}
+                placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/..."
+              />
+            </div>
+            {video && (
+              <div className="story-media-link-status">
+                <FiCheck size={13} style={{ color: '#059669', flexShrink: 0 }} />
+                <span>
+                  Video button linked to:{' '}
+                  <a
+                    href={video.startsWith('http') ? video : `https://${video}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: '#006B3F', fontWeight: 600, textDecoration: 'underline' }}
+                  >
+                    {video}
+                  </a>
+                </span>
+              </div>
+            )}
+          </div>
 
           <input
             ref={imageFileInputRef}

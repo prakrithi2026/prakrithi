@@ -102,6 +102,7 @@
 }
 
 .story-media-img-container {
+  position: relative;
   width: 220px;
   height: 150px;
   border-radius: 10px;
@@ -112,6 +113,23 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.story-media-play-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+  transition: transform 0.2s ease;
+}
+
+.story-media-img-container:hover .story-media-play-overlay {
+  transform: translate(-50%, -50%) scale(1.08);
 }
 
 .story-media-img-preview {
@@ -435,6 +453,27 @@
   border-radius: 8px;
   color: #b91c1c;
   font-size: 0.76rem;
+}
+
+/* ── Video Link in Image Tab ── */
+.story-media-video-link-block {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.story-media-link-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.76rem;
+  color: #065f46;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-top: 8px;
+  word-break: break-all;
 }
 
 /* Spin Animation */

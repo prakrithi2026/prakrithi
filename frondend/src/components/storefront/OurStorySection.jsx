@@ -27,6 +27,19 @@ function getHighClarityImage(src) {
   return src;
 }
 
+function normalizeVideoUrl(url) {
+  if (!url || typeof url !== 'string') return '';
+  const trimmed = url.trim();
+  if (!trimmed) return '';
+  if (/^https?:\/\//i.test(trimmed) || trimmed.startsWith('//')) {
+    return trimmed;
+  }
+  if (trimmed.startsWith('/')) {
+    return trimmed;
+  }
+  return `https://${trimmed}`;
+}
+
 export default function OurStorySection() {
   const { config } = useSiteConfig();
   const { ourStory, theme } = config;
@@ -47,15 +60,12 @@ export default function OurStorySection() {
       ].join(', ')
     : undefined;
 
-  const hasVideo = Boolean(ourStory.video);
-  const isVideoMode = ourStory.mediaType === 'video' || (hasVideo && ourStory.mediaType !== 'image');
-  const isYouTubeOrVimeo = hasVideo && (
-    ourStory.video.includes('youtube.com') ||
-    ourStory.video.includes('youtu.be') ||
-    ourStory.video.includes('vimeo.com')
-  );
-  const embedUrl = isYouTubeOrVimeo ? getYouTubeEmbedUrl(ourStory.video) : '';
-  const hasMedia = isVideoMode ? hasVideo || Boolean(highResStoryImg) : Boolean(highResStoryImg);
+  const rawVideoLink = ourStory.video ? ourStory.video.trim() : '';
+  const hasVideoLink = Boolean(rawVideoLink);
+  const isDirectUploadedVideo = rawVideoLink.startsWith('data:video') || rawVideoLink.startsWith('blob:');
+  const videoUrl = normalizeVideoUrl(rawVideoLink);
+  const isExternalVideo = /^https?:\/\//i.test(videoUrl) || videoUrl.startsWith('//');
+  const hasMedia = hasVideoLink || Boolean(highResStoryImg);
 
   // Extract the main paragraph content
   const paragraphs = ourStory.content.split('\n').filter(p => p.trim() && !p.startsWith('## '));
@@ -79,65 +89,27 @@ export default function OurStorySection() {
         {/* Left Column: Media (Video or Image) */}
         {hasMedia && (
           <div className="our-story-media-col">
-            {isVideoMode && hasVideo ? (
-              isPlaying || !storyImgSrc ? (
-                <div className="our-story-video-wrapper">
-                  {isYouTubeOrVimeo && embedUrl ? (
-                    <iframe
-                      src={`${embedUrl}${embedUrl.includes('?') ? '&' : '?'}autoplay=1`}
-                      title={ourStory.title || 'Our Story Video'}
-                      className="our-story-iframe"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  ) : (
-                    <video
-                      src={ourStory.video}
-                      controls
-                      autoPlay={isPlaying}
-                      playsInline
-                      className="our-story-video"
-                    >
-                      Your browser does not support HTML5 video.
-                    </video>
-                  )}
-                </div>
-              ) : (
-                <div
-                  className="our-story-image-wrapper our-story-image-wrapper--clickable"
-                  onClick={() => setIsPlaying(true)}
-                  role="button"
-                  tabIndex={0}
-                  aria-label="Play video"
-                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setIsPlaying(true); }}
+            {isDirectUploadedVideo && isPlaying ? (
+              <div className="our-story-video-wrapper">
+                <video
+                  src={rawVideoLink}
+                  controls
+                  autoPlay
+                  playsInline
+                  className="our-story-video"
                 >
-                  <img
-                    src={highResStoryImg}
-                    srcSet={storySrcSet}
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
-                    alt={ourStory.title || 'Our Story'}
-                    className="our-story-img"
-                    loading="eager"
-                    fetchPriority="high"
-                    decoding="async"
-                    width="600"
-                    height="400"
-                    onError={(e) => {
-                      if (defaultImg && e.currentTarget.src !== defaultImg) {
-                        e.currentTarget.src = defaultImg;
-                      }
-                    }}
-                  />
-                  <div className="our-story-play-overlay">
-                    <svg width="50" height="50" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <circle cx="30" cy="30" r="30" fill="#EF1C1C" />
-                      <path d="M40 30L24 40V20L40 30Z" fill="white" />
-                    </svg>
-                  </div>
-                </div>
-              )
-            ) : highResStoryImg ? (
-              <div className="our-story-image-wrapper">
+                  Your browser does not support HTML5 video.
+                </video>
+              </div>
+            ) : isDirectUploadedVideo ? (
+              <div
+                className="our-story-image-wrapper our-story-image-wrapper--clickable"
+                onClick={() => setIsPlaying(true)}
+                role="button"
+                tabIndex={0}
+                aria-label="Play video"
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setIsPlaying(true); }}
+              >
                 <img
                   src={highResStoryImg}
                   srcSet={storySrcSet}
@@ -155,7 +127,76 @@ export default function OurStorySection() {
                     }
                   }}
                 />
+                <div className="our-story-play-overlay">
+                  <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="56" height="56" rx="28" fill="#FF1818"/>
+                    <path d="M22 38.7633L40.0937 28.3817L22 18V38.7633Z" fill="white"/>
+                  </svg>
+                </div>
               </div>
+            ) : hasVideoLink && isExternalVideo ? (
+              /* When video link is added, clicking the video button / image goes to the video link */
+              <a
+                href={videoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="our-story-image-wrapper our-story-image-wrapper--clickable"
+                aria-label="Watch story video"
+              >
+                <img
+                  src={highResStoryImg}
+                  srcSet={storySrcSet}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
+                  alt={ourStory.title || 'Our Story'}
+                  className="our-story-img"
+                  loading="eager"
+                  fetchPriority="high"
+                  decoding="async"
+                  width="600"
+                  height="400"
+                  onError={(e) => {
+                    if (defaultImg && e.currentTarget.src !== defaultImg) {
+                      e.currentTarget.src = defaultImg;
+                    }
+                  }}
+                />
+                <div className="our-story-play-overlay">
+                  <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="56" height="56" rx="28" fill="#FF1818"/>
+                    <path d="M22 38.7633L40.0937 28.3817L22 18V38.7633Z" fill="white"/>
+                  </svg>
+                </div>
+              </a>
+            ) : highResStoryImg ? (
+              <Link
+                to={hasVideoLink ? videoUrl : '/our-story'}
+                className="our-story-image-wrapper our-story-image-wrapper--clickable"
+                aria-label="Read our Story"
+              >
+                <img
+                  src={highResStoryImg}
+                  srcSet={storySrcSet}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
+                  alt={ourStory.title || 'Our Story'}
+                  className="our-story-img"
+                  loading="eager"
+                  fetchPriority="high"
+                  decoding="async"
+                  width="600"
+                  height="400"
+                  onError={(e) => {
+                    if (defaultImg && e.currentTarget.src !== defaultImg) {
+                      e.currentTarget.src = defaultImg;
+                    }
+                  }}
+                />
+                <div className="our-story-play-overlay">
+                  <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="56" height="56" rx="28" fill="#FF1818"/>
+                    <path d="M22 38.7633L40.0937 28.3817L22 18V38.7633Z" fill="white"/>
+                  </svg>
+                </div>
+              </Link>
             ) : null}
           </div>
         )}
