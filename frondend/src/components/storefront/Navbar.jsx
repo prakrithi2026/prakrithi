@@ -195,7 +195,7 @@ export default function Navbar() {
                 <img
                   src={logoSrc}
                   alt={navbar.brandName || "Logo"}
-                  style={{ height: '48px', width: 'auto' }}
+                  className="navbar-brand-img"
                 />
               </Link>
             );
