@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useSiteConfig } from '../../context/SiteConfigContext';
 import ProductCard from './ProductCard';
@@ -13,6 +13,7 @@ export default function ShopByConcern() {
   const theme = config.theme || {};
   const [activeCategory, setActiveCategory] = useState('all');
   const [scrollRatio, setScrollRatio] = useState(0);
+  const [canScroll, setCanScroll] = useState(false);
   const scrollRef = useRef(null);
   const trackRef = useRef(null);
 
@@ -34,13 +35,69 @@ export default function ShopByConcern() {
       ? displayProducts
       : displayProducts.filter((p) => p.category === activeCategory);
 
+  const getCardStep = useCallback(() => {
+    if (!scrollRef.current) return 233;
+    const firstCard = scrollRef.current.querySelector('.product-card');
+    if (!firstCard) return 233;
+    const cardWidth = firstCard.offsetWidth;
+    const row = scrollRef.current.querySelector('.products-row');
+    let gap = 20;
+    if (row && typeof window !== 'undefined' && window.getComputedStyle) {
+      const rowGap = parseFloat(window.getComputedStyle(row).gap);
+      if (!isNaN(rowGap) && rowGap > 0) gap = rowGap;
+    }
+    return Math.max(1, cardWidth + gap);
+  }, []);
+
+  // Check whether the products container can scroll
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const checkScrollable = () => {
+      if (filteredProducts.length === 0) {
+        setCanScroll(false);
+        setScrollRatio(0);
+        return;
+      }
+      const maxScroll = el.scrollWidth - el.clientWidth;
+      const scrollable = maxScroll > 1;
+      setCanScroll(scrollable);
+      if (!scrollable) {
+        setScrollRatio(0);
+      } else {
+        const step = getCardStep();
+        const cardsScrolled = el.scrollLeft / step;
+        const ratio = Math.min(1, Math.max(0, cardsScrolled / 10));
+        setScrollRatio(ratio);
+      }
+    };
+
+    checkScrollable();
+
+    const ro = new ResizeObserver(checkScrollable);
+    ro.observe(el);
+    window.addEventListener('resize', checkScrollable);
+
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', checkScrollable);
+    };
+  }, [filteredProducts, getCardStep]);
+
   const handleScroll = useCallback(() => {
     if (!scrollRef.current) return;
     const el = scrollRef.current;
     const maxScroll = el.scrollWidth - el.clientWidth;
-    const ratio = maxScroll > 0 ? el.scrollLeft / maxScroll : 0;
-    setScrollRatio(Math.max(0, Math.min(1, ratio)));
-  }, []);
+    if (maxScroll <= 1) {
+      setScrollRatio(0);
+      return;
+    }
+    const step = getCardStep();
+    const cardsScrolled = el.scrollLeft / step;
+    const ratio = Math.min(1, Math.max(0, cardsScrolled / 10));
+    setScrollRatio(ratio);
+  }, [getCardStep]);
 
   const handleCategoryClick = (catId) => {
     setActiveCategory(catId);
@@ -50,44 +107,52 @@ export default function ShopByConcern() {
     setScrollRatio(0);
   };
 
-  const updateScrollFromPointer = useCallback((clientX) => {
-    if (!trackRef.current || !scrollRef.current) return;
+  const handleTrackPointerDown = (e) => {
+    if (e.button !== undefined && e.button !== 0) return;
+    if (!canScroll || filteredProducts.length === 0 || !scrollRef.current || !trackRef.current) return;
+
+    const el = scrollRef.current;
+    const maxScroll = el.scrollWidth - el.clientWidth;
+    if (maxScroll <= 1) return;
+
     const rect = trackRef.current.getBoundingClientRect();
     if (rect.width <= 0) return;
 
-    const clickFraction = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-    const minRatio = INITIAL_FILL_PERCENT / 100;
-
-    let targetRatio = 0;
-    if (clickFraction > minRatio) {
-      targetRatio = (clickFraction - minRatio) / (1 - minRatio);
-    }
-    targetRatio = Math.max(0, Math.min(1, targetRatio));
-
-    const maxScroll = scrollRef.current.scrollWidth - scrollRef.current.clientWidth;
-    if (maxScroll > 0) {
-      scrollRef.current.scrollLeft = targetRatio * maxScroll;
-    }
-    setScrollRatio(targetRatio);
-  }, []);
-
-  const handleTrackPointerDown = (e) => {
-    if (e.button !== undefined && e.button !== 0) return;
     isDraggingTrackRef.current = true;
     if (trackRef.current) {
       trackRef.current.classList.add('is-dragging');
     }
 
+    const step = getCardStep();
+
+    const applyPointerPosition = (clientX) => {
+      const curRect = trackRef.current ? trackRef.current.getBoundingClientRect() : rect;
+      if (curRect.width <= 0) return;
+      const clickFraction = Math.max(0, Math.min(1, (clientX - curRect.left) / curRect.width));
+      const minRatio = INITIAL_FILL_PERCENT / 100;
+
+      let targetCards = 0;
+      if (clickFraction > minRatio) {
+        const fractionInRemaining = (clickFraction - minRatio) / (1 - minRatio);
+        targetCards = fractionInRemaining * 10;
+      }
+
+      const targetScroll = Math.max(0, Math.min(maxScroll, targetCards * step));
+      el.scrollLeft = targetScroll;
+      const cardsScrolled = targetScroll / step;
+      setScrollRatio(Math.min(1, Math.max(0, cardsScrolled / 10)));
+    };
+
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    updateScrollFromPointer(clientX);
+    applyPointerPosition(clientX);
 
     const handlePointerMove = (moveEvent) => {
-      if (!isDraggingTrackRef.current) return;
+      if (!isDraggingTrackRef.current || !trackRef.current || !scrollRef.current) return;
       if (moveEvent.cancelable) {
         moveEvent.preventDefault();
       }
       const curX = moveEvent.touches ? moveEvent.touches[0].clientX : moveEvent.clientX;
-      updateScrollFromPointer(curX);
+      applyPointerPosition(curX);
     };
 
     const handlePointerUp = () => {
@@ -112,14 +177,16 @@ export default function ShopByConcern() {
   const handleCardsMouseDown = (e) => {
     if (e.button !== 0) return;
     if (e.target.closest('button')) return;
+    if (!canScroll || filteredProducts.length === 0 || !scrollRef.current) return;
+
+    const maxScroll = scrollRef.current.scrollWidth - scrollRef.current.clientWidth;
+    if (maxScroll <= 1) return;
 
     isDraggingCardsRef.current = true;
     cardHasMovedRef.current = false;
     cardStartXRef.current = e.clientX;
-    cardStartScrollRef.current = scrollRef.current ? scrollRef.current.scrollLeft : 0;
-    if (scrollRef.current) {
-      scrollRef.current.classList.add('is-dragging');
-    }
+    cardStartScrollRef.current = scrollRef.current.scrollLeft;
+    scrollRef.current.classList.add('is-dragging');
 
     const onCardsMouseMove = (moveEvent) => {
       if (!isDraggingCardsRef.current || !scrollRef.current) return;
@@ -151,7 +218,9 @@ export default function ShopByConcern() {
     }
   };
 
-  const fillWidth = INITIAL_FILL_PERCENT + scrollRatio * (100 - INITIAL_FILL_PERCENT);
+  const fillWidth = canScroll && filteredProducts.length > 0
+    ? INITIAL_FILL_PERCENT + scrollRatio * (100 - INITIAL_FILL_PERCENT)
+    : (filteredProducts.length > 0 ? INITIAL_FILL_PERCENT : 0);
 
   return (
     <section className="shop-section">
@@ -178,22 +247,28 @@ export default function ShopByConcern() {
         )}
 
         <div
-          className="products-scroll-wrapper"
+          className={`products-scroll-wrapper ${canScroll ? 'can-scroll' : 'no-scroll'}`}
           ref={scrollRef}
           onScroll={handleScroll}
           onMouseDown={handleCardsMouseDown}
           onClickCapture={handleCardsClickCapture}
         >
           <div className="products-row">
-            {filteredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+            {filteredProducts.length > 0 ? (
+              filteredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))
+            ) : (
+              <div className="no-products-msg" style={{ padding: '24px 0', color: '#666' }}>
+                No products available in this category.
+              </div>
+            )}
           </div>
         </div>
 
         <div className="progress-viewall-row">
           <div
-            className="scroll-progress"
+            className={`scroll-progress ${canScroll ? 'can-scroll' : 'no-scroll'}`}
             ref={trackRef}
             onMouseDown={handleTrackPointerDown}
             onTouchStart={handleTrackPointerDown}
@@ -201,7 +276,7 @@ export default function ShopByConcern() {
             aria-valuenow={Math.round(fillWidth)}
             aria-valuemin={0}
             aria-valuemax={100}
-            tabIndex={0}
+            tabIndex={canScroll ? 0 : -1}
           >
             <div
               className="scroll-progress-bar"

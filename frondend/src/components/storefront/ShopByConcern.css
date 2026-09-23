@@ -1,1 +1,1 @@
-/* ShopByConcern uses shared .shop-section styles from ShopByProduct.css */
+@import './ShopByProduct.css';

@@ -66,6 +66,10 @@
   -webkit-user-select: none;
 }
 
+.products-scroll-wrapper.no-scroll {
+  cursor: default;
+}
+
 .products-scroll-wrapper.is-dragging {
   cursor: grabbing;
   scroll-behavior: auto;
@@ -105,6 +109,11 @@
   -webkit-user-select: none;
 }
 
+.scroll-progress.no-scroll {
+  cursor: default;
+  pointer-events: none;
+}
+
 /* Invisible expanded hitbox for easy touch/grab on mobile devices */
 .scroll-progress::before {
   content: '';
@@ -115,6 +124,11 @@
   right: 0;
   cursor: pointer;
   z-index: 1;
+}
+
+.scroll-progress.no-scroll::before {
+  cursor: default;
+  pointer-events: none;
 }
 
 .scroll-progress-bar {
@@ -130,6 +144,7 @@
 }
 
 .scroll-progress.is-dragging .scroll-progress-bar,
+.products-scroll-wrapper.is-dragging ~ .progress-viewall-row .scroll-progress-bar,
 .scroll-progress:active .scroll-progress-bar {
   transition: none;
 }
