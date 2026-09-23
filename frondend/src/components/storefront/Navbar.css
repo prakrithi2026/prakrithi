@@ -124,6 +124,10 @@
   font-family: 'Jost', sans-serif;
 }
 
+.badge-label--trending {
+  padding-right: 1px;
+}
+
 /* Dropdown */
 .nav-item-has-dropdown {
   position: relative;

@@ -231,7 +231,7 @@ export default function Navbar() {
                 >
                   {item.badge && (
                     <span
-                      className="badge-label"
+                      className={`badge-label ${item.badge.includes('⚡') || item.badge.toLowerCase().includes('trending') || item.id === 'new' ? 'badge-label--trending' : ''}`}
                       style={{
                         backgroundColor: item.badgeColor    || '#BDD681',
                         color:           item.badgeTextColor || '#012B28',
