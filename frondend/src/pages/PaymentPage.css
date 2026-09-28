@@ -176,6 +176,25 @@
   cursor: not-allowed;
 }
 
+.checkout-terms-notice {
+  margin-top: 14px;
+  font-size: 0.85rem;
+  color: #6b7280;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.checkout-terms-notice a {
+  color: #374151;
+  text-decoration: underline;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.checkout-terms-notice a:hover {
+  color: #111827;
+}
+
 .payment-error {
   color: #dc2626;
   background: #fee2e2;

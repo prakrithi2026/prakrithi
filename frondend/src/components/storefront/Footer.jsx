@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useSiteConfig } from '../../context/SiteConfigContext';
 import './Footer.css';
 
@@ -102,6 +103,11 @@ export default function Footer() {
         {/* Bottom */}
         <div className="footer-bottom">
           <p>{footer.copyright}</p>
+          <div className="footer-legal-links">
+            <Link to="/privacy-policy">Privacy Policy</Link>
+            <span className="footer-legal-divider">•</span>
+            <Link to="/terms-and-conditions">Terms & Conditions</Link>
+          </div>
         </div>
       </div>
     </footer>

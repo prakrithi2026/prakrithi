@@ -1,0 +1,122 @@
+/* Clean, minimal D2C policy page styling matching reference image */
+.policy-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  color: #222222;
+}
+
+.policy-main {
+  flex: 1;
+  width: 100%;
+  background-color: #ffffff;
+}
+
+.policy-container {
+  max-width: 880px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 64px 24px 96px;
+  box-sizing: border-box;
+}
+
+/* Centered Main Title */
+.policy-title {
+  font-family: 'Jost', sans-serif;
+  font-size: 44px;
+  font-weight: 500;
+  color: var(--primary, #153e35);
+  text-align: center;
+  margin: 0 0 56px 0;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+/* Body content */
+.policy-content {
+  font-family: 'Jost', sans-serif;
+  font-size: 16px;
+  line-height: 1.75;
+  color: #222222;
+}
+
+.policy-content p {
+  margin: 0 0 22px 0;
+}
+
+/* Section Headings matching OVERVIEW in reference image */
+.policy-section-heading {
+  font-family: 'Jost', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #111111;
+  margin: 40px 0 16px 0;
+}
+
+.policy-content > .policy-section-heading:first-child {
+  margin-top: 0;
+}
+
+/* Unordered Lists */
+.policy-list {
+  margin: 0 0 24px 24px;
+  padding: 0;
+  list-style-type: disc;
+}
+
+.policy-list li {
+  font-size: 16px;
+  line-height: 1.7;
+  color: #222222;
+  margin-bottom: 10px;
+}
+
+.policy-list li:last-child {
+  margin-bottom: 0;
+}
+
+/* Contact box */
+.policy-contact-details {
+  margin-top: 12px;
+  line-height: 1.8;
+}
+
+.policy-contact-details a {
+  color: var(--primary, #153e35);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.policy-contact-details a:hover {
+  opacity: 0.8;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .policy-container {
+    padding: 40px 20px 64px;
+  }
+
+  .policy-title {
+    font-size: 32px;
+    margin-bottom: 40px;
+  }
+
+  .policy-content {
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .policy-list li {
+    font-size: 15px;
+  }
+
+  .policy-section-heading {
+    font-size: 15px;
+    margin-top: 32px;
+    margin-bottom: 12px;
+  }
+}

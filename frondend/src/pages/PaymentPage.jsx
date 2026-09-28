@@ -257,6 +257,13 @@ export default function PaymentPage() {
             >
               {orderStatus === 'submitting' ? 'Processing...' : `Pay ₹${formatPrice(cartTotal)}`}
             </button>
+
+            <p className="checkout-terms-notice">
+              By placing your order, you agree to our{' '}
+              <a href="/terms-and-conditions" target="_blank" rel="noopener noreferrer">Terms &amp; Conditions</a>
+              {' '}and{' '}
+              <a href="/privacy-policy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.
+            </p>
           </form>
         </div>
 

@@ -15,6 +15,8 @@ import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import OurStoryPage from './pages/OurStoryPage';
+import TermsPage from './pages/TermsPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import DashboardLayout from './components/dashboard/DashboardLayout';
 import ScrollToTop from './components/ScrollToTop';
 import './App.css';
@@ -34,6 +36,10 @@ function App() {
                 <Route path="/our-story" element={<OurStoryPage />} />
                 <Route path="/product/:id" element={<ProductPage />} />
                 <Route path="/contact" element={<ContactPage />} />
+                <Route path="/terms-and-conditions" element={<TermsPage />} />
+                <Route path="/terms"   element={<Navigate to="/terms-and-conditions" replace />} />
+                <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+                <Route path="/privacy" element={<Navigate to="/privacy-policy" replace />} />
                 <Route path="/login"   element={<LoginPage />} />
                 <Route path="/signup"  element={<SignupPage />} />
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
