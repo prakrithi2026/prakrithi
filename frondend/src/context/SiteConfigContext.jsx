@@ -89,23 +89,23 @@ function getInitialConfig() {
   ) {
     base.ourStory.image = defaultConfig.ourStory?.image || 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&q=95&w=1800';
   }
-  if (!Array.isArray(base.hero?.images)) {
+  if (base.hero) {
+    const rawDesktop = (Array.isArray(base.hero.images)
+      ? base.hero.images
+      : (base.hero.bgImage ? [base.hero.bgImage] : [])
+    ).filter((img) => typeof img === 'string' && !img.includes('photo-1596040033229-a9821ebd058d'));
+
+    const rawMobile = (Array.isArray(base.hero.mobileImages)
+      ? base.hero.mobileImages
+      : []
+    ).filter((img) => typeof img === 'string' && !img.includes('photo-1596040033229-a9821ebd058d'));
+
     base.hero = {
-      ...(base.hero || {}),
-      images: base.hero?.bgImage ? [base.hero.bgImage] : [],
-      bgImage: base.hero?.bgImage || ''
-    };
-  }
-  if (!Array.isArray(base.hero?.mobileImages)) {
-    base.hero = {
-      ...(base.hero || {}),
-      mobileImages: []
-    };
-  }
-  if (!Array.isArray(base.hero?.productLinks)) {
-    base.hero = {
-      ...(base.hero || {}),
-      productLinks: []
+      ...base.hero,
+      images: rawDesktop,
+      mobileImages: rawMobile,
+      productLinks: Array.isArray(base.hero.productLinks) ? base.hero.productLinks : [],
+      bgImage: rawDesktop.length > 0 ? rawDesktop[0] : ''
     };
   }
   return base;
@@ -147,8 +147,13 @@ export function SiteConfigProvider({ children }) {
           if (Array.isArray(stored.categories) && stored.categories.length > 0) {
             merged.categories = stored.categories;
           }
-          if (stored.hero && Array.isArray(stored.hero.images) && stored.hero.images.length > 0) {
-            merged.hero = { ...merged.hero, ...stored.hero };
+          if (stored.hero && Array.isArray(stored.hero.images)) {
+            const cleanImgs = stored.hero.images.filter(
+              (img) => typeof img === 'string' && !img.includes('photo-1596040033229-a9821ebd058d')
+            );
+            if (cleanImgs.length > 0) {
+              merged.hero = { ...merged.hero, ...stored.hero, images: cleanImgs, bgImage: cleanImgs[0] };
+            }
           }
           sourceRef.current = 'storage';
           setConfig(merged);
@@ -288,21 +293,25 @@ export function SiteConfigProvider({ children }) {
 
         // Ensure hero images are valid arrays respecting backend user data without forcing default banners
         if (configData.hero && typeof configData.hero === 'object') {
+          const rawHeroImgs = (Array.isArray(configData.hero.images)
+            ? configData.hero.images
+            : (configData.hero.bgImage ? [configData.hero.bgImage] : [])
+          ).filter((img) => typeof img === 'string' && !img.includes('photo-1596040033229-a9821ebd058d'));
+
+          const rawMobileImgs = (Array.isArray(configData.hero.mobileImages)
+            ? configData.hero.mobileImages
+            : []
+          ).filter((img) => typeof img === 'string' && !img.includes('photo-1596040033229-a9821ebd058d'));
+
           mergedConfig.hero = {
             ...mergedConfig.hero,
             ...configData.hero,
-            images: Array.isArray(configData.hero.images)
-              ? configData.hero.images
-              : (configData.hero.bgImage ? [configData.hero.bgImage] : []),
-            mobileImages: Array.isArray(configData.hero.mobileImages)
-              ? configData.hero.mobileImages
-              : [],
+            images: rawHeroImgs,
+            mobileImages: rawMobileImgs,
             productLinks: Array.isArray(configData.hero.productLinks)
               ? configData.hero.productLinks
               : [],
-            bgImage: (Array.isArray(configData.hero.images) && configData.hero.images.length > 0)
-              ? configData.hero.images[0]
-              : (configData.hero.bgImage || '')
+            bgImage: rawHeroImgs.length > 0 ? rawHeroImgs[0] : ''
           };
         } else if (!Array.isArray(mergedConfig.hero?.images)) {
           mergedConfig.hero = {

@@ -4,7 +4,7 @@
  * with asynchronous IndexedDB (for high-capacity, quota-free storage of banners and products).
  */
 
-const LOCAL_CACHE_KEY = 'prakrithi_siteconfig_cache_v8';
+const LOCAL_CACHE_KEY = 'prakrithi_siteconfig_cache_v9';
 const DB_NAME = 'prakrithi_storage';
 const DB_VERSION = 1;
 const STORE_NAME = 'site_config';
@@ -108,6 +108,21 @@ export async function setStoredConfig(config) {
   }
 }
 
+function sanitizeCachedHero(configObj) {
+  if (!configObj || typeof configObj !== 'object') return configObj;
+  if (configObj.hero) {
+    if (Array.isArray(configObj.hero.images)) {
+      configObj.hero.images = configObj.hero.images.filter(
+        (img) => typeof img === 'string' && !img.includes('photo-1596040033229-a9821ebd058d')
+      );
+    }
+    if (typeof configObj.hero.bgImage === 'string' && configObj.hero.bgImage.includes('photo-1596040033229-a9821ebd058d')) {
+      configObj.hero.bgImage = configObj.hero.images && configObj.hero.images.length > 0 ? configObj.hero.images[0] : '';
+    }
+  }
+  return configObj;
+}
+
 /**
  * Synchronously retrieves initial configuration from LocalStorage for instantaneous
  * first-frame rendering on page load/reload.
@@ -117,14 +132,16 @@ export function getInitialLocalConfig() {
   try {
     let cached = localStorage.getItem(LOCAL_CACHE_KEY);
     if (!cached) {
-      // Migrate from previous cache versions (v7, v6, v5...) so user never experiences cold cache
-      for (let v = 7; v >= 1; v--) {
+      // Migrate from previous cache versions (v8, v7, v6...) so user never experiences cold cache
+      for (let v = 8; v >= 1; v--) {
         const prevKey = `prakrithi_siteconfig_cache_v${v}`;
         const prevData = localStorage.getItem(prevKey);
         if (prevData) {
-          cached = prevData;
           try {
-            localStorage.setItem(LOCAL_CACHE_KEY, prevData);
+            const parsed = JSON.parse(prevData);
+            const sanitized = sanitizeCachedHero(parsed);
+            cached = JSON.stringify(sanitized);
+            localStorage.setItem(LOCAL_CACHE_KEY, cached);
           } catch {}
           break;
         }
@@ -132,7 +149,8 @@ export function getInitialLocalConfig() {
     }
     if (cached) {
       cleanupLegacyStorage();
-      return JSON.parse(cached);
+      const parsed = JSON.parse(cached);
+      return sanitizeCachedHero(parsed);
     }
   } catch (err) {
     console.warn('Failed to read initial config from localStorage:', err);

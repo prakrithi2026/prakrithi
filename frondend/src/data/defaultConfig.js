@@ -101,10 +101,8 @@ const defaultConfig = {
   },
   "hero": {
     "enabled": true,
-    "images": [
-      "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&q=95&w=1800"
-    ],
-    "bgImage": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&q=95&w=1800",
+    "images": [],
+    "bgImage": "",
     "mobileImages": [],
     "productLinks": [],
     "bgColor": "#2E7D32",
