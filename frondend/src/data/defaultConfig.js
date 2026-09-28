@@ -101,10 +101,25 @@ const defaultConfig = {
   },
   "hero": {
     "enabled": true,
-    "images": [],
-    "bgImage": "",
-    "mobileImages": [],
-    "productLinks": [],
+    "images": [
+      "/banners/banner-desktop-1.webp",
+      "/banners/banner-desktop-2.webp",
+      "/banners/banner-desktop-3.webp",
+      "/banners/banner-desktop-4.webp"
+    ],
+    "bgImage": "/banners/banner-desktop-1.webp",
+    "mobileImages": [
+      "/banners/banner-mobile-1.webp",
+      "/banners/banner-mobile-2.webp",
+      "/banners/banner-mobile-3.webp",
+      "/banners/banner-mobile-4.webp"
+    ],
+    "productLinks": [
+      11,
+      12,
+      null,
+      null
+    ],
     "bgColor": "#2E7D32",
     "overlayOpacity": 0.3,
     "tagline": "100% Natural | Premium Quality",

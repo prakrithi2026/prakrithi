@@ -4,7 +4,9 @@
  * with asynchronous IndexedDB (for high-capacity, quota-free storage of banners and products).
  */
 
-const LOCAL_CACHE_KEY = 'prakrithi_siteconfig_cache_v9';
+import defaultConfig from '../data/defaultConfig';
+
+const LOCAL_CACHE_KEY = 'prakrithi_siteconfig_cache_v10';
 const DB_NAME = 'prakrithi_storage';
 const DB_VERSION = 1;
 const STORE_NAME = 'site_config';
@@ -112,12 +114,37 @@ function sanitizeCachedHero(configObj) {
   if (!configObj || typeof configObj !== 'object') return configObj;
   if (configObj.hero) {
     if (Array.isArray(configObj.hero.images)) {
-      configObj.hero.images = configObj.hero.images.filter(
-        (img) => typeof img === 'string' && !img.includes('photo-1596040033229-a9821ebd058d')
-      );
+      configObj.hero.images = configObj.hero.images
+        .filter((img) => typeof img === 'string' && !img.includes('photo-1596040033229-a9821ebd058d'))
+        .map((img, idx) => {
+          if (typeof img === 'string' && img.startsWith('data:image/webp;base64,') && defaultConfig.hero?.images?.[idx]) {
+            return defaultConfig.hero.images[idx];
+          }
+          return img;
+        });
     }
-    if (typeof configObj.hero.bgImage === 'string' && configObj.hero.bgImage.includes('photo-1596040033229-a9821ebd058d')) {
-      configObj.hero.bgImage = configObj.hero.images && configObj.hero.images.length > 0 ? configObj.hero.images[0] : '';
+    if (Array.isArray(configObj.hero.mobileImages)) {
+      configObj.hero.mobileImages = configObj.hero.mobileImages
+        .filter((img) => typeof img === 'string' && !img.includes('photo-1596040033229-a9821ebd058d'))
+        .map((img, idx) => {
+          if (typeof img === 'string' && img.startsWith('data:image/webp;base64,') && defaultConfig.hero?.mobileImages?.[idx]) {
+            return defaultConfig.hero.mobileImages[idx];
+          }
+          return img;
+        });
+    }
+    // If cache was empty or invalid, fall back to high-speed default banners
+    if (!Array.isArray(configObj.hero.images) || configObj.hero.images.length === 0) {
+      if (Array.isArray(defaultConfig.hero?.images) && defaultConfig.hero.images.length > 0) {
+        configObj.hero.images = [...defaultConfig.hero.images];
+        configObj.hero.mobileImages = Array.isArray(defaultConfig.hero?.mobileImages) ? [...defaultConfig.hero.mobileImages] : [];
+        configObj.hero.bgImage = defaultConfig.hero.bgImage || configObj.hero.images[0];
+        configObj.hero.productLinks = Array.isArray(defaultConfig.hero?.productLinks) ? [...defaultConfig.hero.productLinks] : [];
+      }
+    } else {
+      if (typeof configObj.hero.bgImage === 'string' && (configObj.hero.bgImage.includes('photo-1596040033229-a9821ebd058d') || configObj.hero.bgImage.startsWith('data:image/webp;base64,'))) {
+        configObj.hero.bgImage = configObj.hero.images && configObj.hero.images.length > 0 ? configObj.hero.images[0] : '';
+      }
     }
   }
   return configObj;
@@ -132,8 +159,8 @@ export function getInitialLocalConfig() {
   try {
     let cached = localStorage.getItem(LOCAL_CACHE_KEY);
     if (!cached) {
-      // Migrate from previous cache versions (v8, v7, v6...) so user never experiences cold cache
-      for (let v = 8; v >= 1; v--) {
+      // Migrate from previous cache versions (v9, v8, v7...) so user never experiences cold cache
+      for (let v = 9; v >= 1; v--) {
         const prevKey = `prakrithi_siteconfig_cache_v${v}`;
         const prevData = localStorage.getItem(prevKey);
         if (prevData) {

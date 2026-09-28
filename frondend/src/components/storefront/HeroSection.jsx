@@ -138,14 +138,16 @@ export default function HeroSection() {
             const pictureContent = (
               <picture className="hero-picture">
                 {slide.mobile && (
-                  <source media="(max-width: 768px)" srcSet={slide.mobile} />
+                  <source media="(max-width: 768px)" srcSet={slide.mobile} width="1080" height="1350" />
                 )}
                 <img
                   src={slide.desktop || slide.mobile}
                   alt={slide.productName ? `${slide.productName} Banner` : `Banner ${index + 1}`}
                   className="hero-img"
+                  width="2560"
+                  height="907"
                   loading={index === 0 ? 'eager' : 'lazy'}
-                  decoding="async"
+                  decoding={index === 0 ? 'sync' : 'async'}
                   fetchPriority={index === 0 ? 'high' : 'low'}
                 />
               </picture>

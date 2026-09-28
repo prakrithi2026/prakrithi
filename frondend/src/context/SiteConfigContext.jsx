@@ -100,12 +100,17 @@ function getInitialConfig() {
       : []
     ).filter((img) => typeof img === 'string' && !img.includes('photo-1596040033229-a9821ebd058d'));
 
+    const finalDesktop = rawDesktop.length > 0 ? rawDesktop : (defaultConfig.hero?.images || []);
+    const finalMobile = rawMobile.length > 0 ? rawMobile : (defaultConfig.hero?.mobileImages || []);
+
     base.hero = {
       ...base.hero,
-      images: rawDesktop,
-      mobileImages: rawMobile,
-      productLinks: Array.isArray(base.hero.productLinks) ? base.hero.productLinks : [],
-      bgImage: rawDesktop.length > 0 ? rawDesktop[0] : ''
+      images: finalDesktop,
+      mobileImages: finalMobile,
+      productLinks: Array.isArray(base.hero.productLinks) && base.hero.productLinks.length > 0
+        ? base.hero.productLinks
+        : (defaultConfig.hero?.productLinks || []),
+      bgImage: finalDesktop.length > 0 ? finalDesktop[0] : ''
     };
   }
   return base;
@@ -148,11 +153,32 @@ export function SiteConfigProvider({ children }) {
             merged.categories = stored.categories;
           }
           if (stored.hero && Array.isArray(stored.hero.images)) {
-            const cleanImgs = stored.hero.images.filter(
-              (img) => typeof img === 'string' && !img.includes('photo-1596040033229-a9821ebd058d')
-            );
+            const cleanImgs = stored.hero.images
+              .filter((img) => typeof img === 'string' && !img.includes('photo-1596040033229-a9821ebd058d'))
+              .map((img, idx) => {
+                if (typeof img === 'string' && img.startsWith('data:image/webp;base64,') && defaultConfig.hero?.images?.[idx]) {
+                  return defaultConfig.hero.images[idx];
+                }
+                return img;
+              });
+            const cleanMobile = Array.isArray(stored.hero.mobileImages)
+              ? stored.hero.mobileImages
+                  .filter((img) => typeof img === 'string' && !img.includes('photo-1596040033229-a9821ebd058d'))
+                  .map((img, idx) => {
+                    if (typeof img === 'string' && img.startsWith('data:image/webp;base64,') && defaultConfig.hero?.mobileImages?.[idx]) {
+                      return defaultConfig.hero.mobileImages[idx];
+                    }
+                    return img;
+                  })
+              : (defaultConfig.hero?.mobileImages || []);
             if (cleanImgs.length > 0) {
-              merged.hero = { ...merged.hero, ...stored.hero, images: cleanImgs, bgImage: cleanImgs[0] };
+              merged.hero = {
+                ...merged.hero,
+                ...stored.hero,
+                images: cleanImgs,
+                mobileImages: cleanMobile,
+                bgImage: cleanImgs[0]
+              };
             }
           }
           sourceRef.current = 'storage';
@@ -303,15 +329,18 @@ export function SiteConfigProvider({ children }) {
             : []
           ).filter((img) => typeof img === 'string' && !img.includes('photo-1596040033229-a9821ebd058d'));
 
+          const finalDesktop = rawHeroImgs.length > 0 ? rawHeroImgs : (defaultConfig.hero?.images || []);
+          const finalMobile = rawMobileImgs.length > 0 ? rawMobileImgs : (defaultConfig.hero?.mobileImages || []);
+
           mergedConfig.hero = {
             ...mergedConfig.hero,
             ...configData.hero,
-            images: rawHeroImgs,
-            mobileImages: rawMobileImgs,
-            productLinks: Array.isArray(configData.hero.productLinks)
+            images: finalDesktop,
+            mobileImages: finalMobile,
+            productLinks: Array.isArray(configData.hero.productLinks) && configData.hero.productLinks.length > 0
               ? configData.hero.productLinks
-              : [],
-            bgImage: rawHeroImgs.length > 0 ? rawHeroImgs[0] : ''
+              : (defaultConfig.hero?.productLinks || []),
+            bgImage: finalDesktop.length > 0 ? finalDesktop[0] : ''
           };
         } else if (!Array.isArray(mergedConfig.hero?.images)) {
           mergedConfig.hero = {
