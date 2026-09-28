@@ -427,3 +427,182 @@
   font-size: 1rem;
 }
 
+/* ── Product Linking Controls in Upload Area ── */
+.hero-editor-product-link-row {
+  margin-bottom: 16px;
+  background: #ffffff;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.hero-editor-product-link-row__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.hero-editor-product-link-row__label {
+  font-size: 0.86rem;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hero-editor-product-link-row__label strong {
+  color: #006B3F;
+}
+
+.hero-editor-product-link-row__hint {
+  font-size: 0.74rem;
+  color: #64748b;
+}
+
+.hero-editor-product-link-row__select {
+  max-width: 320px;
+  min-width: 220px;
+  height: 38px;
+  font-size: 0.82rem;
+  border-radius: 8px;
+  background-color: #f8fafc;
+  cursor: pointer;
+}
+
+/* ── Product Link Badge on Slide Preview ── */
+.hero-slide-card__prod-badge {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  right: 8px;
+  background: rgba(0, 107, 63, 0.9);
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 4px;
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* ── Product Linking Controls on Slide Card ── */
+.hero-slide-card__product-link {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hero-product-link__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hero-product-link__title {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.hero-product-link__status-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  background: #dcfce7;
+  color: #15803d;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.hero-product-link__select {
+  width: 100%;
+  padding: 6px 8px;
+  font-size: 0.78rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #1e293b;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.hero-product-link__select:focus {
+  border-color: #006B3F;
+}
+
+.hero-product-link__preview-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.hero-product-link__thumb {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: #f1f5f9;
+}
+
+.hero-product-link__preview-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.hero-product-link__prod-name {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hero-product-link__prod-price {
+  font-size: 0.7rem;
+  color: #006B3F;
+  font-weight: 600;
+}
+
+.hero-product-link__external-link {
+  color: #64748b;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.hero-product-link__external-link:hover {
+  color: #006B3F;
+  background: #f1f5f9;
+}
+

@@ -102,6 +102,12 @@ function getInitialConfig() {
       mobileImages: []
     };
   }
+  if (!Array.isArray(base.hero?.productLinks)) {
+    base.hero = {
+      ...(base.hero || {}),
+      productLinks: []
+    };
+  }
   return base;
 }
 
@@ -291,6 +297,9 @@ export function SiteConfigProvider({ children }) {
             mobileImages: Array.isArray(configData.hero.mobileImages)
               ? configData.hero.mobileImages
               : [],
+            productLinks: Array.isArray(configData.hero.productLinks)
+              ? configData.hero.productLinks
+              : [],
             bgImage: (Array.isArray(configData.hero.images) && configData.hero.images.length > 0)
               ? configData.hero.images[0]
               : (configData.hero.bgImage || '')
@@ -300,6 +309,7 @@ export function SiteConfigProvider({ children }) {
             ...(mergedConfig.hero || {}),
             images: [],
             mobileImages: [],
+            productLinks: [],
             bgImage: ''
           };
         }
@@ -470,6 +480,7 @@ export function SiteConfigProvider({ children }) {
       if (configToSave.hero.images.length === 0) {
         configToSave.hero.bgImage = '';
         configToSave.hero.mobileImages = [];
+        configToSave.hero.productLinks = [];
       } else {
         configToSave.hero.bgImage = configToSave.hero.images[0];
       }

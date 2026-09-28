@@ -1,7 +1,8 @@
 import { useState, useRef } from 'react';
 import { 
   FiUpload, FiImage, FiPlus, FiTrash2, FiMonitor, FiSmartphone, 
-  FiInfo, FiChevronLeft, FiChevronRight, FiStar, FiSave, FiCheck, FiRefreshCw, FiCopy
+  FiInfo, FiChevronLeft, FiChevronRight, FiStar, FiSave, FiCheck, FiRefreshCw, FiCopy,
+  FiLink, FiExternalLink
 } from 'react-icons/fi';
 import { useSiteConfig } from '../../context/SiteConfigContext';
 import { compressImage, normalizeImageInput } from '../../utils/imageOptimizer';
@@ -10,10 +11,13 @@ import './HeroEditor.css';
 export default function HeroEditor() {
   const { config, updateConfig, saveConfig } = useSiteConfig();
   const { hero } = config;
+  const products = Array.isArray(config.products) ? config.products : [];
+  const productLinks = Array.isArray(hero.productLinks) ? hero.productLinks : [];
   const [deviceView, setDeviceView] = useState('desktop'); // 'desktop' | 'mobile'
   const [uploadMode, setUploadMode] = useState('file'); // 'file' | 'url'
   const [dragActive, setDragActive] = useState(false);
   const [urlInput, setUrlInput] = useState('');
+  const [selectedProductForAdd, setSelectedProductForAdd] = useState('');
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const fileInputRef = useRef(null);
@@ -32,11 +36,13 @@ export default function HeroEditor() {
       ? heroToSave.images 
       : (heroToSave.bgImage ? [heroToSave.bgImage] : []);
     const curMobile = curDesktop.length === 0 ? [] : (Array.isArray(heroToSave.mobileImages) ? heroToSave.mobileImages : []);
+    const curLinks = curDesktop.length === 0 ? [] : (Array.isArray(heroToSave.productLinks) ? heroToSave.productLinks.slice(0, curDesktop.length) : []);
 
     const currentHero = {
       ...heroToSave,
       images: curDesktop,
       mobileImages: curMobile,
+      productLinks: curLinks,
       bgImage: curDesktop.length > 0 ? curDesktop[0] : ''
     };
     // Send ONLY hero to prevent any crosstalk or accidental product catalog deletion
@@ -54,13 +60,19 @@ export default function HeroEditor() {
   };
 
   // Helper to update images and keep legacy bgImage in sync
-  const setImagesForDevice = (view, newImagesList) => {
+  const setImagesForDevice = (view, newImagesList, newLinksList = null) => {
     const nextHero = { ...hero };
     if (view === 'desktop') {
       nextHero.images = newImagesList;
       nextHero.bgImage = newImagesList.length > 0 ? newImagesList[0] : '';
+      if (newLinksList !== null) {
+        nextHero.productLinks = newLinksList;
+      }
     } else {
       nextHero.mobileImages = newImagesList;
+      if (newLinksList !== null) {
+        nextHero.productLinks = newLinksList;
+      }
     }
 
     updateConfig('hero', nextHero);
@@ -96,7 +108,17 @@ export default function HeroEditor() {
 
     if (newImages.length > 0) {
       const updated = [...currentImages, ...newImages];
-      const nextHero = setImagesForDevice(deviceView, updated);
+      let newLinks = null;
+      if (deviceView === 'desktop') {
+        const existingLinks = [...productLinks];
+        const addedLink = selectedProductForAdd ? (isNaN(selectedProductForAdd) ? selectedProductForAdd : Number(selectedProductForAdd)) : null;
+        for (let i = 0; i < newImages.length; i++) {
+          existingLinks.push(addedLink);
+        }
+        newLinks = existingLinks;
+      }
+      const nextHero = setImagesForDevice(deviceView, updated, newLinks);
+      setSelectedProductForAdd('');
       // Auto-save immediately to database so newly uploaded banners are never lost
       await saveHeroToBackend(nextHero);
     }
@@ -133,9 +155,31 @@ export default function HeroEditor() {
     const trimmed = urlInput.trim();
     const formatted = normalizeImageInput(trimmed);
     const updated = [...currentImages, formatted];
-    const nextHero = setImagesForDevice(deviceView, updated);
+    let newLinks = null;
+    if (deviceView === 'desktop') {
+      const existingLinks = [...productLinks];
+      const addedLink = selectedProductForAdd ? (isNaN(selectedProductForAdd) ? selectedProductForAdd : Number(selectedProductForAdd)) : null;
+      existingLinks.push(addedLink);
+      newLinks = existingLinks;
+    }
+    const nextHero = setImagesForDevice(deviceView, updated, newLinks);
     setUrlInput('');
+    setSelectedProductForAdd('');
     // Auto-save immediately to database
+    await saveHeroToBackend(nextHero);
+  };
+
+  const handleLinkProduct = async (index, productId) => {
+    const currentLinks = Array.isArray(hero.productLinks) ? [...hero.productLinks] : [];
+    while (currentLinks.length <= index) {
+      currentLinks.push(null);
+    }
+    currentLinks[index] = productId ? (isNaN(productId) ? productId : Number(productId)) : null;
+    const nextHero = {
+      ...hero,
+      productLinks: currentLinks
+    };
+    updateConfig('hero', nextHero);
     await saveHeroToBackend(nextHero);
   };
 
@@ -148,8 +192,13 @@ export default function HeroEditor() {
       // If all desktop banners are removed, also clear mobileImages so no phantom banners remain
       if (newDesktop.length === 0) {
         nextHero.mobileImages = [];
-      } else if (mobileImages.length > 0 && indexToRemove < mobileImages.length) {
-        nextHero.mobileImages = mobileImages.filter((_, idx) => idx !== indexToRemove);
+        nextHero.productLinks = [];
+      } else {
+        if (mobileImages.length > 0 && indexToRemove < mobileImages.length) {
+          nextHero.mobileImages = mobileImages.filter((_, idx) => idx !== indexToRemove);
+        }
+        const currentLinks = Array.isArray(hero.productLinks) ? [...hero.productLinks] : [];
+        nextHero.productLinks = currentLinks.filter((_, idx) => idx !== indexToRemove);
       }
     } else {
       nextHero.mobileImages = mobileImages.filter((_, idx) => idx !== indexToRemove);
@@ -175,6 +224,13 @@ export default function HeroEditor() {
         updatedM.unshift(selectedM);
         nextHero.mobileImages = updatedM;
       }
+      const currentLinks = Array.isArray(hero.productLinks) ? [...hero.productLinks] : [];
+      while (currentLinks.length <= index) {
+        currentLinks.push(null);
+      }
+      const [selectedL] = currentLinks.splice(index, 1);
+      currentLinks.unshift(selectedL);
+      nextHero.productLinks = currentLinks;
     } else {
       const updated = [...currentImages];
       const [selected] = updated.splice(index, 1);
@@ -203,6 +259,14 @@ export default function HeroEditor() {
         updatedM[newIndex] = tempM;
         nextHero.mobileImages = updatedM;
       }
+      const currentLinks = Array.isArray(hero.productLinks) ? [...hero.productLinks] : [];
+      while (currentLinks.length <= Math.max(index, newIndex)) {
+        currentLinks.push(null);
+      }
+      const tempL = currentLinks[index];
+      currentLinks[index] = currentLinks[newIndex];
+      currentLinks[newIndex] = tempL;
+      nextHero.productLinks = currentLinks;
     } else {
       const updatedM = [...mobileImages];
       const tempM = updatedM[index];
@@ -220,6 +284,7 @@ export default function HeroEditor() {
         ...hero,
         images: [],
         mobileImages: [],
+        productLinks: [],
         bgImage: ''
       };
       updateConfig('hero', nextHero);
@@ -390,6 +455,32 @@ export default function HeroEditor() {
                 </button>
               </div>
 
+              {/* Optional Link to Product when adding a banner */}
+              <div className="hero-editor-product-link-row">
+                <div className="hero-editor-product-link-row__text">
+                  <span className="hero-editor-product-link-row__label">
+                    <FiLink size={14} style={{ color: '#006B3F' }} />
+                    <strong>Link to Product</strong> (Optional)
+                  </span>
+                  <span className="hero-editor-product-link-row__hint">
+                    When clicked, redirects user to this product
+                  </span>
+                </div>
+                <select
+                  className="dash-field__input hero-editor-product-link-row__select"
+                  value={selectedProductForAdd}
+                  onChange={(e) => setSelectedProductForAdd(e.target.value)}
+                  title="Choose product to link to newly added banner"
+                >
+                  <option value="">-- No Link (Display Only) --</option>
+                  {products.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name} {p.salePrice ? `(₹${p.salePrice})` : `(₹${p.price})`}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               {uploadMode === 'file' && (
                 <div
                   className={`hero-editor-upload ${dragActive ? 'hero-editor-upload--active' : ''}`}
@@ -501,6 +592,8 @@ export default function HeroEditor() {
                 <div className={`hero-slides-grid ${deviceView === 'mobile' ? 'hero-slides-grid--mobile' : ''}`}>
                   {currentImages.map((img, index) => {
                     const isPrimary = index === 0;
+                    const linkedPid = productLinks[index];
+                    const linkedProduct = linkedPid ? products.find((p) => String(p.id) === String(linkedPid)) : null;
                     return (
                       <div key={index} className={`hero-slide-card ${isPrimary ? 'hero-slide-card--primary' : ''} ${deviceView === 'mobile' ? 'hero-slide-card--mobile' : ''}`}>
                         <div
@@ -510,10 +603,68 @@ export default function HeroEditor() {
                           <span className={`hero-slide-card__badge ${isPrimary ? 'hero-slide-card__badge--primary' : ''}`}>
                             {isPrimary ? '★ Primary (Main Banner)' : `Slide ${index + 1}`}
                           </span>
+                          {linkedProduct && (
+                            <span className="hero-slide-card__prod-badge" title={`Linked to: ${linkedProduct.name}`}>
+                              <FiLink size={10} /> {linkedProduct.name}
+                            </span>
+                          )}
                         </div>
                         
                         {/* Slide Card Controls */}
                         <div className="hero-slide-card__controls">
+                          {/* Product Link Selector */}
+                          <div className="hero-slide-card__product-link">
+                            <div className="hero-product-link__header">
+                              <span className="hero-product-link__title">
+                                <FiLink size={12} style={{ color: '#006B3F' }} /> Link to Product
+                              </span>
+                              {linkedProduct && (
+                                <span className="hero-product-link__status-badge">Active Link</span>
+                              )}
+                            </div>
+                            <select
+                              className="hero-product-link__select"
+                              value={linkedPid ?? ''}
+                              onChange={(e) => handleLinkProduct(index, e.target.value)}
+                              disabled={saving}
+                              title="Select product to redirect to when user clicks this banner"
+                            >
+                              <option value="">-- No Link (Not Clickable) --</option>
+                              {products.map((p) => (
+                                <option key={p.id} value={p.id}>
+                                  {p.name} {p.salePrice ? `(₹${p.salePrice})` : `(₹${p.price})`}
+                                </option>
+                              ))}
+                            </select>
+                            {linkedProduct && (
+                              <div className="hero-product-link__preview-box">
+                                {linkedProduct.image && (
+                                  <img
+                                    src={linkedProduct.image}
+                                    alt={linkedProduct.name}
+                                    className="hero-product-link__thumb"
+                                  />
+                                )}
+                                <div className="hero-product-link__preview-text">
+                                  <span className="hero-product-link__prod-name">{linkedProduct.name}</span>
+                                  <span className="hero-product-link__prod-price">
+                                    {linkedProduct.salePrice ? `₹${linkedProduct.salePrice}` : `₹${linkedProduct.price}`}
+                                  </span>
+                                </div>
+                                <a
+                                  href={`/product/${linkedProduct.id}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="hero-product-link__external-link"
+                                  title="Preview product page in new tab"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <FiExternalLink size={12} />
+                                </a>
+                              </div>
+                            )}
+                          </div>
+
                           {/* Reordering Controls */}
                           <div className="hero-slide-card__reorder">
                             <button

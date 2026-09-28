@@ -106,6 +106,7 @@ const defaultConfig = {
     ],
     "bgImage": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&q=95&w=1800",
     "mobileImages": [],
+    "productLinks": [],
     "bgColor": "#2E7D32",
     "overlayOpacity": 0.3,
     "tagline": "100% Natural | Premium Quality",

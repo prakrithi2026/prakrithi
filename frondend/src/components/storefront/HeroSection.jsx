@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { useSiteConfig } from '../../context/SiteConfigContext';
 import './HeroSection.css';
 
@@ -9,6 +10,8 @@ export default function HeroSection() {
   const [isPaused, setIsPaused] = useState(false);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
+  const touchMovedRef = useRef(false);
+  const touchStartXRef = useRef(0);
 
   // Memoize sanitized image arrays so reference doesn't change every render
   const desktopImages = useMemo(() => (
@@ -21,12 +24,20 @@ export default function HeroSection() {
     Array.isArray(hero.mobileImages) ? hero.mobileImages : []
   ).filter(Boolean), [hero.mobileImages]);
 
+  const productLinks = useMemo(() => (
+    Array.isArray(hero.productLinks) ? hero.productLinks : []
+  ), [hero.productLinks]);
+
+  const products = useMemo(() => (
+    Array.isArray(config?.products) ? config.products : []
+  ), [config?.products]);
+
   // Desktop images are the primary banners for the storefront.
   // If no desktop banners exist, the hero section is hidden everywhere.
   const slideCount = desktopImages.length;
   const enabled = hero.enabled !== false && slideCount > 0;
 
-  // Pre-construct slides pairing desktop and mobile images cleanly
+  // Pre-construct slides pairing desktop and mobile images cleanly with their linked products
   const slides = useMemo(() => {
     if (slideCount === 0) return [];
     const list = [];
@@ -34,10 +45,18 @@ export default function HeroSection() {
       const desktop = desktopImages[i];
       // Use mobile-specific image if configured for this slide; otherwise fall back to desktop
       const mobile = mobileImages[i] || desktop;
-      list.push({ desktop, mobile });
+      const rawPid = productLinks[i];
+      const productId = rawPid !== undefined && rawPid !== null && rawPid !== '' ? rawPid : null;
+      const linkedProduct = productId ? products.find((p) => String(p.id) === String(productId)) : null;
+      list.push({
+        desktop,
+        mobile,
+        productId,
+        productName: linkedProduct?.name || ''
+      });
     }
     return list;
-  }, [desktopImages, mobileImages, slideCount]);
+  }, [desktopImages, mobileImages, productLinks, products, slideCount]);
 
   // Set up automatic scrolling interval if there are 2 or more images
   useEffect(() => {
@@ -61,12 +80,18 @@ export default function HeroSection() {
   const minSwipeDistance = 45;
 
   const onTouchStart = (e) => {
+    touchMovedRef.current = false;
+    touchStartXRef.current = e.targetTouches[0].clientX;
     setTouchEnd(null);
     setTouchStart(e.targetTouches[0].clientX);
   };
 
   const onTouchMove = (e) => {
-    setTouchEnd(e.targetTouches[0].clientX);
+    const currentX = e.targetTouches[0].clientX;
+    if (Math.abs(currentX - touchStartXRef.current) > 10) {
+      touchMovedRef.current = true;
+    }
+    setTouchEnd(currentX);
   };
 
   const onTouchEnd = () => {
@@ -100,24 +125,46 @@ export default function HeroSection() {
         >
           {slides.map((slide, index) => {
             const isActive = index === currentSlide || slideCount === 1;
+            const hasLink = Boolean(slide.productId);
+
+            const pictureContent = (
+              <picture className="hero-picture">
+                {slide.mobile && (
+                  <source media="(max-width: 768px)" srcSet={slide.mobile} />
+                )}
+                <img
+                  src={slide.desktop || slide.mobile}
+                  alt={slide.productName ? `${slide.productName} Banner` : `Banner ${index + 1}`}
+                  className="hero-img"
+                  loading={index === 0 ? 'eager' : 'lazy'}
+                  decoding="async"
+                  fetchPriority={index === 0 ? 'high' : 'low'}
+                />
+              </picture>
+            );
+
             return (
               <div
                 key={index}
-                className={`hero-slide ${isActive ? 'active' : ''}`}
+                className={`hero-slide ${isActive ? 'active' : ''} ${hasLink ? 'hero-slide--clickable' : ''}`}
               >
-                <picture className="hero-picture">
-                  {slide.mobile && (
-                    <source media="(max-width: 768px)" srcSet={slide.mobile} />
-                  )}
-                  <img
-                    src={slide.desktop || slide.mobile}
-                    alt={`Banner ${index + 1}`}
-                    className="hero-img"
-                    loading={index === 0 ? 'eager' : 'lazy'}
-                    decoding="async"
-                    fetchPriority={index === 0 ? 'high' : 'low'}
-                  />
-                </picture>
+                {hasLink ? (
+                  <Link
+                    to={`/product/${slide.productId}`}
+                    className="hero-slide-link"
+                    onClick={(e) => {
+                      if (touchMovedRef.current) {
+                        e.preventDefault();
+                      }
+                    }}
+                    title={slide.productName ? `View ${slide.productName}` : 'View Product'}
+                    aria-label={slide.productName ? `View ${slide.productName}` : `Banner slide ${index + 1}`}
+                  >
+                    {pictureContent}
+                  </Link>
+                ) : (
+                  pictureContent
+                )}
               </div>
             );
           })}

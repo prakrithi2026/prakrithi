@@ -40,6 +40,23 @@ class ProductConfigPersistenceTests(TestCase):
         config = SiteConfig.objects.get(id=1)
         self.assertEqual(config.config_data.get('hero', {}).get('images'), ["https://example.com/banner1.jpg"])
 
+    def test_updating_hero_banner_with_product_links(self):
+        """Saving a hero banner with productLinks persists correctly."""
+        payload = {
+            "hero": {
+                "enabled": True,
+                "images": ["https://example.com/banner1.jpg", "https://example.com/banner2.jpg"],
+                "bgImage": "https://example.com/banner1.jpg",
+                "mobileImages": [],
+                "productLinks": [1, 2]
+            }
+        }
+        res = self.client.put('/api/config/', data=payload, format='json')
+        self.assertEqual(res.status_code, 200)
+
+        config = SiteConfig.objects.get(id=1)
+        self.assertEqual(config.config_data.get('hero', {}).get('productLinks'), [1, 2])
+
     def test_updating_single_product_does_not_delete_other_products(self):
         """Adding or updating one product should NOT delete other products in catalog."""
         payload = {
