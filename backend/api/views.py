@@ -292,6 +292,7 @@ class SiteConfigView(APIView):
                             merged_config['hero']['bgImage'] = ''
                             merged_config['hero']['mobileImages'] = []
                             merged_config['hero']['productLinks'] = []
+                            merged_config['hero']['categoryLinks'] = []
                         else:
                             merged_config['hero']['bgImage'] = hero_data.get('bgImage') or hero_data['images'][0]
                     if 'mobileImages' in hero_data and isinstance(hero_data['mobileImages'], list):
@@ -304,6 +305,11 @@ class SiteConfigView(APIView):
                             merged_config.setdefault('hero', {})['productLinks'] = hero_data['productLinks']
                         else:
                             merged_config.setdefault('hero', {})['productLinks'] = []
+                    if 'categoryLinks' in hero_data and isinstance(hero_data['categoryLinks'], list):
+                        if len(hero_data.get('images', [])) > 0:
+                            merged_config.setdefault('hero', {})['categoryLinks'] = hero_data['categoryLinks']
+                        else:
+                            merged_config.setdefault('hero', {})['categoryLinks'] = []
                     if 'bgImage' in hero_data and len(hero_data.get('images', [])) > 0:
                         merged_config.setdefault('hero', {})['bgImage'] = hero_data['bgImage']
                 if 'ourStory' in data and isinstance(data['ourStory'], dict):

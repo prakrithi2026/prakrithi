@@ -140,8 +140,12 @@ function sanitizeCachedHero(configObj) {
         configObj.hero.mobileImages = Array.isArray(defaultConfig.hero?.mobileImages) ? [...defaultConfig.hero.mobileImages] : [];
         configObj.hero.bgImage = defaultConfig.hero.bgImage || configObj.hero.images[0];
         configObj.hero.productLinks = Array.isArray(defaultConfig.hero?.productLinks) ? [...defaultConfig.hero.productLinks] : [];
+        configObj.hero.categoryLinks = Array.isArray(defaultConfig.hero?.categoryLinks) ? [...defaultConfig.hero.categoryLinks] : [];
       }
     } else {
+      if (!Array.isArray(configObj.hero.categoryLinks)) {
+        configObj.hero.categoryLinks = Array.isArray(defaultConfig.hero?.categoryLinks) ? [...defaultConfig.hero.categoryLinks] : [];
+      }
       if (typeof configObj.hero.bgImage === 'string' && (configObj.hero.bgImage.includes('photo-1596040033229-a9821ebd058d') || configObj.hero.bgImage.startsWith('data:image/webp;base64,'))) {
         configObj.hero.bgImage = configObj.hero.images && configObj.hero.images.length > 0 ? configObj.hero.images[0] : '';
       }

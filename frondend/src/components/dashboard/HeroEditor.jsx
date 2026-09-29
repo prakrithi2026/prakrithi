@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { 
   FiUpload, FiImage, FiPlus, FiTrash2, FiMonitor, FiSmartphone, 
   FiInfo, FiChevronLeft, FiChevronRight, FiStar, FiSave, FiCheck, FiRefreshCw, FiCopy,
-  FiLink, FiExternalLink
+  FiLink, FiFolder, FiExternalLink
 } from 'react-icons/fi';
 import { useSiteConfig } from '../../context/SiteConfigContext';
 import { compressImage, normalizeImageInput } from '../../utils/imageOptimizer';
@@ -12,12 +12,13 @@ export default function HeroEditor() {
   const { config, updateConfig, saveConfig } = useSiteConfig();
   const { hero } = config;
   const products = Array.isArray(config.products) ? config.products : [];
-  const productLinks = Array.isArray(hero.productLinks) ? hero.productLinks : [];
+  const categories = Array.isArray(config.categories) ? config.categories : [];
+  const categoryLinks = Array.isArray(hero.categoryLinks) ? hero.categoryLinks : [];
   const [deviceView, setDeviceView] = useState('desktop'); // 'desktop' | 'mobile'
   const [uploadMode, setUploadMode] = useState('file'); // 'file' | 'url'
   const [dragActive, setDragActive] = useState(false);
   const [urlInput, setUrlInput] = useState('');
-  const [selectedProductForAdd, setSelectedProductForAdd] = useState('');
+  const [selectedCategoryForAdd, setSelectedCategoryForAdd] = useState('');
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const fileInputRef = useRef(null);
@@ -36,16 +37,18 @@ export default function HeroEditor() {
       ? heroToSave.images 
       : (heroToSave.bgImage ? [heroToSave.bgImage] : []);
     const curMobile = curDesktop.length === 0 ? [] : (Array.isArray(heroToSave.mobileImages) ? heroToSave.mobileImages : []);
-    const curLinks = curDesktop.length === 0 ? [] : (Array.isArray(heroToSave.productLinks) ? heroToSave.productLinks.slice(0, curDesktop.length) : []);
+    const curProductLinks = curDesktop.length === 0 ? [] : (Array.isArray(heroToSave.productLinks) ? heroToSave.productLinks.slice(0, curDesktop.length) : []);
+    const curCategoryLinks = curDesktop.length === 0 ? [] : (Array.isArray(heroToSave.categoryLinks) ? heroToSave.categoryLinks.slice(0, curDesktop.length) : []);
 
     const currentHero = {
       ...heroToSave,
       images: curDesktop,
       mobileImages: curMobile,
-      productLinks: curLinks,
+      productLinks: curProductLinks,
+      categoryLinks: curCategoryLinks,
       bgImage: curDesktop.length > 0 ? curDesktop[0] : ''
     };
-    // Send ONLY hero to prevent any crosstalk or accidental product catalog deletion
+    // Send ONLY hero to prevent any crosstalk or accidental catalog modifications
     const res = await saveConfig({ hero: currentHero });
     setSaving(false);
     if (res?.success) {
@@ -66,13 +69,10 @@ export default function HeroEditor() {
       nextHero.images = newImagesList;
       nextHero.bgImage = newImagesList.length > 0 ? newImagesList[0] : '';
       if (newLinksList !== null) {
-        nextHero.productLinks = newLinksList;
+        nextHero.categoryLinks = newLinksList;
       }
     } else {
       nextHero.mobileImages = newImagesList;
-      if (newLinksList !== null) {
-        nextHero.productLinks = newLinksList;
-      }
     }
 
     updateConfig('hero', nextHero);
@@ -110,15 +110,15 @@ export default function HeroEditor() {
       const updated = [...currentImages, ...newImages];
       let newLinks = null;
       if (deviceView === 'desktop') {
-        const existingLinks = [...productLinks];
-        const addedLink = selectedProductForAdd ? (isNaN(selectedProductForAdd) ? selectedProductForAdd : Number(selectedProductForAdd)) : null;
+        const existingLinks = [...categoryLinks];
+        const addedLink = selectedCategoryForAdd ? String(selectedCategoryForAdd).trim() : null;
         for (let i = 0; i < newImages.length; i++) {
           existingLinks.push(addedLink);
         }
         newLinks = existingLinks;
       }
       const nextHero = setImagesForDevice(deviceView, updated, newLinks);
-      setSelectedProductForAdd('');
+      setSelectedCategoryForAdd('');
       // Auto-save immediately to database so newly uploaded banners are never lost
       await saveHeroToBackend(nextHero);
     }
@@ -157,27 +157,27 @@ export default function HeroEditor() {
     const updated = [...currentImages, formatted];
     let newLinks = null;
     if (deviceView === 'desktop') {
-      const existingLinks = [...productLinks];
-      const addedLink = selectedProductForAdd ? (isNaN(selectedProductForAdd) ? selectedProductForAdd : Number(selectedProductForAdd)) : null;
+      const existingLinks = [...categoryLinks];
+      const addedLink = selectedCategoryForAdd ? String(selectedCategoryForAdd).trim() : null;
       existingLinks.push(addedLink);
       newLinks = existingLinks;
     }
     const nextHero = setImagesForDevice(deviceView, updated, newLinks);
     setUrlInput('');
-    setSelectedProductForAdd('');
+    setSelectedCategoryForAdd('');
     // Auto-save immediately to database
     await saveHeroToBackend(nextHero);
   };
 
-  const handleLinkProduct = async (index, productId) => {
-    const currentLinks = Array.isArray(hero.productLinks) ? [...hero.productLinks] : [];
+  const handleLinkCategory = async (index, categoryId) => {
+    const currentLinks = Array.isArray(hero.categoryLinks) ? [...hero.categoryLinks] : [];
     while (currentLinks.length <= index) {
       currentLinks.push(null);
     }
-    currentLinks[index] = productId ? (isNaN(productId) ? productId : Number(productId)) : null;
+    currentLinks[index] = categoryId ? String(categoryId).trim() : null;
     const nextHero = {
       ...hero,
-      productLinks: currentLinks
+      categoryLinks: currentLinks
     };
     updateConfig('hero', nextHero);
     await saveHeroToBackend(nextHero);
@@ -189,16 +189,19 @@ export default function HeroEditor() {
       const newDesktop = desktopImages.filter((_, idx) => idx !== indexToRemove);
       nextHero.images = newDesktop;
       nextHero.bgImage = newDesktop.length > 0 ? newDesktop[0] : '';
-      // If all desktop banners are removed, also clear mobileImages so no phantom banners remain
+      // If all desktop banners are removed, also clear mobileImages and links
       if (newDesktop.length === 0) {
         nextHero.mobileImages = [];
         nextHero.productLinks = [];
+        nextHero.categoryLinks = [];
       } else {
         if (mobileImages.length > 0 && indexToRemove < mobileImages.length) {
           nextHero.mobileImages = mobileImages.filter((_, idx) => idx !== indexToRemove);
         }
         const currentLinks = Array.isArray(hero.productLinks) ? [...hero.productLinks] : [];
         nextHero.productLinks = currentLinks.filter((_, idx) => idx !== indexToRemove);
+        const currentCatLinks = Array.isArray(hero.categoryLinks) ? [...hero.categoryLinks] : [];
+        nextHero.categoryLinks = currentCatLinks.filter((_, idx) => idx !== indexToRemove);
       }
     } else {
       nextHero.mobileImages = mobileImages.filter((_, idx) => idx !== indexToRemove);
@@ -231,6 +234,14 @@ export default function HeroEditor() {
       const [selectedL] = currentLinks.splice(index, 1);
       currentLinks.unshift(selectedL);
       nextHero.productLinks = currentLinks;
+
+      const currentCatLinks = Array.isArray(hero.categoryLinks) ? [...hero.categoryLinks] : [];
+      while (currentCatLinks.length <= index) {
+        currentCatLinks.push(null);
+      }
+      const [selectedCat] = currentCatLinks.splice(index, 1);
+      currentCatLinks.unshift(selectedCat);
+      nextHero.categoryLinks = currentCatLinks;
     } else {
       const updated = [...currentImages];
       const [selected] = updated.splice(index, 1);
@@ -267,6 +278,15 @@ export default function HeroEditor() {
       currentLinks[index] = currentLinks[newIndex];
       currentLinks[newIndex] = tempL;
       nextHero.productLinks = currentLinks;
+
+      const currentCatLinks = Array.isArray(hero.categoryLinks) ? [...hero.categoryLinks] : [];
+      while (currentCatLinks.length <= Math.max(index, newIndex)) {
+        currentCatLinks.push(null);
+      }
+      const tempCat = currentCatLinks[index];
+      currentCatLinks[index] = currentCatLinks[newIndex];
+      currentCatLinks[newIndex] = tempCat;
+      nextHero.categoryLinks = currentCatLinks;
     } else {
       const updatedM = [...mobileImages];
       const tempM = updatedM[index];
@@ -285,6 +305,7 @@ export default function HeroEditor() {
         images: [],
         mobileImages: [],
         productLinks: [],
+        categoryLinks: [],
         bgImage: ''
       };
       updateConfig('hero', nextHero);
@@ -455,29 +476,33 @@ export default function HeroEditor() {
                 </button>
               </div>
 
-              {/* Optional Link to Product when adding a banner */}
-              <div className="hero-editor-product-link-row">
-                <div className="hero-editor-product-link-row__text">
-                  <span className="hero-editor-product-link-row__label">
-                    <FiLink size={14} style={{ color: '#006B3F' }} />
-                    <strong>Link to Product</strong> (Optional)
+              {/* Optional Link to Category when adding a banner */}
+              <div className="hero-editor-category-link-row">
+                <div className="hero-editor-category-link-row__text">
+                  <span className="hero-editor-category-link-row__label">
+                    <FiFolder size={14} style={{ color: '#006B3F' }} />
+                    <strong>Link to Category</strong> (Optional)
                   </span>
-                  <span className="hero-editor-product-link-row__hint">
-                    When clicked, redirects user to this product
+                  <span className="hero-editor-category-link-row__hint">
+                    When clicked, redirects user to this category page in shop
                   </span>
                 </div>
                 <select
-                  className="dash-field__input hero-editor-product-link-row__select"
-                  value={selectedProductForAdd}
-                  onChange={(e) => setSelectedProductForAdd(e.target.value)}
-                  title="Choose product to link to newly added banner"
+                  className="dash-field__input hero-editor-category-link-row__select"
+                  value={selectedCategoryForAdd}
+                  onChange={(e) => setSelectedCategoryForAdd(e.target.value)}
+                  title="Choose category to link to newly added banner"
                 >
                   <option value="">-- No Link (Display Only) --</option>
-                  {products.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name} {p.salePrice ? `(₹${p.salePrice})` : `(₹${p.price})`}
-                    </option>
-                  ))}
+                  {categories.map((c) => {
+                    const catId = c.id || c.category_id;
+                    if (!catId) return null;
+                    return (
+                      <option key={catId} value={catId}>
+                        {c.label || catId} {catId === 'all' ? '(All Products - /shop)' : `(/shop?category=${catId})`}
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
 
@@ -592,8 +617,11 @@ export default function HeroEditor() {
                 <div className={`hero-slides-grid ${deviceView === 'mobile' ? 'hero-slides-grid--mobile' : ''}`}>
                   {currentImages.map((img, index) => {
                     const isPrimary = index === 0;
-                    const linkedPid = productLinks[index];
-                    const linkedProduct = linkedPid ? products.find((p) => String(p.id) === String(linkedPid)) : null;
+                    const linkedCatId = categoryLinks[index];
+                    const linkedCat = linkedCatId ? categories.find((c) => String(c.id || c.category_id) === String(linkedCatId)) : null;
+                    const categoryLabel = linkedCat?.label || (linkedCatId === 'all' ? 'All Products' : linkedCatId);
+                    const targetHref = linkedCatId === 'all' ? '/shop' : (linkedCatId ? `/shop?category=${encodeURIComponent(linkedCatId)}` : null);
+                    const matchingProductCount = linkedCatId ? (linkedCatId === 'all' ? products.length : products.filter((p) => p.category === linkedCatId).length) : 0;
                     return (
                       <div key={index} className={`hero-slide-card ${isPrimary ? 'hero-slide-card--primary' : ''} ${deviceView === 'mobile' ? 'hero-slide-card--mobile' : ''}`}>
                         <div
@@ -603,60 +631,60 @@ export default function HeroEditor() {
                           <span className={`hero-slide-card__badge ${isPrimary ? 'hero-slide-card__badge--primary' : ''}`}>
                             {isPrimary ? '★ Primary (Main Banner)' : `Slide ${index + 1}`}
                           </span>
-                          {linkedProduct && (
-                            <span className="hero-slide-card__prod-badge" title={`Linked to: ${linkedProduct.name}`}>
-                              <FiLink size={10} /> {linkedProduct.name}
+                          {linkedCatId && (
+                            <span className="hero-slide-card__cat-badge" title={`Linked to category: ${categoryLabel}`}>
+                              <FiFolder size={10} /> {categoryLabel}
                             </span>
                           )}
                         </div>
                         
                         {/* Slide Card Controls */}
                         <div className="hero-slide-card__controls">
-                          {/* Product Link Selector */}
-                          <div className="hero-slide-card__product-link">
-                            <div className="hero-product-link__header">
-                              <span className="hero-product-link__title">
-                                <FiLink size={12} style={{ color: '#006B3F' }} /> Link to Product
+                          {/* Category Link Selector */}
+                          <div className="hero-slide-card__category-link">
+                            <div className="hero-category-link__header">
+                              <span className="hero-category-link__title">
+                                <FiFolder size={12} style={{ color: '#006B3F' }} /> Link to Category
                               </span>
-                              {linkedProduct && (
-                                <span className="hero-product-link__status-badge">Active Link</span>
+                              {linkedCatId && (
+                                <span className="hero-category-link__status-badge">Active Link</span>
                               )}
                             </div>
                             <select
-                              className="hero-product-link__select"
-                              value={linkedPid ?? ''}
-                              onChange={(e) => handleLinkProduct(index, e.target.value)}
+                              className="hero-category-link__select"
+                              value={linkedCatId ?? ''}
+                              onChange={(e) => handleLinkCategory(index, e.target.value)}
                               disabled={saving}
-                              title="Select product to redirect to when user clicks this banner"
+                              title="Select category to redirect to when user clicks this banner"
                             >
                               <option value="">-- No Link (Not Clickable) --</option>
-                              {products.map((p) => (
-                                <option key={p.id} value={p.id}>
-                                  {p.name} {p.salePrice ? `(₹${p.salePrice})` : `(₹${p.price})`}
-                                </option>
-                              ))}
+                              {categories.map((c) => {
+                                const catId = c.id || c.category_id;
+                                if (!catId) return null;
+                                return (
+                                  <option key={catId} value={catId}>
+                                    {c.label || catId} {catId === 'all' ? '(All Products - /shop)' : `(/shop?category=${catId})`}
+                                  </option>
+                                );
+                              })}
                             </select>
-                            {linkedProduct && (
-                              <div className="hero-product-link__preview-box">
-                                {linkedProduct.image && (
-                                  <img
-                                    src={linkedProduct.image}
-                                    alt={linkedProduct.name}
-                                    className="hero-product-link__thumb"
-                                  />
-                                )}
-                                <div className="hero-product-link__preview-text">
-                                  <span className="hero-product-link__prod-name">{linkedProduct.name}</span>
-                                  <span className="hero-product-link__prod-price">
-                                    {linkedProduct.salePrice ? `₹${linkedProduct.salePrice}` : `₹${linkedProduct.price}`}
+                            {linkedCatId && (
+                              <div className="hero-category-link__preview-box">
+                                <div className="hero-category-link__icon-box">
+                                  <FiFolder size={14} style={{ color: '#006B3F' }} />
+                                </div>
+                                <div className="hero-category-link__preview-text">
+                                  <span className="hero-category-link__cat-name">{categoryLabel}</span>
+                                  <span className="hero-category-link__cat-detail">
+                                    {targetHref} • {matchingProductCount} {matchingProductCount === 1 ? 'product' : 'products'}
                                   </span>
                                 </div>
                                 <a
-                                  href={`/product/${linkedProduct.id}`}
+                                  href={targetHref}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="hero-product-link__external-link"
-                                  title="Preview product page in new tab"
+                                  className="hero-category-link__external-link"
+                                  title="Preview category page in new tab"
                                   onClick={(e) => e.stopPropagation()}
                                 >
                                   <FiExternalLink size={12} />

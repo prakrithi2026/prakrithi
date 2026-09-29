@@ -110,6 +110,9 @@ function getInitialConfig() {
       productLinks: Array.isArray(base.hero.productLinks) && base.hero.productLinks.length > 0
         ? base.hero.productLinks
         : (defaultConfig.hero?.productLinks || []),
+      categoryLinks: Array.isArray(base.hero.categoryLinks) && base.hero.categoryLinks.length > 0
+        ? base.hero.categoryLinks
+        : (defaultConfig.hero?.categoryLinks || []),
       bgImage: finalDesktop.length > 0 ? finalDesktop[0] : ''
     };
   }
@@ -340,6 +343,9 @@ export function SiteConfigProvider({ children }) {
             productLinks: Array.isArray(configData.hero.productLinks) && configData.hero.productLinks.length > 0
               ? configData.hero.productLinks
               : (defaultConfig.hero?.productLinks || []),
+            categoryLinks: Array.isArray(configData.hero.categoryLinks) && configData.hero.categoryLinks.length > 0
+              ? configData.hero.categoryLinks
+              : (defaultConfig.hero?.categoryLinks || []),
             bgImage: finalDesktop.length > 0 ? finalDesktop[0] : ''
           };
         } else if (!Array.isArray(mergedConfig.hero?.images)) {
@@ -348,6 +354,7 @@ export function SiteConfigProvider({ children }) {
             images: [],
             mobileImages: [],
             productLinks: [],
+            categoryLinks: [],
             bgImage: ''
           };
         }
@@ -519,6 +526,7 @@ export function SiteConfigProvider({ children }) {
         configToSave.hero.bgImage = '';
         configToSave.hero.mobileImages = [];
         configToSave.hero.productLinks = [];
+        configToSave.hero.categoryLinks = [];
       } else {
         configToSave.hero.bgImage = configToSave.hero.images[0];
       }

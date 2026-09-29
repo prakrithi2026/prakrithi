@@ -24,20 +24,20 @@ export default function HeroSection() {
     Array.isArray(hero.mobileImages) ? hero.mobileImages : []
   ).filter(Boolean), [hero.mobileImages]);
 
-  const productLinks = useMemo(() => (
-    Array.isArray(hero.productLinks) ? hero.productLinks : []
-  ), [hero.productLinks]);
+  const categoryLinks = useMemo(() => (
+    Array.isArray(hero.categoryLinks) ? hero.categoryLinks : []
+  ), [hero.categoryLinks]);
 
-  const products = useMemo(() => (
-    Array.isArray(config?.products) ? config.products : []
-  ), [config?.products]);
+  const categories = useMemo(() => (
+    Array.isArray(config?.categories) ? config.categories : []
+  ), [config?.categories]);
 
   // Desktop images are the primary banners for the storefront.
   // If no desktop banners exist, the hero section is hidden everywhere.
   const slideCount = desktopImages.length;
   const enabled = hero.enabled !== false && slideCount > 0;
 
-  // Pre-construct slides pairing desktop and mobile images cleanly with their linked products
+  // Pre-construct slides pairing desktop and mobile images cleanly with their linked category
   const slides = useMemo(() => {
     if (slideCount === 0) return [];
     const list = [];
@@ -45,18 +45,21 @@ export default function HeroSection() {
       const desktop = desktopImages[i];
       // Use mobile-specific image if configured for this slide; otherwise fall back to desktop
       const mobile = mobileImages[i] || desktop;
-      const rawPid = productLinks[i];
-      const productId = rawPid !== undefined && rawPid !== null && rawPid !== '' ? rawPid : null;
-      const linkedProduct = productId ? products.find((p) => String(p.id) === String(productId)) : null;
+      const rawCid = categoryLinks[i];
+      const categoryId = rawCid !== undefined && rawCid !== null && rawCid !== '' ? String(rawCid).trim() : null;
+      const linkedCategory = categoryId ? categories.find((c) => String(c.id || c.category_id) === String(categoryId)) : null;
+      const categoryLabel = linkedCategory?.label || (categoryId === 'all' ? 'All Products' : (categoryId || ''));
+      const targetPath = categoryId ? (categoryId === 'all' ? '/shop' : `/shop?category=${encodeURIComponent(categoryId)}`) : null;
       list.push({
         desktop,
         mobile,
-        productId,
-        productName: linkedProduct?.name || ''
+        categoryId,
+        categoryLabel,
+        targetPath
       });
     }
     return list;
-  }, [desktopImages, mobileImages, productLinks, products, slideCount]);
+  }, [desktopImages, mobileImages, categoryLinks, categories, slideCount]);
 
   // Set up automatic scrolling interval if there are 2 or more images
   useEffect(() => {
@@ -133,7 +136,7 @@ export default function HeroSection() {
         >
           {slides.map((slide, index) => {
             const isActive = index === currentSlide || slideCount === 1;
-            const hasLink = Boolean(slide.productId);
+            const hasLink = Boolean(slide.targetPath);
 
             const pictureContent = (
               <picture className="hero-picture">
@@ -142,7 +145,7 @@ export default function HeroSection() {
                 )}
                 <img
                   src={slide.desktop || slide.mobile}
-                  alt={slide.productName ? `${slide.productName} Banner` : `Banner ${index + 1}`}
+                  alt={slide.categoryLabel ? `${slide.categoryLabel} Banner` : `Banner ${index + 1}`}
                   className="hero-img"
                   width="2560"
                   height="907"
@@ -160,15 +163,15 @@ export default function HeroSection() {
               >
                 {hasLink ? (
                   <Link
-                    to={`/product/${slide.productId}`}
+                    to={slide.targetPath}
                     className="hero-slide-link"
                     onClick={(e) => {
                       if (touchMovedRef.current) {
                         e.preventDefault();
                       }
                     }}
-                    title={slide.productName ? `View ${slide.productName}` : 'View Product'}
-                    aria-label={slide.productName ? `View ${slide.productName}` : `Banner slide ${index + 1}`}
+                    title={slide.categoryLabel ? `Explore ${slide.categoryLabel}` : 'Explore Category'}
+                    aria-label={slide.categoryLabel ? `Explore ${slide.categoryLabel}` : `Banner slide ${index + 1}`}
                   >
                     {pictureContent}
                   </Link>

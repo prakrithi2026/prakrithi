@@ -427,7 +427,8 @@
   font-size: 1rem;
 }
 
-/* ── Product Linking Controls in Upload Area ── */
+/* ── Category & Product Linking Controls in Upload Area ── */
+.hero-editor-category-link-row,
 .hero-editor-product-link-row {
   margin-bottom: 16px;
   background: #ffffff;
@@ -441,12 +442,14 @@
   gap: 12px;
 }
 
+.hero-editor-category-link-row__text,
 .hero-editor-product-link-row__text {
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
+.hero-editor-category-link-row__label,
 .hero-editor-product-link-row__label {
   font-size: 0.86rem;
   color: #1e293b;
@@ -455,18 +458,21 @@
   gap: 6px;
 }
 
+.hero-editor-category-link-row__label strong,
 .hero-editor-product-link-row__label strong {
   color: #006B3F;
 }
 
+.hero-editor-category-link-row__hint,
 .hero-editor-product-link-row__hint {
   font-size: 0.74rem;
   color: #64748b;
 }
 
+.hero-editor-category-link-row__select,
 .hero-editor-product-link-row__select {
-  max-width: 320px;
-  min-width: 220px;
+  max-width: 340px;
+  min-width: 240px;
   height: 38px;
   font-size: 0.82rem;
   border-radius: 8px;
@@ -474,13 +480,14 @@
   cursor: pointer;
 }
 
-/* ── Product Link Badge on Slide Preview ── */
+/* ── Category & Product Link Badge on Slide Preview ── */
+.hero-slide-card__cat-badge,
 .hero-slide-card__prod-badge {
   position: absolute;
   bottom: 8px;
   left: 8px;
   right: 8px;
-  background: rgba(0, 107, 63, 0.9);
+  background: rgba(0, 107, 63, 0.92);
   color: #ffffff;
   font-size: 0.7rem;
   font-weight: 600;
@@ -496,7 +503,8 @@
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* ── Product Linking Controls on Slide Card ── */
+/* ── Category & Product Linking Controls on Slide Card ── */
+.hero-slide-card__category-link,
 .hero-slide-card__product-link {
   background: #f8fafc;
   border: 1px solid #e2e8f0;
@@ -507,12 +515,14 @@
   gap: 6px;
 }
 
+.hero-category-link__header,
 .hero-product-link__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
+.hero-category-link__title,
 .hero-product-link__title {
   font-size: 0.74rem;
   font-weight: 700;
@@ -524,6 +534,7 @@
   letter-spacing: 0.03em;
 }
 
+.hero-category-link__status-badge,
 .hero-product-link__status-badge {
   font-size: 0.65rem;
   font-weight: 700;
@@ -533,6 +544,7 @@
   border-radius: 4px;
 }
 
+.hero-category-link__select,
 .hero-product-link__select {
   width: 100%;
   padding: 6px 8px;
@@ -546,10 +558,12 @@
   transition: border-color 0.15s ease;
 }
 
+.hero-category-link__select:focus,
 .hero-product-link__select:focus {
   border-color: #006B3F;
 }
 
+.hero-category-link__preview-box,
 .hero-product-link__preview-box {
   display: flex;
   align-items: center;
@@ -560,15 +574,18 @@
   border: 1px solid #e2e8f0;
 }
 
-.hero-product-link__thumb {
+.hero-category-link__icon-box {
   width: 28px;
   height: 28px;
   border-radius: 4px;
-  object-fit: cover;
+  background: #f0fdf4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
-  background: #f1f5f9;
 }
 
+.hero-category-link__preview-text,
 .hero-product-link__preview-text {
   flex: 1;
   min-width: 0;
@@ -576,6 +593,7 @@
   flex-direction: column;
 }
 
+.hero-category-link__cat-name,
 .hero-product-link__prod-name {
   font-size: 0.75rem;
   font-weight: 600;
@@ -585,12 +603,14 @@
   text-overflow: ellipsis;
 }
 
+.hero-category-link__cat-detail,
 .hero-product-link__prod-price {
   font-size: 0.7rem;
   color: #006B3F;
   font-weight: 600;
 }
 
+.hero-category-link__external-link,
 .hero-product-link__external-link {
   color: #64748b;
   padding: 4px;
@@ -601,6 +621,7 @@
   transition: color 0.15s ease, background 0.15s ease;
 }
 
+.hero-category-link__external-link:hover,
 .hero-product-link__external-link:hover {
   color: #006B3F;
   background: #f1f5f9;
