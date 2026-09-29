@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { FiEye, FiEyeOff } from 'react-icons/fi';
 import { useSiteConfig } from '../context/SiteConfigContext';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/storefront/Navbar';
@@ -17,6 +18,8 @@ export default function SignupPage() {
   const [searchParams] = useSearchParams();
 
   const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '' });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -133,31 +136,64 @@ export default function SignupPage() {
               />
             </div>
 
-            <div className="auth-form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div className="auth-form-row">
               <div className="auth-field">
                 <label htmlFor="signup-password">Password</label>
-                <input
-                  id="signup-password"
-                  name="password"
-                  type="password"
-                  placeholder="Create a password"
-                  value={form.password}
-                  onChange={handleChange}
-                  required
-                />
+                <div className="auth-input-wrapper">
+                  <input
+                    id="signup-password"
+                    name="password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Create a password"
+                    value={form.password}
+                    onChange={handleChange}
+                    required
+                    minLength={6}
+                    autoComplete="new-password"
+                  />
+                  <button
+                    type="button"
+                    className="auth-password-toggle"
+                    onClick={() => setShowPassword(!showPassword)}
+                    tabIndex={-1}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    title={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                  </button>
+                </div>
               </div>
 
               <div className="auth-field">
                 <label htmlFor="signup-confirm-password">Confirm Password</label>
-                <input
-                  id="signup-confirm-password"
-                  name="confirmPassword"
-                  type="password"
-                  placeholder="Re-enter password"
-                  value={form.confirmPassword}
-                  onChange={handleChange}
-                  required
-                />
+                <div className="auth-input-wrapper">
+                  <input
+                    id="signup-confirm-password"
+                    name="confirmPassword"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    placeholder="Re-enter password"
+                    value={form.confirmPassword}
+                    onChange={handleChange}
+                    required
+                    minLength={6}
+                    autoComplete="new-password"
+                  />
+                  <button
+                    type="button"
+                    className="auth-password-toggle"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    tabIndex={-1}
+                    aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                    title={showConfirmPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showConfirmPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                  </button>
+                </div>
+                {form.confirmPassword && form.password && (
+                  <span className={`auth-field-hint ${form.password === form.confirmPassword ? 'auth-field-hint--success' : 'auth-field-hint--error'}`}>
+                    {form.password === form.confirmPassword ? '✓ Passwords match' : '✕ Passwords do not match'}
+                  </span>
+                )}
               </div>
             </div>
 

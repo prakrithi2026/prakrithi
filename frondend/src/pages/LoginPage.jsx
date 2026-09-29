@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { FiEye, FiEyeOff } from 'react-icons/fi';
 import { useSiteConfig } from '../context/SiteConfigContext';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/storefront/Navbar';
@@ -17,6 +18,7 @@ export default function LoginPage() {
   const [searchParams] = useSearchParams();
 
   const [form, setForm] = useState({ email: '', password: '' });
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -141,19 +143,37 @@ export default function LoginPage() {
 
             <div className="auth-field">
               <label htmlFor="login-password">Password</label>
-              <input
-                id="login-password"
-                name="password"
-                type="password"
-                placeholder="Enter your password"
-                value={form.password}
-                onChange={handleChange}
-                required
-              />
+              <div className="auth-input-wrapper">
+                <input
+                  id="login-password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Enter your password"
+                  value={form.password}
+                  onChange={handleChange}
+                  required
+                  autoComplete="current-password"
+                />
+                <button
+                  type="button"
+                  className="auth-password-toggle"
+                  onClick={() => setShowPassword(!showPassword)}
+                  tabIndex={-1}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  title={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                </button>
+              </div>
             </div>
 
             <div className="auth-options" style={{ justifyContent: 'flex-end', marginTop: '-12px', marginBottom: '-12px' }}>
-              <Link to="/forgot-password" className="auth-forgot">Forgot Password?</Link>
+              <Link 
+                to={form.email?.trim() ? `/forgot-password?email=${encodeURIComponent(form.email.trim())}` : '/forgot-password'} 
+                className="auth-forgot"
+              >
+                Forgot Password?
+              </Link>
             </div>
 
             <button
