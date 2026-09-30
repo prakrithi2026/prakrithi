@@ -1,0 +1,418 @@
+/* ==========================================================================
+   SEARCH DRAWER - Right Slide-Out Panel
+   ========================================================================== */
+
+.search-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.52);
+  backdrop-filter: blur(3px);
+  z-index: 10000;
+  display: flex;
+  justify-content: flex-end;
+  animation: searchOverlayFadeIn 0.25s ease;
+}
+
+@keyframes searchOverlayFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.search-drawer-panel {
+  width: 480px;
+  max-width: 100vw;
+  height: 100vh;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.2);
+  animation: slideInSearchDrawer 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+  position: relative;
+}
+
+@keyframes slideInSearchDrawer {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* ── Top Header matching reference ── */
+.search-drawer-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 24px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #ffffff;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.search-drawer-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1f2937;
+  flex-shrink: 0;
+}
+
+.search-drawer-search-icon {
+  width: 22px;
+  height: 22px;
+}
+
+input.search-drawer-input,
+.search-drawer-panel input.search-drawer-input {
+  flex: 1 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  font-size: 1.12rem !important;
+  font-family: inherit !important;
+  color: #111827 !important;
+  background: transparent !important;
+  padding: 4px 0 !important;
+  font-weight: 400 !important;
+  line-height: 1.5 !important;
+}
+
+input.search-drawer-input:focus,
+.search-drawer-panel input.search-drawer-input:focus {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.search-drawer-input::placeholder {
+  color: #555555;
+  font-size: 1.12rem;
+  font-weight: 400;
+  opacity: 1;
+}
+
+/* Remove default webkit search decoration cancel buttons */
+.search-drawer-input::-webkit-search-decoration,
+.search-drawer-input::-webkit-search-cancel-button,
+.search-drawer-input::-webkit-search-results-button,
+.search-drawer-input::-webkit-search-results-decoration {
+  display: none;
+}
+
+.search-drawer-clear-btn {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s;
+}
+
+.search-drawer-clear-btn:hover {
+  color: #374151;
+}
+
+.search-drawer-close-btn {
+  background: none;
+  border: none;
+  color: #1f2937;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  margin-left: 4px;
+}
+
+.search-drawer-close-btn:hover {
+  background: #f3f4f6;
+  color: #000000;
+  transform: scale(1.05);
+}
+
+/* ── Body Area ── */
+.search-drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Custom scrollbar */
+.search-drawer-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.search-drawer-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.search-drawer-body::-webkit-scrollbar-thumb {
+  background: #e5e7eb;
+  border-radius: 999px;
+}
+
+.search-drawer-body::-webkit-scrollbar-thumb:hover {
+  background: #cbd5e1;
+}
+
+/* ── Sections ── */
+.search-drawer-section {
+  margin-bottom: 28px;
+}
+
+.search-drawer-section-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #6b7280;
+  margin: 0 0 14px 0;
+}
+
+/* ── Search Pills / Tags ── */
+.search-drawer-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.search-drawer-tag-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.search-drawer-tag-pill svg {
+  color: #9ca3af;
+}
+
+.search-drawer-tag-pill:hover {
+  background: #e5e7eb;
+  color: #111827;
+  border-color: #d1d5db;
+  transform: translateY(-1px);
+}
+
+.search-drawer-tag-pill:hover svg {
+  color: #4b5563;
+}
+
+/* ── Product Row Items ── */
+.search-drawer-trending-list,
+.search-drawer-results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.search-drawer-product-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.18s ease;
+  background: #ffffff;
+  border: 1px solid transparent;
+}
+
+.search-drawer-product-row:hover {
+  background: #f9fafb;
+  border-color: #f3f4f6;
+  transform: translateX(3px);
+}
+
+.search-drawer-product-thumb {
+  width: 58px;
+  height: 58px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f3f4f6;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #f0f0f0;
+}
+
+.search-drawer-product-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.search-drawer-emoji-fallback {
+  font-size: 1.6rem;
+}
+
+.search-drawer-product-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.search-drawer-product-cat {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #00472a;
+  margin-bottom: 2px;
+}
+
+.search-drawer-product-name {
+  font-size: 0.94rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+
+.search-drawer-product-price {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 0.88rem;
+}
+
+.search-drawer-product-price .current-price {
+  font-weight: 700;
+  color: #00472a;
+}
+
+.search-drawer-product-price .original-price {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  text-decoration: line-through;
+}
+
+.search-drawer-arrow {
+  color: #9ca3af;
+  flex-shrink: 0;
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.search-drawer-product-row:hover .search-drawer-arrow {
+  color: #111827;
+  transform: translateX(2px);
+}
+
+/* ── Results Header ── */
+.search-drawer-results-count {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #6b7280;
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+/* ── Empty No-Results State ── */
+.search-drawer-no-results {
+  text-align: center;
+  padding: 40px 16px;
+}
+
+.search-drawer-no-results-icon {
+  margin-bottom: 16px;
+}
+
+.search-drawer-no-results h5 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+}
+
+.search-drawer-no-results p {
+  font-size: 0.88rem;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Footer ── */
+.search-drawer-footer {
+  padding: 16px 24px;
+  border-top: 1px solid #e5e7eb;
+  background: #ffffff;
+  flex-shrink: 0;
+}
+
+.search-drawer-view-all-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  background: #00472a;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s ease, transform 0.15s ease;
+  font-family: inherit;
+}
+
+.search-drawer-view-all-btn:hover {
+  background: #012b28;
+  transform: translateY(-1px);
+}
+
+/* ── Responsive Mobile ── */
+@media (max-width: 640px) {
+  .search-drawer-panel {
+    width: 100vw;
+  }
+
+  .search-drawer-header {
+    padding: 16px 18px;
+  }
+
+  .search-drawer-input {
+    font-size: 1rem;
+  }
+
+  .search-drawer-input::placeholder {
+    font-size: 0.95rem;
+  }
+
+  .search-drawer-body {
+    padding: 18px;
+  }
+}

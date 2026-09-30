@@ -5,6 +5,7 @@ import defaultConfig from '../../data/defaultConfig';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
 import { useAuth } from '../../context/AuthContext';
+import SearchDrawer from './SearchDrawer';
 import './Navbar.css';
 
 /**
@@ -80,10 +81,7 @@ export default function Navbar() {
   const [mobileOpen,     setMobileOpen]     = useState(false);
   const [openDropdown,   setOpenDropdown]   = useState(null);
   const [searchOpen,     setSearchOpen]     = useState(false);
-  const [searchQuery,    setSearchQuery]    = useState('');
   const [profileOpen,    setProfileOpen]    = useState(false);
-  const searchRef        = useRef(null);
-  const searchInputRef   = useRef(null);
   const profileRef       = useRef(null);
 
   // Close mobile menu whenever the route changes
@@ -99,14 +97,7 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    if (searchOpen) searchInputRef.current?.focus();
-  }, [searchOpen]);
-
-  useEffect(() => {
     const onClick = (e) => {
-      if (searchRef.current && !searchRef.current.contains(e.target)) {
-        setSearchOpen(false);
-      }
       if (profileRef.current && !profileRef.current.contains(e.target)) {
         setProfileOpen(false);
       }
@@ -114,24 +105,6 @@ export default function Navbar() {
     document.addEventListener('mousedown', onClick);
     return () => document.removeEventListener('mousedown', onClick);
   }, []);
-
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/shop?q=${encodeURIComponent(searchQuery.trim())}`);
-      setSearchOpen(false);
-      setSearchQuery('');
-    }
-  };
-
-  const searchResults = searchQuery.trim()
-    ? (config.products || [])
-        .filter(p =>
-          p.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          p.description?.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-        .slice(0, 5)
-    : [];
 
   // Active link check
   const isActive = (href) => {
@@ -291,10 +264,10 @@ export default function Navbar() {
         <div className="nav-icons">
 
           {/* Search */}
-          <div className="nav-search-wrap" ref={searchRef}>
+          <div className="nav-search-wrap">
             <button
               className="nav-icon-link nav-search-btn"
-              onClick={() => setSearchOpen(prev => !prev)}
+              onClick={() => setSearchOpen(true)}
               aria-label="Search"
             >
               <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -302,57 +275,6 @@ export default function Navbar() {
                 <path d="M20.7637 22.0137L26.067 27.317" stroke={navbar.textColor || '#012B28'} strokeWidth="2" strokeLinejoin="round"/>
               </svg>
             </button>
-
-            {searchOpen && (
-              <div className="nav-search-panel">
-                <form onSubmit={handleSearchSubmit} className="nav-search-form">
-                  <input
-                    ref={searchInputRef}
-                    type="search"
-                    className="nav-search-input"
-                    placeholder="Search products..."
-                    value={searchQuery}
-                    onChange={e => setSearchQuery(e.target.value)}
-                  />
-                  <button type="submit" className="nav-search-submit">→</button>
-                </form>
-
-                {searchResults.length > 0 && (
-                  <div className="nav-search-results">
-                    {searchResults.map(p => (
-                      <Link
-                        key={p.id}
-                        to={`/product/${p.id}`}
-                        className="nav-search-result-item"
-                        onClick={() => { setSearchOpen(false); setSearchQuery(''); }}
-                      >
-                        {p.image
-                          ? <img src={p.image} alt="" />
-                          : <span className="nav-search-result-emoji">🌿</span>
-                        }
-                        <div>
-                          <p className="nav-search-result-name">{p.name}</p>
-                          <p className="nav-search-result-price">
-                            ₹{parseFloat(p.salePrice || p.price).toLocaleString('en-IN')}
-                          </p>
-                        </div>
-                      </Link>
-                    ))}
-                    <Link
-                      to={`/shop?q=${encodeURIComponent(searchQuery)}`}
-                      className="nav-search-see-all"
-                      onClick={() => { setSearchOpen(false); setSearchQuery(''); }}
-                    >
-                      See all results for "{searchQuery}" →
-                    </Link>
-                  </div>
-                )}
-
-                {searchQuery.trim() && searchResults.length === 0 && (
-                  <div className="nav-search-empty">No products found for "{searchQuery}"</div>
-                )}
-              </div>
-            )}
           </div>
 
           {/* Profile icon — with dropdown */}
@@ -486,6 +408,9 @@ export default function Navbar() {
           {mobileOpen ? '✕' : '☰'}
         </button>
       </div>
+
+      {/* Slide-out Search Drawer */}
+      <SearchDrawer isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
     </nav>
   );
 }
