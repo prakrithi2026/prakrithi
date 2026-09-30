@@ -348,6 +348,17 @@
   padding: 0;
 }
 
+@keyframes profileDropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .nav-profile-dropdown {
   position: absolute;
   top: calc(100% + 14px);
@@ -359,8 +370,9 @@
   box-shadow: 0 12px 36px rgba(0,0,0,0.12);
   z-index: 500;
   overflow: hidden;
-  animation: dropdownFadeIn 180ms ease;
+  animation: profileDropdownFadeIn 180ms ease forwards;
   padding: 8px 0;
+  transform-origin: top right;
 }
 
 /* Logged-in: user card */
