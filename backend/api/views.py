@@ -10,6 +10,8 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.core.mail import send_mail
+from datetime import timedelta
+import traceback
 import razorpay
 from .models import SiteConfig, Category, Product, Order, PasswordResetCode
 from .serializers import SiteConfigSerializer, CategorySerializer, ProductSerializer, OrderSerializer
@@ -33,13 +35,13 @@ class LoginView(APIView):
             )
 
         # Django's auth uses username; look up by email
-        try:
-            user_obj = User.objects.get(email__iexact=email)
-        except User.DoesNotExist:
+        user_obj = User.objects.filter(email__iexact=email).order_by('-date_joined').first()
+        if not user_obj:
             return Response(
                 {'detail': 'No account found with this email.'},
                 status=status.HTTP_401_UNAUTHORIZED
             )
+
 
         user = authenticate(request, username=user_obj.username, password=password)
         if user is None:
@@ -119,122 +121,127 @@ class ForgotPasswordView(APIView):
     Body: { "email": "..." }
     """
     def post(self, request):
-        email = request.data.get('email', '').strip()
-        if not email:
-            return Response(
-                {'detail': 'Email address is required.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
         try:
-            user_obj = User.objects.get(email__iexact=email)
-        except User.DoesNotExist:
-            return Response(
-                {'detail': 'No account found with this email address.'},
-                status=status.HTTP_404_NOT_FOUND
+            email = request.data.get('email', '').strip()
+            if not email:
+                return Response(
+                    {'detail': 'Email address is required.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            user_obj = User.objects.filter(email__iexact=email).order_by('-date_joined').first()
+            if not user_obj:
+                return Response(
+                    {'detail': 'No account found with this email address.'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
+            # Invalidate any previous unused reset codes for this user
+            PasswordResetCode.objects.filter(user=user_obj, is_used=False).update(is_used=True)
+
+            # Generate a 6-digit verification code
+            code = f"{random.randint(100000, 999999)}"
+            expires_at = timezone.now() + timedelta(minutes=10)
+
+            # Save to database
+            PasswordResetCode.objects.create(
+                user=user_obj,
+                code=code,
+                expires_at=expires_at,
             )
 
-        # Invalidate any previous unused reset codes for this user
-        PasswordResetCode.objects.filter(user=user_obj, is_used=False).update(is_used=True)
+            # Email content
+            subject = "Your Password Reset Code — Prakrithi Naturals"
+            html_content = f"""
+            <!DOCTYPE html>
+            <html>
+            <head>
+              <meta charset="utf-8">
+              <style>
+                body {{ font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f7faf8; color: #1a332a; margin: 0; padding: 24px; }}
+                .card {{ max-width: 480px; margin: 0 auto; background: #ffffff; border-radius: 16px; padding: 36px 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid #e5ede9; }}
+                .brand {{ font-size: 20px; font-weight: 800; color: #00472A; text-transform: uppercase; letter-spacing: 1.5px; text-align: center; margin-bottom: 24px; }}
+                h2 {{ font-size: 20px; color: #012B28; margin: 0 0 12px; }}
+                p {{ font-size: 14px; color: #4a5568; line-height: 1.6; margin: 0 0 16px; }}
+                .code-box {{ background: #f0f7f4; border: 2px dashed #00472A; border-radius: 12px; padding: 18px; text-align: center; margin: 24px 0; }}
+                .otp {{ font-size: 32px; font-weight: 800; letter-spacing: 8px; color: #00472A; margin: 0; font-family: monospace; }}
+                .note {{ font-size: 13px; color: #718096; }}
+                .footer {{ font-size: 12px; color: #a0aec0; text-align: center; margin-top: 28px; border-top: 1px solid #edf2f7; padding-top: 16px; }}
+              </style>
+            </head>
+            <body>
+              <div class="card">
+                <div class="brand">Prakrithi Naturals</div>
+                <h2>Password Reset Verification</h2>
+                <p>Hello {user_obj.first_name or user_obj.username},</p>
+                <p>You requested to reset your password. Use the 6-digit verification code below to proceed:</p>
+                <div class="code-box">
+                  <div class="otp">{code}</div>
+                </div>
+                <p class="note">This code will expire in <strong>10 minutes</strong>. If you did not make this request, you can safely ignore this email.</p>
+                <div class="footer">
+                  &copy; Prakrithi Naturals. All rights reserved.
+                </div>
+              </div>
+            </body>
+            </html>
+            """
+            plain_content = (
+                f"Hello {user_obj.first_name or user_obj.username},\n\n"
+                f"Your 6-digit password reset verification code is: {code}\n\n"
+                f"This code will expire in 10 minutes.\n"
+                f"If you did not request this, please ignore this email.\n\n"
+                f"— Prakrithi Naturals"
+            )
 
-        # Generate a 6-digit verification code
-        code = f"{random.randint(100000, 999999)}"
-        expires_at = timezone.now() + timezone.timedelta(minutes=10)
-
-        # Save to database
-        PasswordResetCode.objects.create(
-            user=user_obj,
-            code=code,
-            expires_at=expires_at,
-        )
-
-        # Email content
-        subject = "Your Password Reset Code — Prakrithi Naturals"
-        html_content = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="utf-8">
-          <style>
-            body {{ font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f7faf8; color: #1a332a; margin: 0; padding: 24px; }}
-            .card {{ max-width: 480px; margin: 0 auto; background: #ffffff; border-radius: 16px; padding: 36px 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid #e5ede9; }}
-            .brand {{ font-size: 20px; font-weight: 800; color: #00472A; text-transform: uppercase; letter-spacing: 1.5px; text-align: center; margin-bottom: 24px; }}
-            h2 {{ font-size: 20px; color: #012B28; margin: 0 0 12px; }}
-            p {{ font-size: 14px; color: #4a5568; line-height: 1.6; margin: 0 0 16px; }}
-            .code-box {{ background: #f0f7f4; border: 2px dashed #00472A; border-radius: 12px; padding: 18px; text-align: center; margin: 24px 0; }}
-            .otp {{ font-size: 32px; font-weight: 800; letter-spacing: 8px; color: #00472A; margin: 0; font-family: monospace; }}
-            .note {{ font-size: 13px; color: #718096; }}
-            .footer {{ font-size: 12px; color: #a0aec0; text-align: center; margin-top: 28px; border-top: 1px solid #edf2f7; padding-top: 16px; }}
-          </style>
-        </head>
-        <body>
-          <div class="card">
-            <div class="brand">Prakrithi Naturals</div>
-            <h2>Password Reset Verification</h2>
-            <p>Hello {user_obj.first_name or user_obj.username},</p>
-            <p>You requested to reset your password. Use the 6-digit verification code below to proceed:</p>
-            <div class="code-box">
-              <div class="otp">{code}</div>
-            </div>
-            <p class="note">This code will expire in <strong>10 minutes</strong>. If you did not make this request, you can safely ignore this email.</p>
-            <div class="footer">
-              &copy; Prakrithi Naturals. All rights reserved.
-            </div>
-          </div>
-        </body>
-        </html>
-        """
-        plain_content = (
-            f"Hello {user_obj.first_name or user_obj.username},\n\n"
-            f"Your 6-digit password reset verification code is: {code}\n\n"
-            f"This code will expire in 10 minutes.\n"
-            f"If you did not request this, please ignore this email.\n\n"
-            f"— Prakrithi Naturals"
-        )
-
-        email_sent = False
-        smtp_error_msg = None
-        # Attempt to send email via configured SMTP
-        if getattr(settings, 'EMAIL_HOST_USER', None) and getattr(settings, 'EMAIL_HOST_PASSWORD', None):
-            try:
-                send_mail(
-                    subject=subject,
-                    message=plain_content,
-                    from_email=settings.DEFAULT_FROM_EMAIL or settings.EMAIL_HOST_USER,
-                    recipient_list=[user_obj.email],
-                    html_message=html_content,
-                    fail_silently=False,
-                )
-                email_sent = True
-            except Exception as e:
-                smtp_error_msg = str(e)
+            email_sent = False
+            smtp_error_msg = None
+            # Attempt to send email via configured SMTP
+            if getattr(settings, 'EMAIL_HOST_USER', None) and getattr(settings, 'EMAIL_HOST_PASSWORD', None):
+                try:
+                    send_mail(
+                        subject=subject,
+                        message=plain_content,
+                        from_email=settings.DEFAULT_FROM_EMAIL or settings.EMAIL_HOST_USER,
+                        recipient_list=[user_obj.email],
+                        html_message=html_content,
+                        fail_silently=False,
+                    )
+                    email_sent = True
+                except Exception as e:
+                    smtp_error_msg = str(e)
+                    print(f"\n================ [PASSWORD RESET OTP] ================")
+                    print(f"Recipient: {user_obj.email}")
+                    print(f"Code: {code}")
+                    print(f"SMTP error: {smtp_error_msg}")
+                    print(f"======================================================\n")
+            else:
+                smtp_error_msg = "EMAIL_HOST_USER and EMAIL_HOST_PASSWORD are not configured in backend/.env"
                 print(f"\n================ [PASSWORD RESET OTP] ================")
                 print(f"Recipient: {user_obj.email}")
                 print(f"Code: {code}")
-                print(f"SMTP error: {smtp_error_msg}")
+                print(f"Notice: {smtp_error_msg}")
                 print(f"======================================================\n")
-        else:
-            smtp_error_msg = "EMAIL_HOST_USER and EMAIL_HOST_PASSWORD are not configured in backend/.env"
-            print(f"\n================ [PASSWORD RESET OTP] ================")
-            print(f"Recipient: {user_obj.email}")
-            print(f"Code: {code}")
-            print(f"Notice: {smtp_error_msg}")
-            print(f"======================================================\n")
 
-        if email_sent:
+            if email_sent:
+                return Response({
+                    'email_sent': True,
+                    'detail': f'A 6-digit verification code has been sent to {user_obj.email}. Please check your inbox (and spam folder).',
+                }, status=status.HTTP_200_OK)
+            else:
+                resp_data = {
+                    'email_sent': False,
+                    'dev_code': code,
+                    'detail': f'Email could not be delivered (SMTP not configured in backend/.env). Verification code: {code}',
+                    'smtp_notice': 'To send real emails to inboxes, add EMAIL_HOST_USER and EMAIL_HOST_PASSWORD to backend/.env',
+                }
+                return Response(resp_data, status=status.HTTP_200_OK)
+
+        except Exception as exc:
+            traceback.print_exc()
             return Response({
-                'email_sent': True,
-                'detail': f'A 6-digit verification code has been sent to {user_obj.email}. Please check your inbox (and spam folder).',
-            }, status=status.HTTP_200_OK)
-        else:
-            resp_data = {
-                'email_sent': False,
-                'dev_code': code,
-                'detail': f'Email could not be delivered (SMTP not configured in backend/.env). Verification code: {code}',
-                'smtp_notice': 'To send real emails to inboxes, add EMAIL_HOST_USER and EMAIL_HOST_PASSWORD to backend/.env',
-            }
-            return Response(resp_data, status=status.HTTP_200_OK)
-
+                'detail': f'Server error: {str(exc)}',
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class VerifyResetCodeView(APIView):
@@ -243,41 +250,47 @@ class VerifyResetCodeView(APIView):
     Body: { "email": "...", "code": "..." }
     """
     def post(self, request):
-        email = request.data.get('email', '').strip()
-        code = request.data.get('code', '').strip()
-
-        if not email or not code:
-            return Response(
-                {'detail': 'Email and 6-digit verification code are required.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
         try:
-            user_obj = User.objects.get(email__iexact=email)
-        except User.DoesNotExist:
-            return Response(
-                {'detail': 'No account found with this email.'},
-                status=status.HTTP_404_NOT_FOUND
-            )
+            email = request.data.get('email', '').strip()
+            code = request.data.get('code', '').strip()
 
-        # Check for active valid code
-        reset_entry = PasswordResetCode.objects.filter(
-            user=user_obj,
-            code=code,
-            is_used=False,
-            expires_at__gte=timezone.now(),
-        ).first()
+            if not email or not code:
+                return Response(
+                    {'detail': 'Email and 6-digit verification code are required.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
-        if not reset_entry:
-            return Response(
-                {'detail': 'Invalid or expired verification code. Please check the code or request a new one.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            user_obj = User.objects.filter(email__iexact=email).order_by('-date_joined').first()
+            if not user_obj:
+                return Response(
+                    {'detail': 'No account found with this email.'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
 
-        return Response({
-            'detail': 'Code verified successfully.',
-            'valid': True,
-        }, status=status.HTTP_200_OK)
+            # Check for active valid code
+            reset_entry = PasswordResetCode.objects.filter(
+                user=user_obj,
+                code=code,
+                is_used=False,
+                expires_at__gte=timezone.now(),
+            ).first()
+
+            if not reset_entry:
+                return Response(
+                    {'detail': 'Invalid or expired verification code. Please check the code or request a new one.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            return Response({
+                'detail': 'Code verified successfully.',
+                'valid': True,
+            }, status=status.HTTP_200_OK)
+
+        except Exception as exc:
+            traceback.print_exc()
+            return Response({
+                'detail': f'Server error: {str(exc)}',
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class ResetPasswordView(APIView):
@@ -286,55 +299,62 @@ class ResetPasswordView(APIView):
     Body: { "email": "...", "code": "...", "password": "..." }
     """
     def post(self, request):
-        email = request.data.get('email', '').strip()
-        code = request.data.get('code', '').strip()
-        password = request.data.get('password', '')
-
-        if not email or not code or not password:
-            return Response(
-                {'detail': 'Email, verification code, and new password are required.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        if len(password) < 6:
-            return Response(
-                {'detail': 'Password must be at least 6 characters long.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
         try:
-            user_obj = User.objects.get(email__iexact=email)
-        except User.DoesNotExist:
-            return Response(
-                {'detail': 'No account found with this email.'},
-                status=status.HTTP_404_NOT_FOUND
-            )
+            email = request.data.get('email', '').strip()
+            code = request.data.get('code', '').strip()
+            password = request.data.get('password', '')
 
-        # Validate code
-        reset_entry = PasswordResetCode.objects.filter(
-            user=user_obj,
-            code=code,
-            is_used=False,
-            expires_at__gte=timezone.now(),
-        ).first()
+            if not email or not code or not password:
+                return Response(
+                    {'detail': 'Email, verification code, and new password are required.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
-        if not reset_entry:
-            return Response(
-                {'detail': 'Invalid or expired verification code. Please request a new code.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            if len(password) < 6:
+                return Response(
+                    {'detail': 'Password must be at least 6 characters long.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
-        # Set new password
-        user_obj.set_password(password)
-        user_obj.save()
+            user_obj = User.objects.filter(email__iexact=email).order_by('-date_joined').first()
+            if not user_obj:
+                return Response(
+                    {'detail': 'No account found with this email.'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
 
-        # Mark code as used
-        reset_entry.is_used = True
-        reset_entry.save()
+            # Validate code
+            reset_entry = PasswordResetCode.objects.filter(
+                user=user_obj,
+                code=code,
+                is_used=False,
+                expires_at__gte=timezone.now(),
+            ).first()
 
-        return Response({
-            'detail': 'Your password has been reset successfully. You can now log in with your new password.',
-        }, status=status.HTTP_200_OK)
+            if not reset_entry:
+                return Response(
+                    {'detail': 'Invalid or expired verification code. Please request a new code.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Set new password
+            user_obj.set_password(password)
+            user_obj.save()
+
+            # Mark code as used
+            reset_entry.is_used = True
+            reset_entry.save()
+
+            return Response({
+                'detail': 'Your password has been reset successfully. You can now log in with your new password.',
+            }, status=status.HTTP_200_OK)
+
+        except Exception as exc:
+            traceback.print_exc()
+            return Response({
+                'detail': f'Server error: {str(exc)}',
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 def deep_merge(base, update):
