@@ -20,6 +20,12 @@ services:
       - key: RAZORPAY_KEY_SECRET
         sync: false
         placeholder: "Enter Razorpay Key Secret (optional)"
+      - key: EMAIL_HOST_USER
+        sync: false
+        placeholder: "Enter Gmail address (e.g. sale.prakrithi@gmail.com)"
+      - key: EMAIL_HOST_PASSWORD
+        sync: false
+        placeholder: "Enter Google App Password (16 characters)"
 
   - type: static
     name: prakrithi-frontend
