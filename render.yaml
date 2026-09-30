@@ -26,6 +26,10 @@ services:
       - key: EMAIL_HOST_PASSWORD
         sync: false
         placeholder: "Enter Google App Password (16 characters)"
+      - key: RESEND_API_KEY
+        sync: false
+        placeholder: "Enter Resend API Key (re_..., for free HTTPS emails on Render)"
+
 
   - type: static
     name: prakrithi-frontend

@@ -1,3 +1,4 @@
+import os
 import json
 import random
 from pathlib import Path
@@ -196,8 +197,63 @@ class ForgotPasswordView(APIView):
 
             email_sent = False
             smtp_error_msg = None
-            # Attempt to send email via configured SMTP
-            if getattr(settings, 'EMAIL_HOST_USER', None) and getattr(settings, 'EMAIL_HOST_PASSWORD', None):
+
+            # 1. Try Resend HTTP REST API (Bypasses all SMTP port blocks on Render Free Tier via HTTPS port 443)
+            resend_key = os.environ.get('RESEND_API_KEY')
+            if not email_sent and resend_key:
+                try:
+                    import requests
+                    from_email = os.environ.get('RESEND_FROM_EMAIL', 'Prakrithi Naturals <onboarding@resend.dev>')
+                    r = requests.post(
+                        "https://api.resend.com/emails",
+                        headers={
+                            "Authorization": f"Bearer {resend_key.strip()}",
+                            "Content-Type": "application/json",
+                        },
+                        json={
+                            "from": from_email,
+                            "to": [user_obj.email],
+                            "subject": subject,
+                            "html": html_content,
+                        },
+                        timeout=8,
+                    )
+                    if r.status_code in (200, 201):
+                        email_sent = True
+                    else:
+                        smtp_error_msg = f"Resend API error ({r.status_code}): {r.text}"
+                except Exception as e:
+                    smtp_error_msg = f"Resend error: {e}"
+
+            # 2. Try Brevo HTTP REST API (Also uses HTTPS port 443, never blocked by Render)
+            brevo_key = os.environ.get('BREVO_API_KEY')
+            if not email_sent and brevo_key:
+                try:
+                    import requests
+                    from_addr = os.environ.get('DEFAULT_FROM_EMAIL', 'sale.prakrithi@gmail.com')
+                    r = requests.post(
+                        "https://api.brevo.com/v3/smtp/email",
+                        headers={
+                            "api-key": brevo_key.strip(),
+                            "Content-Type": "application/json",
+                        },
+                        json={
+                            "sender": {"name": "Prakrithi Naturals", "email": from_addr},
+                            "to": [{"email": user_obj.email}],
+                            "subject": subject,
+                            "htmlContent": html_content,
+                        },
+                        timeout=8,
+                    )
+                    if r.status_code in (200, 201):
+                        email_sent = True
+                    else:
+                        smtp_error_msg = f"Brevo API error ({r.status_code}): {r.text}"
+                except Exception as e:
+                    smtp_error_msg = f"Brevo error: {e}"
+
+            # 3. Fallback to Gmail SMTP (Works on Localhost and Paid Cloud)
+            if not email_sent and getattr(settings, 'EMAIL_HOST_USER', None) and getattr(settings, 'EMAIL_HOST_PASSWORD', None):
                 try:
                     send_mail(
                         subject=subject,
@@ -215,13 +271,7 @@ class ForgotPasswordView(APIView):
                     print(f"Code: {code}")
                     print(f"SMTP error: {smtp_error_msg}")
                     print(f"======================================================\n")
-            else:
-                smtp_error_msg = "EMAIL_HOST_USER and EMAIL_HOST_PASSWORD are not configured in backend/.env"
-                print(f"\n================ [PASSWORD RESET OTP] ================")
-                print(f"Recipient: {user_obj.email}")
-                print(f"Code: {code}")
-                print(f"Notice: {smtp_error_msg}")
-                print(f"======================================================\n")
+
 
             if email_sent:
                 return Response({
