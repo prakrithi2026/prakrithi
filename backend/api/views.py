@@ -199,8 +199,9 @@ class ForgotPasswordView(APIView):
             smtp_error_msg = None
 
             # 1. Try Resend HTTP REST API (Bypasses all SMTP port blocks on Render Free Tier via HTTPS port 443)
-            resend_key = os.environ.get('RESEND_API_KEY')
+            resend_key = os.environ.get('RESEND_API_KEY') or getattr(settings, 'RESEND_API_KEY', None)
             if not email_sent and resend_key:
+
                 try:
                     import requests
                     from_email = os.environ.get('RESEND_FROM_EMAIL', 'Prakrithi Naturals <onboarding@resend.dev>')
