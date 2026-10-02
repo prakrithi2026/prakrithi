@@ -294,7 +294,7 @@ export default function ForgotPasswordPage() {
                   }}
                 >
                   <div style={{ fontWeight: '600', marginBottom: '4px' }}>
-                    ⚠️ Email not sent: SMTP credentials not set in <code>backend/.env</code>
+                    ⚠️ Note: Resend test sandbox delivers emails to <strong>sale.prakrithi@gmail.com</strong>.
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '6px' }}>
                     <span>Your code: <strong style={{ letterSpacing: '2px', fontSize: '1.15rem', color: '#b45309' }}>{devCode}</strong></span>

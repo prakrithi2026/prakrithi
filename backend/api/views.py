@@ -283,8 +283,8 @@ class ForgotPasswordView(APIView):
                 resp_data = {
                     'email_sent': False,
                     'dev_code': code,
-                    'detail': f'Email could not be delivered (SMTP not configured in backend/.env). Verification code: {code}',
-                    'smtp_notice': 'To send real emails to inboxes, add EMAIL_HOST_USER and EMAIL_HOST_PASSWORD to backend/.env',
+                    'detail': f'Email delivery note: Resend sandbox delivers to sale.prakrithi@gmail.com. Verification code: {code}',
+                    'smtp_error': smtp_error_msg,
                 }
                 return Response(resp_data, status=status.HTTP_200_OK)
 
