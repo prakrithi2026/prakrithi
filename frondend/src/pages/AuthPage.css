@@ -74,6 +74,23 @@
   animation: authFadeIn 0.3s ease;
 }
 
+.auth-success {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  margin-bottom: 16px;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: authFadeIn 0.3s ease;
+  line-height: 1.45;
+}
+
 .auth-form {
   display: flex;
   flex-direction: column;

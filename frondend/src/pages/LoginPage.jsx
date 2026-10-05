@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import { useSiteConfig } from '../context/SiteConfigContext';
 import { useAuth } from '../context/AuthContext';
@@ -15,12 +15,22 @@ export default function LoginPage() {
   const { theme } = config;
   const { login, isLoggedIn } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
 
-  const [form, setForm] = useState({ email: '', password: '' });
+  // If navigated after password reset, pre-fill email and show success banner
+  const resetEmail = (location.state?.email || searchParams.get('email') || '').trim();
+  const isResetSuccess = location.state?.resetSuccess || searchParams.get('reset') === 'success';
+
+  const [form, setForm] = useState({ email: resetEmail, password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [successMsg, setSuccessMsg] = useState(
+    isResetSuccess 
+      ? (location.state?.message || 'Password reset successfully! You can now log in with your new password.') 
+      : ''
+  );
 
   // If already logged in, redirect away
   useEffect(() => {
@@ -49,6 +59,7 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setSuccessMsg('');
 
     try {
       const res = await fetch(`${API_BASE_URL}/auth/login/`, {
@@ -120,6 +131,13 @@ export default function LoginPage() {
         <div className="auth-card">
           <h1 className="auth-title">Welcome Back</h1>
           <p className="auth-subtitle">Sign in to access your account and orders.</p>
+
+          {successMsg && (
+            <div className="auth-success">
+              <span style={{ fontSize: '1.2rem', lineHeight: 1 }}>✅</span>
+              <span>{successMsg}</span>
+            </div>
+          )}
 
           {error && (
             <div className="auth-error">

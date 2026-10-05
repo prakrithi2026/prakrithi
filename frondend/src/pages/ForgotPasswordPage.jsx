@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import { useSiteConfig } from '../context/SiteConfigContext';
 import Navbar from '../components/storefront/Navbar';
@@ -12,6 +12,7 @@ import './AuthPage.css';
 export default function ForgotPasswordPage() {
   const { config } = useSiteConfig();
   const { theme } = config;
+  const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
   const emailFromQuery = (searchParams.get('email') || '').trim();
@@ -47,6 +48,23 @@ export default function ForgotPasswordPage() {
     }, 1000);
     return () => clearInterval(timer);
   }, [cooldown]);
+
+  // Auto redirect to login if step 4 is ever reached
+  useEffect(() => {
+    if (step === 4) {
+      const timer = setTimeout(() => {
+        navigate(`/login?reset=success&email=${encodeURIComponent(email.trim())}`, {
+          state: {
+            resetSuccess: true,
+            email: email.trim(),
+            message: 'Password reset successfully! You can now log in with your new password.',
+          },
+          replace: true,
+        });
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [step, email, navigate]);
 
   const safeJson = async (res) => {
     const ct = res.headers.get('content-type') || '';
@@ -167,7 +185,15 @@ export default function ForgotPasswordPage() {
         throw new Error(data?.detail || data?.message || 'Failed to reset password.');
       }
 
-      setStep(4);
+      // Automatically redirect to login page with success notification and prefilled email
+      navigate(`/login?reset=success&email=${encodeURIComponent(email.trim())}`, {
+        state: {
+          resetSuccess: true,
+          email: email.trim(),
+          message: 'Password reset successfully! You can now log in with your new password.',
+        },
+        replace: true,
+      });
     } catch (err) {
       setError(err.message || 'Failed to reset password. Please try again.');
     } finally {
@@ -485,21 +511,14 @@ export default function ForgotPasswordPage() {
             </>
           )}
 
-          {/* STEP 4: Success */}
+          {/* STEP 4: Fallback auto-redirect */}
           {step === 4 && (
-            <div style={{ marginTop: '20px' }}>
-              <div style={{ fontSize: '3rem', marginBottom: '16px' }}>✅</div>
-              <h3 style={{ fontSize: '1.3rem', color: '#012B28', marginBottom: '10px' }}>Password Reset Successful</h3>
-              <p className="auth-subtitle" style={{ marginBottom: '24px' }}>
-                Your password has been successfully updated. You can now log in with your new password.
+            <div style={{ padding: '24px 0', textAlign: 'center' }}>
+              <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>✅</div>
+              <h3 style={{ fontSize: '1.25rem', color: '#012B28', marginBottom: '8px' }}>Password Reset Successful</h3>
+              <p className="auth-subtitle" style={{ margin: 0 }}>
+                Redirecting to login...
               </p>
-              <Link 
-                to="/login" 
-                className="auth-btn" 
-                style={{ backgroundColor: theme.primaryColor, textDecoration: 'none', display: 'inline-flex', justifyContent: 'center' }}
-              >
-                Return to Login
-              </Link>
             </div>
           )}
 
