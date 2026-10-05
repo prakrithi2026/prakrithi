@@ -204,25 +204,36 @@ class ForgotPasswordView(APIView):
 
                 try:
                     import requests
-                    from_email = os.environ.get('RESEND_FROM_EMAIL', 'Prakrithi Naturals <onboarding@resend.dev>')
-                    r = requests.post(
-                        "https://api.resend.com/emails",
-                        headers={
-                            "Authorization": f"Bearer {resend_key.strip()}",
-                            "Content-Type": "application/json",
-                        },
-                        json={
-                            "from": from_email,
-                            "to": [user_obj.email],
-                            "subject": subject,
-                            "html": html_content,
-                        },
-                        timeout=8,
-                    )
-                    if r.status_code in (200, 201):
-                        email_sent = True
+                    
+                    # Try custom verified domain first, fallback to onboarding@resend.dev
+                    from_candidates = []
+                    env_from = os.environ.get('RESEND_FROM_EMAIL')
+                    if env_from:
+                        from_candidates.append(env_from)
                     else:
-                        smtp_error_msg = f"Resend API error ({r.status_code}): {r.text}"
+                        from_candidates.append('Prakrithi Naturals <noreply@prakrithi.in>')
+                        from_candidates.append('Prakrithi Naturals <onboarding@resend.dev>')
+
+                    for cand_from in from_candidates:
+                        r = requests.post(
+                            "https://api.resend.com/emails",
+                            headers={
+                                "Authorization": f"Bearer {resend_key.strip()}",
+                                "Content-Type": "application/json",
+                            },
+                            json={
+                                "from": cand_from,
+                                "to": [user_obj.email],
+                                "subject": subject,
+                                "html": html_content,
+                            },
+                            timeout=8,
+                        )
+                        if r.status_code in (200, 201):
+                            email_sent = True
+                            break
+                        else:
+                            smtp_error_msg = f"Resend API error ({r.status_code}): {r.text}"
                 except Exception as e:
                     smtp_error_msg = f"Resend error: {e}"
 
