@@ -32,12 +32,23 @@ export default function LoginPage() {
       : ''
   );
 
+  // Helper to determine where to redirect after login
+  const getRedirectTarget = () => {
+    const redirect = searchParams.get('redirect');
+    if (!redirect) return '/shop';
+    const decoded = decodeURIComponent(redirect);
+    // If redirect points to wishlist or default profile, redirect to product page (/shop)
+    if (decoded === '/profile' || decoded.includes('wishlist')) {
+      return '/shop';
+    }
+    return decoded;
+  };
+
   // If already logged in, redirect away
   useEffect(() => {
     document.title = 'Sign In — Prakrithi Naturals';
     if (isLoggedIn) {
-      const redirect = searchParams.get('redirect') || '/profile';
-      navigate(decodeURIComponent(redirect), { replace: true });
+      navigate(getRedirectTarget(), { replace: true });
     }
   }, [isLoggedIn]);
 
@@ -79,8 +90,7 @@ export default function LoginPage() {
             name: form.email.split('@')[0],
             token: 'demo-token',
           });
-          const redirect = searchParams.get('redirect') || '/profile';
-          navigate(decodeURIComponent(redirect), { replace: true });
+          navigate(getRedirectTarget(), { replace: true });
           return;
         }
         throw new Error(data?.detail || data?.message || 'Invalid email or password.');
@@ -92,8 +102,7 @@ export default function LoginPage() {
         token: data.token || data.access || '',
       });
 
-      const redirect = searchParams.get('redirect') || '/profile';
-      navigate(decodeURIComponent(redirect), { replace: true });
+      navigate(getRedirectTarget(), { replace: true });
 
     } catch (err) {
       if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError') || err.message.includes('Load failed')) {
@@ -103,8 +112,7 @@ export default function LoginPage() {
           name: form.email.split('@')[0],
           token: 'demo-token',
         });
-        const redirect = searchParams.get('redirect') || '/profile';
-        navigate(decodeURIComponent(redirect), { replace: true });
+        navigate(getRedirectTarget(), { replace: true });
       } else {
         setError(err.message);
       }

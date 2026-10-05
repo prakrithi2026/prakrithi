@@ -34,6 +34,8 @@ function App() {
                 {/* Storefront — public */}
                 <Route path="/"        element={<HomePage />} />
                 <Route path="/shop"    element={<ShopPage />} />
+                <Route path="/products" element={<Navigate to="/shop" replace />} />
+                <Route path="/product"  element={<Navigate to="/shop" replace />} />
                 <Route path="/our-story" element={<OurStoryPage />} />
                 <Route path="/product/:id" element={<ProductPage />} />
                 <Route path="/contact" element={<ContactPage />} />

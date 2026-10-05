@@ -13,9 +13,20 @@ import './AuthPage.css';
 export default function SignupPage() {
   const { config } = useSiteConfig();
   const { theme } = config;
-  const { login } = useAuth();
+  const { login, isLoggedIn } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+
+  // Helper to determine where to redirect after signup/login
+  const getRedirectTarget = () => {
+    const redirect = searchParams.get('redirect');
+    if (!redirect) return '/shop';
+    const decoded = decodeURIComponent(redirect);
+    if (decoded === '/profile' || decoded.includes('wishlist')) {
+      return '/shop';
+    }
+    return decoded;
+  };
 
   const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '' });
   const [showPassword, setShowPassword] = useState(false);
@@ -25,7 +36,10 @@ export default function SignupPage() {
 
   useEffect(() => {
     document.title = 'Create Account — Prakrithi Naturals';
-  }, []);
+    if (isLoggedIn) {
+      navigate(getRedirectTarget(), { replace: true });
+    }
+  }, [isLoggedIn]);
 
   const handleChange = (e) => {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -61,8 +75,7 @@ export default function SignupPage() {
         if (data === null || res.status === 404) {
           // Endpoint missing — demo mode
           login({ email: form.email, name: form.name || form.email.split('@')[0], token: 'demo-token' });
-          const redirect = searchParams.get('redirect') || '/profile';
-          navigate(decodeURIComponent(redirect), { replace: true });
+          navigate(getRedirectTarget(), { replace: true });
           return;
         }
         throw new Error(data?.detail || data?.message || 'Registration failed.');
@@ -73,14 +86,12 @@ export default function SignupPage() {
         name: data.name || form.name || form.email.split('@')[0],
         token: data.token || '',
       });
-      const redirect = searchParams.get('redirect') || '/profile';
-      navigate(decodeURIComponent(redirect), { replace: true });
+      navigate(getRedirectTarget(), { replace: true });
 
     } catch (err) {
       if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError') || err.message.includes('Load failed')) {
         login({ email: form.email, name: form.name || form.email.split('@')[0], token: 'demo-token' });
-        const redirect = searchParams.get('redirect') || '/profile';
-        navigate(decodeURIComponent(redirect), { replace: true });
+        navigate(getRedirectTarget(), { replace: true });
       } else {
         setError(err.message);
       }
