@@ -17,6 +17,7 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import OurStoryPage from './pages/OurStoryPage';
 import TermsPage from './pages/TermsPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import RefundPolicyPage from './pages/RefundPolicyPage';
 import DashboardLayout from './components/dashboard/DashboardLayout';
 import ScrollToTop from './components/ScrollToTop';
 import './App.css';
@@ -40,6 +41,10 @@ function App() {
                 <Route path="/terms"   element={<Navigate to="/terms-and-conditions" replace />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
                 <Route path="/privacy" element={<Navigate to="/privacy-policy" replace />} />
+                <Route path="/refund-policy" element={<RefundPolicyPage />} />
+                <Route path="/return-and-refund-policy" element={<Navigate to="/refund-policy" replace />} />
+                <Route path="/returns" element={<Navigate to="/refund-policy" replace />} />
+                <Route path="/refund"  element={<Navigate to="/refund-policy" replace />} />
                 <Route path="/login"   element={<LoginPage />} />
                 <Route path="/signup"  element={<SignupPage />} />
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />

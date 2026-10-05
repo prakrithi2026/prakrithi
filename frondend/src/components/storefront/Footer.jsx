@@ -107,6 +107,8 @@ export default function Footer() {
             <Link to="/privacy-policy">Privacy Policy</Link>
             <span className="footer-legal-divider">•</span>
             <Link to="/terms-and-conditions">Terms & Conditions</Link>
+            <span className="footer-legal-divider">•</span>
+            <Link to="/refund-policy">Return &amp; Refund Policy</Link>
           </div>
         </div>
       </div>
