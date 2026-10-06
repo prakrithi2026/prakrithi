@@ -214,7 +214,7 @@ export default function ProductManager() {
 
         {/* Shop by Product Section */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px', padding: '0 20px' }}>
-           <h3 style={{ fontSize: '1.1rem', color: '#012B28' }}>Shop by Product</h3>
+           <h3 style={{ fontSize: '1.1rem', color: '#00433D' }}>Shop by Product</h3>
            <button className="dash-btn dash-btn--primary" onClick={() => openNew(false)}>
              <FiPlus size={16} style={{ marginRight: '6px' }} />
              Add Product
@@ -229,7 +229,7 @@ export default function ProductManager() {
 
         {/* Shop By Concern Section */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '30px', padding: '20px 20px 0', borderTop: '1px solid #eee' }}>
-           <h3 style={{ fontSize: '1.1rem', color: '#012B28' }}>Shop By Concern</h3>
+           <h3 style={{ fontSize: '1.1rem', color: '#00433D' }}>Shop By Concern</h3>
            <button className="dash-btn dash-btn--primary" onClick={() => openNew(true)}>
              <FiPlus size={16} style={{ marginRight: '6px' }} />
              Add Concern Product

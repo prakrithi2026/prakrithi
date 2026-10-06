@@ -128,7 +128,7 @@
 }
 
 .hero-dot.active {
-  background: var(--brand-green, #00472A);
+  background: var(--brand-green, #00433D);
   width: 10px;
   height: 10px;
   border-radius: 50%;

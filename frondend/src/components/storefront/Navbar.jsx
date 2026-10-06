@@ -176,7 +176,7 @@ export default function Navbar() {
           if (navbar.brandName) {
             return (
               <Link to="/" className="navbar-brand" style={{ textDecoration: 'none' }}>
-                <span style={{ fontSize: '1.4rem', fontWeight: 700, color: navbar.textColor || '#012B28' }}>
+                <span style={{ fontSize: '1.4rem', fontWeight: 700, color: navbar.textColor || '#00433D' }}>
                   {navbar.brandName}
                 </span>
               </Link>
@@ -206,8 +206,8 @@ export default function Navbar() {
                     <span
                       className={`badge-label ${item.badge.includes('⚡') || item.badge.toLowerCase().includes('trending') || item.id === 'new' ? 'badge-label--trending' : ''}`}
                       style={{
-                        backgroundColor: item.badgeColor    || '#BDD681',
-                        color:           item.badgeTextColor || '#012B28',
+                        backgroundColor: item.badgeColor    || '#C5F1A9',
+                        color:           item.badgeTextColor || '#00433D',
                       }}
                     >
                       {item.badge}
@@ -216,7 +216,7 @@ export default function Navbar() {
 
                   <NavLink
                     href={href}
-                    style={{ color: navbar.textColor || '#012B28' }}
+                    style={{ color: navbar.textColor || '#00433D' }}
                     onClick={() => setMobileOpen(false)}
                   >
                     {item.label}
@@ -228,7 +228,7 @@ export default function Navbar() {
                       >
                         <path
                           d="M13.5 6.75L9 11.25L4.5 6.75"
-                          stroke={navbar.textColor || '#012B28'}
+                          stroke={navbar.textColor || '#00433D'}
                           strokeWidth="2" strokeLinecap="square" strokeLinejoin="round"
                         />
                       </svg>
@@ -245,7 +245,7 @@ export default function Navbar() {
                             key={j}
                             href={ddHref}
                             className="nav-dropdown-menu__item"
-                            style={{ color: navbar.textColor || '#012B28' }}
+                            style={{ color: navbar.textColor || '#00433D' }}
                             onClick={() => { setOpenDropdown(null); setMobileOpen(false); }}
                           >
                             {dd.label}
@@ -271,8 +271,8 @@ export default function Navbar() {
               aria-label="Search"
             >
               <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M13.125 25C18.993 25 23.75 20.243 23.75 14.375C23.75 8.507 18.993 3.75 13.125 3.75C7.257 3.75 2.5 8.507 2.5 14.375C2.5 20.243 7.257 25 13.125 25Z" stroke={navbar.textColor || '#012B28'} strokeWidth="2" strokeLinejoin="round"/>
-                <path d="M20.7637 22.0137L26.067 27.317" stroke={navbar.textColor || '#012B28'} strokeWidth="2" strokeLinejoin="round"/>
+                <path d="M13.125 25C18.993 25 23.75 20.243 23.75 14.375C23.75 8.507 18.993 3.75 13.125 3.75C7.257 3.75 2.5 8.507 2.5 14.375C2.5 20.243 7.257 25 13.125 25Z" stroke={navbar.textColor || '#00433D'} strokeWidth="2" strokeLinejoin="round"/>
+                <path d="M20.7637 22.0137L26.067 27.317" stroke={navbar.textColor || '#00433D'} strokeWidth="2" strokeLinejoin="round"/>
               </svg>
             </button>
           </div>
@@ -287,8 +287,8 @@ export default function Navbar() {
             >
               <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g clipPath="url(#clip0_524_232)">
-                  <circle cx="15" cy="10" r="6" stroke={navbar.textColor || '#012B28'} strokeWidth="2"/>
-                  <path d="M4 28C4 21.3726 8.92487 16 15 16" stroke={navbar.textColor || '#012B28'} strokeWidth="2"/>
+                  <circle cx="15" cy="10" r="6" stroke={navbar.textColor || '#00433D'} strokeWidth="2"/>
+                  <path d="M4 28C4 21.3726 8.92487 16 15 16" stroke={navbar.textColor || '#00433D'} strokeWidth="2"/>
                   <path d="M18.2222 28L20.4444 23.875L16 23.325L22.6667 17H23.7778L21.5556 21.125L26 21.675L19.3333 28H18.2222Z" fill="#FF0000"/>
                 </g>
                 <defs>
@@ -355,7 +355,7 @@ export default function Navbar() {
                     <Link
                       to="/login"
                       className="nav-profile-login-btn"
-                      style={{ backgroundColor: navbar.textColor || '#012B28' }}
+                      style={{ backgroundColor: navbar.textColor || '#00433D' }}
                       onClick={() => setProfileOpen(false)}
                     >
                       Sign In
@@ -377,8 +377,8 @@ export default function Navbar() {
           <button className="nav-icon-link cart-link" onClick={toggleCart} aria-label="Cart">
             <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
               <g clipPath="url(#clip0_524_224)">
-                <path d="M25.8828 11L24.1045 27H5.89551L4.11719 11H25.8828Z" stroke={navbar.textColor || '#012B28'} strokeWidth="2"/>
-                <path d="M20 11C20 11 20.0002 3 15.0001 3C9.99987 3 10 11 10 11" stroke={navbar.textColor || '#012B28'} strokeWidth="2"/>
+                <path d="M25.8828 11L24.1045 27H5.89551L4.11719 11H25.8828Z" stroke={navbar.textColor || '#00433D'} strokeWidth="2"/>
+                <path d="M20 11C20 11 20.0002 3 15.0001 3C9.99987 3 10 11 10 11" stroke={navbar.textColor || '#00433D'} strokeWidth="2"/>
               </g>
               <defs>
                 <clipPath id="clip0_524_224">

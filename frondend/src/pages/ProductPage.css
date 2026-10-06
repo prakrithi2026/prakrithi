@@ -29,7 +29,7 @@
 }
 
 .product-breadcrumb a {
-  color: #00472A;
+  color: #00433D;
   text-decoration: none;
   font-weight: 500;
 }
@@ -137,7 +137,7 @@
   font-family: 'Jost', sans-serif;
   font-size: 1.9rem;
   font-weight: 700;
-  color: #012B28;
+  color: #00433D;
   line-height: 1.2;
   margin: 0;
 }
@@ -176,7 +176,7 @@
 .product-price-current {
   font-size: 2rem;
   font-weight: 800;
-  color: #00472A;
+  color: #00433D;
   font-family: 'Jost', sans-serif;
 }
 
@@ -298,11 +298,11 @@
 /* Coupon */
 .product-coupon {
   background: linear-gradient(135deg, #f0fff4, #e8f5e9);
-  border: 1.5px dashed #00472A;
+  border: 1.5px dashed #00433D;
   border-radius: 10px;
   padding: 12px 16px;
   font-size: 0.85rem;
-  color: #00472A;
+  color: #00433D;
   font-weight: 600;
 }
 
@@ -337,7 +337,7 @@
   font-family: 'Jost', sans-serif;
   font-size: 1.4rem;
   font-weight: 700;
-  color: #012B28;
+  color: #00433D;
   margin: 0 0 24px;
 }
 
@@ -371,7 +371,7 @@
 .pnf-btn {
   margin-top: 10px;
   padding: 12px 24px;
-  background: #00472A;
+  background: #00433D;
   color: #fff;
   border-radius: 10px;
   text-decoration: none;

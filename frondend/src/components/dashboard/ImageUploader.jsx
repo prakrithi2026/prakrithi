@@ -255,7 +255,7 @@ export default function ImageUploader({
             value={svgInput}
             onChange={(e) => handleSvgChange(e.target.value)}
             onBlur={handleSvgBlur}
-            placeholder={'<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">\n  <circle cx="15" cy="15" r="10" stroke="#00472A" stroke-width="2"/>\n</svg>'}
+            placeholder={'<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">\n  <circle cx="15" cy="15" r="10" stroke="#00433D" stroke-width="2"/>\n</svg>'}
             rows={compact ? 4 : 6}
             spellCheck={false}
           />

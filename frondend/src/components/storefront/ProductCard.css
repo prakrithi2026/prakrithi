@@ -106,7 +106,7 @@
 }
 
 .product-name {
-  color: #012B28;
+  color: #00433D;
   font-family: 'Jost', sans-serif;
   font-size: 16px;
   font-weight: 600;
@@ -125,12 +125,12 @@
 }
 
 .product-name-link:hover .product-name {
-  color: #00472A;
+  color: #00433D;
   text-decoration: underline;
 }
 
 .product-desc {
-  color: #00472A;
+  color: #00433D;
   font-family: 'Jost', sans-serif;
   font-size: 14px;
   margin: 0;
@@ -156,7 +156,7 @@
 .rating-score {
   font-size: 12px;
   font-weight: 600;
-  color: #00472A;
+  color: #00433D;
   font-family: 'Jost', sans-serif;
 }
 
@@ -175,7 +175,7 @@
 .price-row {
   font-size: 15px;
   font-weight: 600;
-  color: #00472A;
+  color: #00433D;
   font-family: 'Jost', sans-serif;
 }
 

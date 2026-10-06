@@ -26,7 +26,7 @@
   font-family: 'Jost', sans-serif;
   font-size: 44px;
   font-weight: 500;
-  color: var(--primary, #153e35);
+  color: var(--primary, #00433D);
   text-align: center;
   margin: 0 0 56px 0;
   letter-spacing: -0.5px;
@@ -85,7 +85,7 @@
 }
 
 .policy-contact-details a {
-  color: var(--primary, #153e35);
+  color: var(--primary, #00433D);
   text-decoration: underline;
   text-underline-offset: 3px;
 }

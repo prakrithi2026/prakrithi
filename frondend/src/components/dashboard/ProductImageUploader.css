@@ -38,7 +38,7 @@
 
 .product-img-tab--active {
   background: #ffffff;
-  color: #00472A;
+  color: #00433D;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
@@ -59,12 +59,12 @@
 }
 
 .product-img-dropzone:hover {
-  border-color: #00472A;
+  border-color: #00433D;
   background: #f0fdf4;
 }
 
 .product-img-dropzone--dragover {
-  border-color: #00472A;
+  border-color: #00433D;
   background: #dcfce7;
   transform: scale(1.01);
 }
@@ -75,7 +75,7 @@
 }
 
 .product-img-dropzone-icon {
-  color: #00472A;
+  color: #00433D;
   display: flex;
   align-items: center;
   justify-content: center;

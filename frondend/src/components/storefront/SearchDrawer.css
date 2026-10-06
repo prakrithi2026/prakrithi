@@ -285,7 +285,7 @@ input.search-drawer-input:focus,
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: #00472a;
+  color: #00433D;
   margin-bottom: 2px;
 }
 
@@ -309,7 +309,7 @@ input.search-drawer-input:focus,
 
 .search-drawer-product-price .current-price {
   font-weight: 700;
-  color: #00472a;
+  color: #00433D;
 }
 
 .search-drawer-product-price .original-price {
@@ -378,7 +378,7 @@ input.search-drawer-input:focus,
   justify-content: center;
   gap: 8px;
   padding: 12px 18px;
-  background: #00472a;
+  background: #00433D;
   color: #ffffff;
   border: none;
   border-radius: 8px;
@@ -390,7 +390,7 @@ input.search-drawer-input:focus,
 }
 
 .search-drawer-view-all-btn:hover {
-  background: #012b28;
+  background: #002d29;
   transform: translateY(-1px);
 }
 

@@ -35,7 +35,7 @@
   font-family: 'Jost', sans-serif;
   font-size: 8rem;
   font-weight: 900;
-  color: #00472A;
+  color: #00433D;
   margin: 0;
   line-height: 1;
   letter-spacing: -0.04em;
@@ -45,7 +45,7 @@
   font-family: 'Jost', sans-serif;
   font-size: 1.8rem;
   font-weight: 700;
-  color: #012B28;
+  color: #00433D;
   margin: 0;
 }
 
@@ -75,20 +75,20 @@
 }
 
 .not-found__btn--primary {
-  background: #00472A;
+  background: #00433D;
   color: #fff;
 }
 
 .not-found__btn--primary:hover {
-  background: #003820;
+  background: #002d29;
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0,71,42,0.3);
 }
 
 .not-found__btn--secondary {
   background: #fff;
-  color: #00472A;
-  border: 2px solid #00472A;
+  color: #00433D;
+  border: 2px solid #00433D;
 }
 
 .not-found__btn--secondary:hover {

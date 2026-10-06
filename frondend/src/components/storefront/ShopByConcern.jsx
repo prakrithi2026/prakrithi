@@ -282,7 +282,7 @@ export default function ShopByConcern() {
               className="scroll-progress-bar"
               style={{
                 width: `${fillWidth}%`,
-                backgroundColor: theme.primaryColor || '#00472A',
+                backgroundColor: theme.primaryColor || '#00433D',
               }}
             />
           </div>

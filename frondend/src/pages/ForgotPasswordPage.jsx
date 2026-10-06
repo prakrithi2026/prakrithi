@@ -404,7 +404,7 @@ export default function ForgotPasswordPage() {
                       fontSize: '1.5rem',
                       letterSpacing: '8px',
                       fontWeight: '700',
-                      color: theme.primaryColor || '#00472A'
+                      color: theme.primaryColor || '#00433D'
                     }}
                   />
                 </div>
@@ -515,7 +515,7 @@ export default function ForgotPasswordPage() {
           {step === 4 && (
             <div style={{ padding: '24px 0', textAlign: 'center' }}>
               <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>✅</div>
-              <h3 style={{ fontSize: '1.25rem', color: '#012B28', marginBottom: '8px' }}>Password Reset Successful</h3>
+              <h3 style={{ fontSize: '1.25rem', color: '#00433D', marginBottom: '8px' }}>Password Reset Successful</h3>
               <p className="auth-subtitle" style={{ margin: 0 }}>
                 Redirecting to login...
               </p>

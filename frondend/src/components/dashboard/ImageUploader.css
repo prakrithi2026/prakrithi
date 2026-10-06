@@ -34,7 +34,7 @@
 }
 
 .img-uploader__tab--active {
-  color: #00472a;
+  color: #00433D;
   background: #e8f3ee;
   border-color: #b7ded0;
 }
@@ -56,12 +56,12 @@
 
 .img-uploader__dropzone:hover {
   background: #f3fdf8;
-  border-color: #00472a;
+  border-color: #00433D;
 }
 
 .img-uploader__dropzone--active {
   background: #e6f7ef;
-  border-color: #00472a;
+  border-color: #00433D;
 }
 
 .img-uploader__dropzone--loading {
@@ -70,7 +70,7 @@
 }
 
 .img-uploader__dropzone-icon {
-  color: #00472a;
+  color: #00433D;
   margin-bottom: 6px;
 }
 
@@ -109,7 +109,7 @@
 }
 
 .img-uploader__svg-textarea:focus {
-  border-color: #00472a;
+  border-color: #00433D;
   box-shadow: 0 0 0 2px rgba(0, 71, 42, 0.15);
 }
 

@@ -50,7 +50,7 @@
   font-family: 'Jost', sans-serif;
   font-size: 2rem;
   font-weight: 800;
-  color: #012B28;
+  color: #00433D;
   margin: 0 0 8px;
   letter-spacing: -0.02em;
 }
@@ -174,7 +174,7 @@
 }
 
 .auth-password-toggle:focus-visible {
-  outline: 2px solid var(--primary, #00472A);
+  outline: 2px solid var(--primary, #00433D);
   outline-offset: 1px;
 }
 

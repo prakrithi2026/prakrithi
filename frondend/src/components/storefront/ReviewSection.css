@@ -137,7 +137,7 @@
 }
 
 .google-label {
-  color: #00472A !important;
+  color: #00433D !important;
   font-family: var(--font-sans);
   font-size: 1.12rem;
   font-weight: 700;
@@ -153,7 +153,7 @@
 }
 
 .google-score {
-  color: #00472A !important;
+  color: #00433D !important;
   font-family: var(--font-sans);
   font-size: 1.05rem;
   font-weight: 700;
@@ -170,7 +170,7 @@
 }
 
 .google-count {
-  color: #00472A !important;
+  color: #00433D !important;
   font-family: var(--font-sans);
   font-size: 0.95rem;
   font-weight: 500;
@@ -182,7 +182,7 @@
 .btn-write-review-link {
   flex-shrink: 0;
   color: #FFFFFF !important;
-  background-color: #00472A;
+  background-color: #00433D;
   border: none;
   padding: 10px 24px;
   border-radius: 12px;
@@ -199,7 +199,7 @@
 }
 
 .btn-write-review-link:hover {
-  background-color: #003620;
+  background-color: #002d29;
   color: #FFFFFF !important;
   transform: translateY(-1px);
 }
@@ -229,7 +229,7 @@
     margin: 0;
     padding: 30px 20px;
     border-radius: 24px;
-    background: linear-gradient(90deg, #0D5130 0%, #9FBD58 100%) !important;
+    background: linear-gradient(90deg, #00433D 0%, #C5F1A9 100%) !important;
   }
   
   .review-container {

@@ -31,7 +31,7 @@ export default function ProductCard({ product }) {
         <span
           className="card-badge"
           style={{
-            backgroundColor: product.badgeColor || '#00472A',
+            backgroundColor: product.badgeColor || '#00433D',
             color: product.badgeTextColor || '#fff',
           }}
         >
@@ -81,7 +81,7 @@ export default function ProductCard({ product }) {
           {/* Rating */}
           <div className="rating">
             <span className="rating-star">
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="#00472A">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="#00433D">
                 <path d="M6 0l1.76 3.56L12 4.12 8.88 7.08l.74 4.32L6 9.28 2.38 11.4l.74-4.32L0 4.12l4.24-.56z"/>
               </svg>
             </span>

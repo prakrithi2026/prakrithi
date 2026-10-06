@@ -20,7 +20,7 @@
   flex-wrap: wrap;
 }
 .contact-breadcrumb a {
-  color: #00472A;
+  color: #00433D;
   text-decoration: none;
   font-weight: 500;
 }
@@ -53,7 +53,7 @@
   font-family: 'Jost', sans-serif;
   font-size: 2.2rem;
   font-weight: 800;
-  color: #012B28;
+  color: #00433D;
   margin: 0;
   letter-spacing: -0.02em;
 }
@@ -100,7 +100,7 @@
 .contact-info-card__title {
   font-size: 0.88rem;
   font-weight: 700;
-  color: #012B28;
+  color: #00433D;
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -134,7 +134,7 @@
   font-family: 'Jost', sans-serif;
   font-size: 1.4rem;
   font-weight: 700;
-  color: #012B28;
+  color: #00433D;
   margin: 0 0 6px;
 }
 
@@ -189,7 +189,7 @@
 .contact-form-field input:focus,
 .contact-form-field select:focus,
 .contact-form-field textarea:focus {
-  border-color: #00472A;
+  border-color: #00433D;
   background: #fff;
   box-shadow: 0 0 0 3px rgba(0,71,42,0.08);
 }
@@ -259,7 +259,7 @@
   padding: 40px 20px;
   background: linear-gradient(135deg, #f0fff4, #e8f5e9);
   border-radius: 14px;
-  border: 1.5px solid #c8e6c9;
+  border: 1.5px solid #C5F1A9;
   animation: fadeIn 0.4s ease;
 }
 
@@ -273,7 +273,7 @@
 .contact-success h3 {
   font-size: 1.2rem;
   font-weight: 700;
-  color: #00472A;
+  color: #00433D;
   margin: 0;
 }
 
@@ -315,7 +315,7 @@
 .contact-quick-links h3 {
   font-size: 0.88rem;
   font-weight: 700;
-  color: #012B28;
+  color: #00433D;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   margin: 0 0 4px;
@@ -338,8 +338,8 @@
 
 .contact-quick-links a:hover {
   background: #f0fff4;
-  border-color: #c8e6c9;
-  color: #00472A;
+  border-color: #C5F1A9;
+  color: #00433D;
   transform: translateX(3px);
 }
 

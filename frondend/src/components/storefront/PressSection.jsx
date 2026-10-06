@@ -40,7 +40,7 @@ export default function PressSection() {
   };
 
   return (
-    <section className="press-section" style={{ backgroundColor: press.bgColor || '#BDD681' }}>
+    <section className="press-section" style={{ backgroundColor: press.bgColor || '#C5F1A9' }}>
       <div
         ref={containerRef}
         className="press-container"
@@ -68,7 +68,7 @@ export default function PressSection() {
                   <svg className="thehindu-emblem" viewBox="0 0 100 45" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                     {/* Center shield / crest */}
                     <path d="M 50 12 C 55 12, 57 15, 57 20 C 57 28, 50 35, 50 35 C 50 35, 43 28, 43 20 C 43 15, 45 12, 50 12 Z" opacity="0.9"/>
-                    <circle cx="50" cy="21" r="3" fill="#BDD681" />
+                    <circle cx="50" cy="21" r="3" fill="#C5F1A9" />
                     {/* Crown on top */}
                     <path d="M 46 8 L 48 11 L 50 8 L 52 11 L 54 8 L 53 13 L 47 13 Z" />
                     {/* Elephant Left */}

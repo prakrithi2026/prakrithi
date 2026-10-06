@@ -80,13 +80,13 @@ export default function OurStorySection() {
     <section 
       className="our-story-section" 
       style={{ 
-        background: `linear-gradient(to bottom, ${theme.accentColor || '#BDD681'} 50%, ${theme.backgroundColor || '#fdfdfd'} 50%)`,
+        background: `linear-gradient(to bottom, ${theme.accentColor || '#C5F1A9'} 50%, ${theme.backgroundColor || '#fdfdfd'} 50%)`,
         width: '100%',
         maxWidth: 'none',
         margin: 0
       }}
     >
-      <div className="our-story-card" style={{ backgroundColor: theme.primaryColor || '#00472A' }}>
+      <div className="our-story-card" style={{ backgroundColor: theme.primaryColor || '#00433D' }}>
         
         {/* Left Column: Media (Video or Image) */}
         {hasMedia && (

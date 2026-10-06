@@ -28,7 +28,7 @@
 }
 
 .shop-breadcrumb a {
-  color: var(--primary, #00472A);
+  color: var(--primary, #00433D);
   text-decoration: none;
   font-weight: 500;
 }
@@ -58,7 +58,7 @@
   font-family: 'Jost', sans-serif;
   font-size: 1.85rem;
   font-weight: 700;
-  color: #012B28;
+  color: #00433D;
   margin: 0;
   line-height: 1.2;
 }
@@ -70,7 +70,7 @@
 }
 
 .shop-count strong {
-  color: #012B28;
+  color: #00433D;
 }
 
 /* Right-side Controls: Category, Filter, Sort, Clear Filter (Side by Side) */
@@ -92,14 +92,14 @@
   border: 1.5px solid #d5ded8;
   border-radius: 8px;
   background-color: #fff;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='none' stroke='%23012B28' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M1 1l4 4 4-4'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='none' stroke='%2300433D' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M1 1l4 4 4-4'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 10px center;
   background-size: 10px 6px;
   font-size: 0.84rem;
   font-family: inherit;
   font-weight: 600;
-  color: #012B28;
+  color: #00433D;
   cursor: pointer;
   outline: none;
   appearance: none;
@@ -112,18 +112,18 @@
 }
 
 .shop-select-btn:hover {
-  border-color: var(--primary, #00472A);
+  border-color: var(--primary, #00433D);
 }
 
 .shop-select-btn:focus {
-  border-color: var(--primary, #00472A);
+  border-color: var(--primary, #00433D);
   box-shadow: 0 0 0 2px rgba(0, 71, 42, 0.12);
   outline: none;
 }
 
 .shop-select-btn option {
   background-color: #fff;
-  color: #012B28;
+  color: #00433D;
   font-size: 0.85rem;
   font-weight: 500;
   padding: 6px 10px;
@@ -277,7 +277,7 @@
 .shop-card__name {
   font-size: 0.92rem;
   font-weight: 600;
-  color: #012B28;
+  color: #00433D;
   text-decoration: none;
   line-height: 1.35;
   display: -webkit-box;
@@ -288,7 +288,7 @@
 }
 
 .shop-card__name:hover {
-  color: var(--primary, #00472A);
+  color: var(--primary, #00433D);
   text-decoration: underline;
 }
 
@@ -336,7 +336,7 @@
 .shop-card__price {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary, #00472A);
+  color: var(--primary, #00433D);
   display: flex;
   align-items: baseline;
   gap: 5px;

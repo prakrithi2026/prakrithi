@@ -3,7 +3,7 @@
   margin-top: var(--section-spacing, 48px);
   padding: 60px 0 50px 0;
   box-sizing: border-box;
-  background-color: var(--accent, #BDD681);
+  background-color: var(--accent, #C5F1A9);
 }
 
 .press-container {
@@ -28,7 +28,7 @@
   max-height: 80px;
   max-width: 210px;
   object-fit: contain;
-  filter: brightness(0) saturate(100%) invert(16%) sepia(78%) saturate(685%) hue-rotate(121deg) brightness(91%) contrast(101%);
+  filter: brightness(0) saturate(100%) invert(18%) sepia(43%) saturate(1637%) hue-rotate(128deg) brightness(96%) contrast(104%);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -37,7 +37,7 @@
 }
 
 .press-text {
-  color: #00472A;
+  color: #00433D;
   font-weight: 700;
   opacity: 0.85;
   font-family: 'Jost', sans-serif;
@@ -50,7 +50,7 @@
 .press-yourstory {
   font-size: 20px;
   letter-spacing: 1.5px;
-  border: 2px solid #00472A;
+  border: 2px solid #00433D;
   padding: 5px 12px;
   opacity: 0.7;
 }

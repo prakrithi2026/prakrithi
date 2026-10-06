@@ -161,11 +161,11 @@ class ForgotPasswordView(APIView):
               <style>
                 body {{ font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f7faf8; color: #1a332a; margin: 0; padding: 24px; }}
                 .card {{ max-width: 480px; margin: 0 auto; background: #ffffff; border-radius: 16px; padding: 36px 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid #e5ede9; }}
-                .brand {{ font-size: 20px; font-weight: 800; color: #00472A; text-transform: uppercase; letter-spacing: 1.5px; text-align: center; margin-bottom: 24px; }}
-                h2 {{ font-size: 20px; color: #012B28; margin: 0 0 12px; }}
+                .brand {{ font-size: 20px; font-weight: 800; color: #00433D; text-transform: uppercase; letter-spacing: 1.5px; text-align: center; margin-bottom: 24px; }}
+                h2 {{ font-size: 20px; color: #00433D; margin: 0 0 12px; }}
                 p {{ font-size: 14px; color: #4a5568; line-height: 1.6; margin: 0 0 16px; }}
-                .code-box {{ background: #f0f7f4; border: 2px dashed #00472A; border-radius: 12px; padding: 18px; text-align: center; margin: 24px 0; }}
-                .otp {{ font-size: 32px; font-weight: 800; letter-spacing: 8px; color: #00472A; margin: 0; font-family: monospace; }}
+                .code-box {{ background: #f0f7f4; border: 2px dashed #00433D; border-radius: 12px; padding: 18px; text-align: center; margin: 24px 0; }}
+                .otp {{ font-size: 32px; font-weight: 800; letter-spacing: 8px; color: #00433D; margin: 0; font-family: monospace; }}
                 .note {{ font-size: 13px; color: #718096; }}
                 .footer {{ font-size: 12px; color: #a0aec0; text-align: center; margin-top: 28px; border-top: 1px solid #edf2f7; padding-top: 16px; }}
               </style>
