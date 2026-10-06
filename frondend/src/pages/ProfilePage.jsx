@@ -8,6 +8,7 @@ import Navbar from '../components/storefront/Navbar';
 import Footer from '../components/storefront/Footer';
 import CartModal from '../components/storefront/CartModal';
 import AnnouncementBar from '../components/storefront/AnnouncementBar';
+import ProductLikeIcon from '../components/storefront/ProductLikeIcon';
 import API_BASE_URL from '../utils/api';
 import './ProfilePage.css';
 
@@ -59,7 +60,7 @@ function WishlistTab({ primaryColor }) {
               aria-label="Remove from wishlist"
               title="Remove from wishlist"
             >
-              ❤️
+              <ProductLikeIcon isLiked={true} size={32} />
             </button>
 
             {/* Discount badge */}

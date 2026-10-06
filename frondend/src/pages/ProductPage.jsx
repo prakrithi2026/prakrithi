@@ -9,6 +9,7 @@ import Footer from '../components/storefront/Footer';
 import CartModal from '../components/storefront/CartModal';
 import AnnouncementBar from '../components/storefront/AnnouncementBar';
 import ProductCard from '../components/storefront/ProductCard';
+import ProductLikeIcon from '../components/storefront/ProductLikeIcon';
 import './ProductPage.css';
 
 const StarRating = ({ rating = 0, max = 5 }) => {
@@ -137,8 +138,9 @@ export default function ProductPage() {
               <button
                 className={`product-wish-btn ${isWishlisted(product.id) ? 'active' : ''}`}
                 onClick={handleWishlist}
+                aria-label="Wishlist"
               >
-                {isWishlisted(product.id) ? '❤️' : '🤍'}
+                <ProductLikeIcon isLiked={isWishlisted(product.id)} size={36} />
               </button>
               {product.image ? (
                 <img src={product.image} alt={product.name} className="product-img" />

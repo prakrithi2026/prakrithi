@@ -7,6 +7,7 @@ import Navbar from '../components/storefront/Navbar';
 import Footer from '../components/storefront/Footer';
 import CartModal from '../components/storefront/CartModal';
 import AnnouncementBar from '../components/storefront/AnnouncementBar';
+import ProductLikeIcon from '../components/storefront/ProductLikeIcon';
 import './ShopPage.css';
 
 const SORT_OPTIONS = [
@@ -221,7 +222,7 @@ export default function ShopPage() {
                       onClick={() => toggleWishlist(product)}
                       aria-label="Toggle wishlist"
                     >
-                      {isWishlisted(product.id) ? '❤️' : '🤍'}
+                      <ProductLikeIcon isLiked={isWishlisted(product.id)} />
                     </button>
                     <Link to={`/product/${product.id}`} className="shop-card__image-link">
                       <div className="shop-card__img-wrap">

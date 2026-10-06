@@ -3,6 +3,7 @@ import { useSiteConfig } from '../../context/SiteConfigContext';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
 import { useAuth } from '../../context/AuthContext';
+import ProductLikeIcon from './ProductLikeIcon';
 import './ProductCard.css';
 
 export default function ProductCard({ product }) {
@@ -44,7 +45,7 @@ export default function ProductCard({ product }) {
         onClick={(e) => { e.stopPropagation(); if (requireAuth()) toggleWishlist(product); }}
         aria-label="Wishlist"
       >
-        {isWishlisted(product.id) ? '❤️' : '🤍'}
+        <ProductLikeIcon isLiked={isWishlisted(product.id)} />
       </button>
 
       {/* Image */}

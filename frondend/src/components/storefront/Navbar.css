@@ -570,6 +570,11 @@
     flex-direction: row;
     gap: 8px;
   }
+
+  .nav-icons {
+    margin-left: auto;
+    margin-right: 16px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -594,6 +599,8 @@
 
   .nav-icons {
     gap: 8px;
+    margin-left: auto;
+    margin-right: 12px;
   }
 
   .nav-search-btn svg,
