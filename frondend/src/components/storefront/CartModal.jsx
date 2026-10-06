@@ -121,7 +121,6 @@ export default function CartModal() {
               </button>
               <button
                 className="checkout-btn"
-                style={{ backgroundColor: cart.filter(i => i.selected !== false).length > 0 ? theme.primaryColor : '#ccc', color: '#fff' }}
                 onClick={handleCheckoutClick}
                 disabled={cart.filter(i => i.selected !== false).length === 0}
               >

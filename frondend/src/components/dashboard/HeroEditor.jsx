@@ -480,7 +480,7 @@ export default function HeroEditor() {
               <div className="hero-editor-category-link-row">
                 <div className="hero-editor-category-link-row__text">
                   <span className="hero-editor-category-link-row__label">
-                    <FiFolder size={14} style={{ color: '#006B3F' }} />
+                    <FiFolder size={14} style={{ color: '#00433D' }} />
                     <strong>Link to Category</strong> (Optional)
                   </span>
                   <span className="hero-editor-category-link-row__hint">
@@ -644,7 +644,7 @@ export default function HeroEditor() {
                           <div className="hero-slide-card__category-link">
                             <div className="hero-category-link__header">
                               <span className="hero-category-link__title">
-                                <FiFolder size={12} style={{ color: '#006B3F' }} /> Link to Category
+                                <FiFolder size={12} style={{ color: '#00433D' }} /> Link to Category
                               </span>
                               {linkedCatId && (
                                 <span className="hero-category-link__status-badge">Active Link</span>
@@ -671,7 +671,7 @@ export default function HeroEditor() {
                             {linkedCatId && (
                               <div className="hero-category-link__preview-box">
                                 <div className="hero-category-link__icon-box">
-                                  <FiFolder size={14} style={{ color: '#006B3F' }} />
+                                  <FiFolder size={14} style={{ color: '#00433D' }} />
                                 </div>
                                 <div className="hero-category-link__preview-text">
                                   <span className="hero-category-link__cat-name">{categoryLabel}</span>

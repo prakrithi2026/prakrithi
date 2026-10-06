@@ -117,7 +117,7 @@
 
 .shop-select-btn:focus {
   border-color: var(--primary, #00433D);
-  box-shadow: 0 0 0 2px rgba(0, 71, 42, 0.12);
+  box-shadow: 0 0 0 2px rgba(0, 67, 61, 0.12);
   outline: none;
 }
 
@@ -136,13 +136,13 @@
   justify-content: center;
   height: 36px;
   padding: 0 14px;
-  border: 1.5px solid rgba(255, 0, 0, 0.25);
+  border: 1.5px solid rgba(0, 67, 61, 0.35);
   border-radius: 8px;
   background-color: #fff;
   font-size: 0.84rem;
   font-family: inherit;
   font-weight: 600;
-  color: #FF0000;
+  color: #00433D;
   cursor: pointer;
   outline: none;
   white-space: nowrap;
@@ -152,12 +152,13 @@
 }
 
 .shop-clear-btn:hover {
-  background-color: #fff5f5;
-  border-color: #FF0000;
+  background-color: var(--accent, #C5F1A9);
+  color: #00433D;
+  border-color: var(--accent, #C5F1A9);
 }
 
 .shop-clear-btn:focus {
-  border-color: #FF0000;
+  border-color: #00433D;
   box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.15);
   outline: none;
 }
@@ -351,21 +352,23 @@
 
 .shop-card__add {
   padding: 7px 14px;
-  border: none;
+  border: 1px solid var(--primary, #00433D);
   border-radius: 8px;
-  color: #fff;
+  background-color: var(--primary, #00433D);
+  color: #ffffff;
   font-size: 0.8rem;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s ease;
   white-space: nowrap;
 }
 
 .shop-card__add:hover {
+  background-color: var(--accent, #C5F1A9) !important;
+  color: var(--primary, #00433D) !important;
+  border-color: var(--accent, #C5F1A9) !important;
   transform: translateY(-1px);
-  filter: brightness(1.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* No results */

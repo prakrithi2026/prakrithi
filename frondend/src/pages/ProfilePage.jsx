@@ -103,7 +103,6 @@ function WishlistTab({ primaryColor }) {
               <div className="wish-card__actions">
                 <button
                   className="wish-card__add-btn"
-                  style={{ backgroundColor: primaryColor }}
                   onClick={() => addToCart(product)}
                 >
                   🛒 Add to Cart

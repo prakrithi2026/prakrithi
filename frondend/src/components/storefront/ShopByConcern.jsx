@@ -236,8 +236,8 @@ export default function ShopByConcern() {
                 onClick={() => handleCategoryClick(cat.id)}
                 style={
                   activeCategory === cat.id
-                    ? { backgroundColor: theme.primaryColor, color: '#fff', borderColor: theme.primaryColor }
-                    : { borderColor: theme.primaryColor, color: theme.primaryColor }
+                    ? { backgroundColor: theme.primaryColor || '#00433D', color: '#fff', borderColor: theme.primaryColor || '#00433D' }
+                    : { borderColor: theme.primaryColor || '#00433D', color: theme.primaryColor || '#00433D' }
                 }
               >
                 {cat.label}

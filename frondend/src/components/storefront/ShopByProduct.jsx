@@ -242,8 +242,8 @@ export default function ShopByProduct() {
                 onClick={() => handleFilterClick(f.id)}
                 style={
                   activeFilter === f.id
-                    ? { backgroundColor: theme.primaryColor, color: '#fff', borderColor: theme.primaryColor }
-                    : { borderColor: theme.primaryColor, color: theme.primaryColor }
+                    ? { backgroundColor: theme.primaryColor || '#00433D', color: '#fff', borderColor: theme.primaryColor || '#00433D' }
+                    : { borderColor: theme.primaryColor || '#00433D', color: theme.primaryColor || '#00433D' }
                 }
               >
                 {f.label}

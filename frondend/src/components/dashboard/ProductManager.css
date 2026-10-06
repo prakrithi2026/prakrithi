@@ -253,9 +253,9 @@
 }
 
 .pm-tag--active {
-  background: #006B3F;
+  background: #00433D;
   color: white;
-  border-color: #006B3F;
+  border-color: #00433D;
 }
 
 /* ── Variants ── */
@@ -347,12 +347,12 @@
 }
 
 .pm-img-upload:hover {
-  border-color: #006B3F;
+  border-color: #00433D;
   background: #f0fdf4;
 }
 
 .pm-img-upload--active {
-  border-color: #006B3F;
+  border-color: #00433D;
   background: #ecfdf5;
   box-shadow: 0 0 0 3px rgba(0, 107, 63, 0.12);
 }
@@ -364,7 +364,7 @@
 }
 
 .pm-img-upload:hover .pm-img-upload__icon {
-  color: #006B3F;
+  color: #00433D;
 }
 
 .pm-img-upload__text {
@@ -374,7 +374,7 @@
 }
 
 .pm-img-upload__text strong {
-  color: #006B3F;
+  color: #00433D;
 }
 
 .pm-img-upload__hint {

@@ -278,21 +278,24 @@
 .product-add-btn {
   flex: 1;
   padding: 14px 24px;
-  border: none;
+  border: 1px solid var(--primary, #00433D);
   border-radius: 12px;
+  background-color: var(--primary, #00433D);
   color: #fff;
   font-size: 1rem;
   font-weight: 700;
   font-family: inherit;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.25s ease;
   letter-spacing: 0.01em;
 }
 
 .product-add-btn:hover {
-  filter: brightness(1.1);
+  background-color: var(--accent, #C5F1A9) !important;
+  color: var(--primary, #00433D) !important;
+  border-color: var(--accent, #C5F1A9) !important;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0,71,42,0.3);
+  box-shadow: 0 6px 20px rgba(0, 67, 61, 0.25);
 }
 
 /* Coupon */

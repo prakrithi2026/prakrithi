@@ -110,7 +110,7 @@
 
 .img-uploader__svg-textarea:focus {
   border-color: #00433D;
-  box-shadow: 0 0 0 2px rgba(0, 71, 42, 0.15);
+  box-shadow: 0 0 0 2px rgba(0, 67, 61, 0.15);
 }
 
 .img-uploader__svg-error {
@@ -180,8 +180,8 @@
 }
 
 .img-uploader__checkerboard--dark {
-  background-color: #0D5130;
-  background-image: repeating-conic-gradient(#083821 0% 25%, #0D5130 0% 50%) 50% / 14px 14px;
+  background-color: #00433D;
+  background-image: repeating-conic-gradient(#083821 0% 25%, #00433D 0% 50%) 50% / 14px 14px;
   border-color: #0a3d24;
 }
 

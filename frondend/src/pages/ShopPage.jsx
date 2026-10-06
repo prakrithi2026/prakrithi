@@ -248,7 +248,6 @@ export default function ShopPage() {
                         </div>
                         <button
                           className="shop-card__add"
-                          style={{ backgroundColor: theme.primaryColor || '#00433D' }}
                           onClick={() => addToCart(product)}
                         >
                           + Cart

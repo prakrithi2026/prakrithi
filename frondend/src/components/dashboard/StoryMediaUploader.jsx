@@ -318,7 +318,7 @@ export default function StoryMediaUploader({
                     href={video.startsWith('http') ? video : `https://${video}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    style={{ color: '#006B3F', fontWeight: 600, textDecoration: 'underline' }}
+                    style={{ color: '#00433D', fontWeight: 600, textDecoration: 'underline' }}
                   >
                     {video}
                   </a>

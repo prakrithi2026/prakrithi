@@ -13,7 +13,7 @@
   gap: 8px;
   padding: 10px 20px;
   border-radius: 10px;
-  background: linear-gradient(135deg, #006B3F, #00895A);
+  background: linear-gradient(135deg, #00433D, #00895A);
   color: white;
   font-size: 0.85rem;
   font-weight: 600;
@@ -134,7 +134,7 @@
 
 .section-item__core-badge {
   font-size: 0.65rem;
-  color: #006B3F;
+  color: #00433D;
   background: #ecfdf5;
   padding: 2px 8px;
   border-radius: 4px;
@@ -164,8 +164,8 @@
 }
 
 .section-item__img-btn:hover {
-  border-color: #006B3F;
-  color: #006B3F;
+  border-color: #00433D;
+  color: #00433D;
   background: #f0fdf4;
 }
 
@@ -308,7 +308,7 @@
 
 .section-item__url-field:focus {
   outline: none;
-  border-color: #006B3F;
+  border-color: #00433D;
   box-shadow: 0 0 0 2px rgba(0, 107, 63, 0.08);
 }
 
@@ -354,7 +354,7 @@
 }
 
 .section-item__toggle input:checked + .section-item__toggle-slider {
-  background: #006B3F;
+  background: #00433D;
 }
 
 .section-item__toggle input:checked + .section-item__toggle-slider::before {
@@ -478,8 +478,8 @@
 }
 
 .crud-list__upload-btn:hover {
-  border-color: #006B3F;
-  color: #006B3F;
+  border-color: #00433D;
+  color: #00433D;
   background: #f0fdf4;
 }
 
@@ -598,7 +598,7 @@
 }
 
 .delivery-step-card__upload:hover {
-  border-color: #006B3F;
+  border-color: #00433D;
   background: #f0fdf4;
 }
 
@@ -609,7 +609,7 @@
 }
 
 .delivery-step-card__upload:hover .delivery-step-card__upload-icon {
-  color: #006B3F;
+  color: #00433D;
 }
 
 .delivery-step-card__upload-text {
@@ -619,7 +619,7 @@
 }
 
 .delivery-step-card__upload-text strong {
-  color: #006B3F;
+  color: #00433D;
 }
 
 .delivery-step-card__upload-hint {
@@ -787,7 +787,7 @@
 }
 
 .section-template-card--selected {
-  border-color: #006B3F;
+  border-color: #00433D;
   background: #f0fdf4;
   box-shadow: 0 0 0 3px rgba(0, 107, 63, 0.08);
 }

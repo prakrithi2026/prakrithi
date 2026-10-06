@@ -40,7 +40,7 @@ function printOrderPDF(order, products) {
       <!-- Header -->
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px">
         <div>
-          <div style="font-size:22px;font-weight:800;color:#006B3F">Order Invoice</div>
+          <div style="font-size:22px;font-weight:800;color:#00433D">Order Invoice</div>
           <div style="font-size:13px;color:#6b7280;margin-top:2px">Order #${order.id}</div>
         </div>
         <div style="text-align:right;font-size:12px;color:#6b7280">
@@ -50,7 +50,7 @@ function printOrderPDF(order, products) {
       </div>
 
       <!-- Divider -->
-      <div style="height:2px;background:linear-gradient(90deg,#006B3F,#00895A,transparent);margin-bottom:24px;border-radius:2px"></div>
+      <div style="height:2px;background:linear-gradient(90deg,#00433D,#00895A,transparent);margin-bottom:24px;border-radius:2px"></div>
 
       <!-- Customer & Shipping -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px">
@@ -95,7 +95,7 @@ function printOrderPDF(order, products) {
 
       <!-- Total -->
       <div style="display:flex;justify-content:flex-end">
-        <div style="background:#006B3F;color:#fff;border-radius:10px;padding:14px 24px;min-width:200px;text-align:right">
+        <div style="background:#00433D;color:#fff;border-radius:10px;padding:14px 24px;min-width:200px;text-align:right">
           <div style="font-size:11px;opacity:0.8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Total Amount</div>
           <div style="font-size:24px;font-weight:800">₹${parseFloat(order.total_amount).toFixed(2)}</div>
         </div>

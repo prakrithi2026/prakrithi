@@ -48,7 +48,9 @@
 }
 
 .filter-btn:hover:not(.active) {
-  background: rgba(0, 71, 42, 0.05);
+  background: var(--accent, #C5F1A9);
+  color: var(--primary, #00433D);
+  border-color: var(--accent, #C5F1A9);
 }
 
 /* Horizontal scroll wrapper */

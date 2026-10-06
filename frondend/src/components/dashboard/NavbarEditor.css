@@ -72,7 +72,7 @@
 }
 
 .nav-item-row__input:focus {
-  border-color: #006B3F;
+  border-color: #00433D;
   outline: none;
 }
 
@@ -288,19 +288,19 @@
 }
 
 .nb-logo-upload:hover {
-  border-color: #006B3F;
+  border-color: #00433D;
   background: #f0fdf4;
 }
 
 .nb-logo-upload--active {
-  border-color: #006B3F;
+  border-color: #00433D;
   background: #ecfdf5;
   box-shadow: 0 0 0 3px rgba(0, 107, 63, 0.12);
 }
 
 .nb-logo-upload--uploading {
   border-style: solid;
-  border-color: #006B3F;
+  border-color: #00433D;
   background: #f0fdf4;
   cursor: wait;
 }
@@ -315,7 +315,7 @@
 }
 
 .nb-logo-upload:hover .nb-logo-upload__icon {
-  color: #006B3F;
+  color: #00433D;
 }
 
 .nb-logo-upload__text {
@@ -325,7 +325,7 @@
 }
 
 .nb-logo-upload__text strong {
-  color: #006B3F;
+  color: #00433D;
 }
 
 .nb-logo-upload__hint {
@@ -424,7 +424,7 @@
   background: white;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
-  border-left: 3px solid #006B3F;
+  border-left: 3px solid #00433D;
 }
 
 .nav-dropdown-editor__row .nav-item-row__input {

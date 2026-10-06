@@ -308,32 +308,42 @@
 .wish-card__add-btn {
   flex: 1;
   padding: 10px;
-  border: none;
+  border: 1px solid var(--primary, #00433D);
   border-radius: 9px;
-  color: #fff;
+  background-color: var(--primary, #00433D);
+  color: #ffffff;
   font-size: 0.82rem;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s ease;
 }
 
-.wish-card__add-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+.wish-card__add-btn:hover {
+  background-color: var(--accent, #C5F1A9) !important;
+  color: var(--primary, #00433D) !important;
+  border-color: var(--accent, #C5F1A9) !important;
+  transform: translateY(-1px);
+}
 
 .wish-card__view-btn {
   padding: 10px 14px;
-  border: 1.5px solid #e0e0e0;
+  border: 1.5px solid var(--primary, #00433D);
   border-radius: 9px;
   text-decoration: none;
-  color: #555;
+  color: var(--primary, #00433D);
   font-size: 0.82rem;
   font-weight: 600;
-  transition: all 0.2s;
-  background: #fafafa;
+  transition: all 0.25s ease;
+  background: #ffffff;
   white-space: nowrap;
 }
 
-.wish-card__view-btn:hover { border-color: #00433D; color: #00433D; }
+.wish-card__view-btn:hover {
+  background-color: var(--accent, #C5F1A9);
+  border-color: var(--accent, #C5F1A9);
+  color: var(--primary, #00433D);
+}
 
 /* ══════════════════════════════
    ORDERS TAB

@@ -181,7 +181,7 @@
 }
 
 .om-search-input:focus {
-  border-color: #006B3F;
+  border-color: #00433D;
   background: #fff;
   box-shadow: 0 0 0 3px rgba(0,107,63,0.08);
 }
@@ -378,7 +378,7 @@
 .om-card__total-amount {
   font-size: 1.3rem;
   font-weight: 800;
-  color: #006B3F;
+  color: #00433D;
 }
 
 .om-card__payment-method {
@@ -494,7 +494,7 @@
   margin-left: auto;
   font-size: 0.84rem;
   font-weight: 700;
-  color: #006B3F;
+  color: #00433D;
   flex-shrink: 0;
 }
 
@@ -533,7 +533,7 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #006B3F;
+  background: #00433D;
   animation: omDots 1.2s ease-in-out infinite;
 }
 .om-loading__dot:nth-child(2) { animation-delay: 0.2s; }

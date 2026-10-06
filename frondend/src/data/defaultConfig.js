@@ -126,7 +126,7 @@ const defaultConfig = {
       null,
       null
     ],
-    "bgColor": "#2E7D32",
+    "bgColor": "#00433D",
     "overlayOpacity": 0.3,
     "tagline": "100% Natural | Premium Quality",
     "title": "Kerala Spices",
