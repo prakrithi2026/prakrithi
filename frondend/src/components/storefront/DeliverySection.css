@@ -30,7 +30,7 @@
   gap: 36px;
   position: relative;
   overflow: hidden;
-  background: linear-gradient(90deg, #004330 0%, #A7CF6D 100%);
+  background: linear-gradient(90deg, #00433D 0%, #A7CF8D 100%);
 }
 
 .delivery-left {
@@ -163,7 +163,7 @@
     padding: 30px 20px;
     gap: 24px;
     text-align: center;
-    background: linear-gradient(90deg, #004330 0%, #A7CF6D 100%);
+    background: linear-gradient(90deg, #00433D 0%, #A7CF8D 100%);
   }
 
   .delivery-left {
