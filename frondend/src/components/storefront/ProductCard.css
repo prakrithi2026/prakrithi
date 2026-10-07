@@ -208,9 +208,18 @@
 }
 
 .btn-add-cart:hover {
-  background-color: var(--accent, #C5F1A9);
-  color: var(--primary, #00433D);
-  border-color: var(--accent, #C5F1A9);
+  background-color: var(--primary, #00433D);
+  color: #ffffff;
+  border-color: var(--primary, #00433D);
+  opacity: 0.92;
+}
+
+.btn-add-cart:focus,
+.btn-add-cart:active {
+  background-color: var(--primary, #00433D);
+  color: #ffffff;
+  border-color: var(--primary, #00433D);
+  outline: none;
 }
 
 /* Coupon note */

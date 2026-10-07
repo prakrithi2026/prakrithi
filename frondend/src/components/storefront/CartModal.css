@@ -399,11 +399,20 @@
 }
 
 .checkout-btn:hover:not(:disabled) {
-  background-color: var(--accent, #C5F1A9) !important;
-  color: var(--primary, #00433D) !important;
-  border-color: var(--accent, #C5F1A9) !important;
+  background-color: var(--primary, #00433D) !important;
+  color: #ffffff !important;
+  border-color: var(--primary, #00433D) !important;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 67, 61, 0.2);
+  filter: brightness(1.08);
+}
+
+.checkout-btn:focus:not(:disabled),
+.checkout-btn:active:not(:disabled) {
+  background-color: var(--primary, #00433D) !important;
+  color: #ffffff !important;
+  border-color: var(--primary, #00433D) !important;
+  outline: none;
 }
 
 .checkout-btn:disabled {

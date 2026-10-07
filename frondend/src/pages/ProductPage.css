@@ -291,11 +291,20 @@
 }
 
 .product-add-btn:hover {
-  background-color: var(--accent, #C5F1A9) !important;
-  color: var(--primary, #00433D) !important;
-  border-color: var(--accent, #C5F1A9) !important;
+  background-color: var(--primary, #00433D) !important;
+  color: #ffffff !important;
+  border-color: var(--primary, #00433D) !important;
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 67, 61, 0.25);
+  filter: brightness(1.08);
+}
+
+.product-add-btn:focus,
+.product-add-btn:active {
+  background-color: var(--primary, #00433D) !important;
+  color: #ffffff !important;
+  border-color: var(--primary, #00433D) !important;
+  outline: none;
 }
 
 /* Coupon */

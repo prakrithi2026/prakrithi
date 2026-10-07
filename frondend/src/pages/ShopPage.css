@@ -365,10 +365,20 @@
 }
 
 .shop-card__add:hover {
-  background-color: var(--accent, #C5F1A9) !important;
-  color: var(--primary, #00433D) !important;
-  border-color: var(--accent, #C5F1A9) !important;
+  background-color: var(--primary, #00433D) !important;
+  color: #ffffff !important;
+  border-color: var(--primary, #00433D) !important;
   transform: translateY(-1px);
+  filter: brightness(1.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.shop-card__add:focus,
+.shop-card__add:active {
+  background-color: var(--primary, #00433D) !important;
+  color: #ffffff !important;
+  border-color: var(--primary, #00433D) !important;
+  outline: none;
 }
 
 /* No results */

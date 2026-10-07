@@ -320,10 +320,19 @@
 }
 
 .wish-card__add-btn:hover {
-  background-color: var(--accent, #C5F1A9) !important;
-  color: var(--primary, #00433D) !important;
-  border-color: var(--accent, #C5F1A9) !important;
+  background-color: var(--primary, #00433D) !important;
+  color: #ffffff !important;
+  border-color: var(--primary, #00433D) !important;
   transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+
+.wish-card__add-btn:focus,
+.wish-card__add-btn:active {
+  background-color: var(--primary, #00433D) !important;
+  color: #ffffff !important;
+  border-color: var(--primary, #00433D) !important;
+  outline: none;
 }
 
 .wish-card__view-btn {

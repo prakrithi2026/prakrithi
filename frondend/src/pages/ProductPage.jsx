@@ -206,7 +206,7 @@ export default function ProductPage() {
               </div>
               <button
                 className="product-add-btn"
-                style={addedFlash ? { backgroundColor: '#C5F1A9', color: '#00433D', borderColor: '#C5F1A9' } : {}}
+                style={addedFlash ? { opacity: 0.92 } : {}}
                 onClick={handleAddToCart}
               >
                 {addedFlash ? '✓ Added to Cart!' : `Add ${quantity > 1 ? `${quantity} × ` : ''}to Cart`}
