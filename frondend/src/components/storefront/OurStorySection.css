@@ -1,7 +1,7 @@
 /* Premium Dark Green Card Story Section */
 .our-story-section {
   width: 100%;
-  margin: var(--section-spacing, 48px) auto 0;
+  margin: 0 auto;
   padding: 0 123px;
   display: flex;
   justify-content: center;
@@ -204,7 +204,7 @@
 @media (max-width: 767px) {
   .our-story-section {
     width: 100%;
-    margin: var(--section-spacing, 32px) auto 0;
+    margin: 0 auto;
     padding: 0 12px;
   }
   

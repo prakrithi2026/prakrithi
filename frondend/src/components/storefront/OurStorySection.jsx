@@ -76,9 +76,17 @@ export default function OurStorySection() {
   const founderName = ourStory.founderName || 'Anjana KA';
   const founderTitle = ourStory.founderTitle || 'Founder Prakrithi India';
 
+  const pressBgColor = config.press?.bgColor || '#C5F1A9';
+  const pageBgColor = theme.backgroundColor || '#fdfdfd';
+
   return (
     <section 
-      className="our-story-section"
+      className="our-story-section" 
+      style={{ 
+        background: `linear-gradient(to bottom, ${pressBgColor} 50%, ${pageBgColor} 50%)`,
+        width: '100%',
+        margin: 0
+      }}
     >
       <div className="our-story-card" style={{ backgroundColor: theme.primaryColor || '#00433D' }}>
         
