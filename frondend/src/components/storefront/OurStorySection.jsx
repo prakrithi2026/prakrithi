@@ -82,7 +82,6 @@ export default function OurStorySection() {
       style={{ 
         background: `linear-gradient(to bottom, ${theme.accentColor || '#C5F1A9'} 50%, ${theme.backgroundColor || '#fdfdfd'} 50%)`,
         width: '100%',
-        maxWidth: 'none',
         margin: 0
       }}
     >
@@ -212,7 +211,7 @@ export default function OurStorySection() {
             {mainParagraphText}
             {mainParagraphText && !mainParagraphText.trim().endsWith('.') ? '.' : ''}{' '}
             <Link to="/our-story" className="our-story-link">
-              Read our Story
+              Read Our Story
             </Link>
           </p>
 

@@ -1,11 +1,7 @@
 /* Premium Dark Green Card Story Section */
 .our-story-section {
   width: 100%;
-  max-width: 1440px;
-  height: auto !important;
-  min-height: 100% !important;
-  overflow: visible !important;
-  margin: var(--section-spacing, 48px) auto 0;
+  margin: 0 auto;
   padding: 0 123px;
   display: flex;
   justify-content: center;
@@ -15,33 +11,39 @@
 
 .our-story-card {
   width: 100%;
-  max-width: none;
+  max-width: 1194px;
   border-radius: 24px;
-  padding: 40px 48px;
+  overflow: hidden;
+  padding: 0;
   display: flex;
-  flex-direction: column;
-  gap: 40px;
-  align-items: center;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 0;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
+  min-height: 380px;
 }
 
-/* Media/Image Column */
+/* Media/Image Column (Left 50%) */
 .our-story-media-col {
-  flex: 1;
-  width: 100%;
-  max-width: 500px;
+  flex: 1 1 50%;
+  width: 50%;
+  max-width: 50%;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-self: stretch;
 }
 
 .our-story-image-wrapper {
   position: relative;
   width: 100%;
-  min-height: 240px;
-  border-radius: 16px;
+  height: 100%;
+  min-height: 100%;
+  border-radius: 0;
   overflow: hidden;
   box-shadow: none;
-  aspect-ratio: 4/3;
-  display: block;
+  display: flex;
   background-color: transparent;
   cursor: pointer;
 }
@@ -83,11 +85,12 @@
 .our-story-video-wrapper {
   position: relative;
   width: 100%;
-  aspect-ratio: 4/3;
-  border-radius: 16px;
+  height: 100%;
+  border-radius: 0;
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  box-shadow: none;
   background: #000000;
+  display: flex;
 }
 
 .our-story-iframe {
@@ -104,19 +107,23 @@
   display: block;
 }
 
-/* Text Column */
+/* Text Column (Right 50%) */
 .our-story-text-col {
-  flex: 1.2;
-  width: 100%;
+  flex: 1 1 50%;
+  width: 50%;
+  max-width: 50%;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
+  padding: 48px 52px;
+  box-sizing: border-box;
 }
 
 .our-story-heading {
   color: #FFFFFF !important;
   font-size: 2rem;
+  margin-top: 0;
   margin-bottom: 14px;
   font-weight: 700;
   line-height: 1.25;
@@ -127,7 +134,8 @@
   color: rgba(255, 255, 255, 0.9) !important;
   font-size: 0.94rem;
   line-height: 1.62;
-  margin-bottom: 20px;
+  margin-top: 0;
+  margin-bottom: 22px;
   font-family: var(--font-sans);
 }
 
@@ -155,7 +163,7 @@
   font-family: var(--font-sans);
 }
 
-/* Read our Story inline text link */
+/* Read Our Story inline text link */
 .our-story-link {
   color: #FFFFFF !important;
   font-family: var(--font-sans);
@@ -173,49 +181,60 @@
   opacity: 0.8;
 }
 
-/* Desktop and Responsive Layouts */
-@media (min-width: 768px) {
-  .our-story-card {
-    flex-direction: row;
-    gap: 40px;
-    padding: 8px 48px 8px 8px;
-    align-items: center;
-    justify-content: space-between;
-  }
-  
-  .our-story-media-col {
-    max-width: 480px;
-  }
-}
-
+/* Tablet Layout */
 @media (max-width: 1024px) {
   .our-story-section {
     padding: 0 20px;
   }
+
+  .our-story-text-col {
+    padding: 36px 32px;
+  }
+
+  .our-story-heading {
+    font-size: 1.75rem;
+  }
 }
 
+/* Mobile Layout */
 @media (max-width: 767px) {
   .our-story-section {
     width: 100%;
-    margin: var(--section-spacing, 32px) auto 0;
+    margin: 0 auto;
     padding: 0 12px;
   }
   
   .our-story-card {
-    padding: 8px 8px 32px 8px;
-    gap: 24px;
-    border-radius: 24px;
+    flex-direction: column;
+    border-radius: 20px;
+    min-height: auto;
+  }
+
+  .our-story-media-col {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    aspect-ratio: 16/10;
+  }
+
+  .our-story-image-wrapper {
+    aspect-ratio: 16/10;
+    min-height: 220px;
   }
 
   .our-story-text-col {
-    padding: 0 12px;
+    width: 100%;
+    max-width: 100%;
+    padding: 28px 20px 32px 20px;
   }
   
   .our-story-heading {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
+    margin-bottom: 12px;
   }
   
   .our-story-description {
-    font-size: 0.92rem;
+    font-size: 0.9rem;
+    margin-bottom: 18px;
   }
 }
