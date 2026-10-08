@@ -68,7 +68,7 @@
                     "subtitle": "Get 25% OFF On your 1st order.",
                     "ctaText": "Use Code : PR25",
                     "ctaLink": "#",
-                    "ctaBgColor": "#00472A",
+                    "ctaBgColor": "#00433D",
                     "ctaTextColor": "#FFFFFF",
                     "textAlign": "left",
                     "showProductImages": true,
@@ -86,7 +86,7 @@
                             "image": ""
                         }
                     ],
-                    "textColor": "#00472a",
+                    "textColor": "#00433D",
                     "productLinks": [
                         11,
                         12,
@@ -101,12 +101,12 @@
                     ]
                 },
                 "theme": {
-                    "primaryColor": "#00472A",
+                    "primaryColor": "#00433D",
                     "secondaryColor": "#F5F5DC",
                     "accentColor": "#BDD681",
                     "backgroundColor": "#fdfdfd",
                     "textColor": "#333333",
-                    "headingColor": "#012B28",
+                    "headingColor": "#00433D",
                     "fontFamily": "'Jost', 'Poppins', sans-serif",
                     "borderRadius": "12px",
                     "cardShadow": "0 2px 12px rgba(0,0,0,0.08)"
@@ -114,7 +114,7 @@
                 "announcement": {
                     "enabled": true,
                     "text": "Extra Rs.250 OFF on your 1st Order on all orders above Rs.999 Use Code : PR 999",
-                    "bgColor": "#00472A",
+                    "bgColor": "#00433D",
                     "textColor": "#FFFFFF"
                 },
                 "navbar": {
@@ -123,7 +123,7 @@
                     "brandName": "Prakrithi",
                     "brandSubtitle": "NATURALS",
                     "bgColor": "#FFFFFF",
-                    "textColor": "#012B28",
+                    "textColor": "#00433D",
                     "items": [
                         {
                             "id": "products",
@@ -159,14 +159,14 @@
                             "href": "#",
                             "badge": "10% OFF",
                             "badgeColor": "#BDD681",
-                            "badgeTextColor": "#012B28"
+                            "badgeTextColor": "#00433D"
                         },
                         {
                             "id": "new",
                             "label": "New arrivals",
                             "href": "#",
                             "badge": "Trending \u26a1",
-                            "badgeColor": "#00472A",
+                            "badgeColor": "#00433D",
                             "badgeTextColor": "#FFFFFF"
                         },
                         {
@@ -440,7 +440,7 @@
             ],
             "variants": [],
             "badge": "New",
-            "badgeColor": "#00472A",
+            "badgeColor": "#00433D",
             "badgeTextColor": null,
             "rating": "4.9",
             "reviews": 28,
@@ -463,7 +463,7 @@
             "variants": [],
             "badge": "Sale 10% Off",
             "badgeColor": "#BDD681",
-            "badgeTextColor": "#012B28",
+            "badgeTextColor": "#00433D",
             "rating": "4.9",
             "reviews": 28,
             "couponNote": "*Best Price \u20b9180 with coupon"
@@ -504,7 +504,7 @@
             ],
             "variants": [],
             "badge": "Best Seller",
-            "badgeColor": "#00472A",
+            "badgeColor": "#00433D",
             "badgeTextColor": null,
             "rating": "4.9",
             "reviews": 28,
@@ -549,7 +549,7 @@
             "variants": [],
             "badge": "Sale",
             "badgeColor": "#BDD681",
-            "badgeTextColor": "#012B28",
+            "badgeTextColor": "#00433D",
             "rating": "4.8",
             "reviews": 30,
             "couponNote": null
@@ -594,7 +594,7 @@
             ],
             "variants": [],
             "badge": "Wellness",
-            "badgeColor": "#00472A",
+            "badgeColor": "#00433D",
             "badgeTextColor": "#FFFFFF",
             "rating": "4.9",
             "reviews": 84,
@@ -618,7 +618,7 @@
             "variants": [],
             "badge": null,
             "badgeColor": "#BDD681",
-            "badgeTextColor": "#012B28",
+            "badgeTextColor": "#00433D",
             "rating": "4.7",
             "reviews": 56,
             "couponNote": null

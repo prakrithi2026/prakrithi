@@ -20,10 +20,15 @@ export default function AnnouncementBar() {
 
   if (!announcement.enabled || dismissed) return null;
 
+  const bg = (!announcement.bgColor || announcement.bgColor.toUpperCase() === '#00472A' || announcement.bgColor.toUpperCase() === '#083B2E')
+    ? '#00433D'
+    : announcement.bgColor;
+  const textColor = announcement.textColor || '#FFFFFF';
+
   return (
     <div
       className="announcement-bar"
-      style={{ backgroundColor: announcement.bgColor, color: announcement.textColor }}
+      style={{ backgroundColor: bg, color: textColor }}
     >
       <span className="announcement-spacer" />
       <p className="announcement-text">{announcement.text}</p>

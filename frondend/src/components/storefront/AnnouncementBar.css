@@ -1,4 +1,6 @@
 .announcement-bar {
+  background-color: var(--primary, #00433D);
+  color: #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: center;

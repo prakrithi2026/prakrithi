@@ -26,6 +26,49 @@ function deepMerge(defaults, overrides) {
   return result;
 }
 
+function normalizeColors(cfg) {
+  if (!cfg || typeof cfg !== 'object') return cfg;
+  if (cfg.announcement) {
+    const bg = cfg.announcement.bgColor;
+    if (!bg || (typeof bg === 'string' && (bg.toUpperCase() === '#00472A' || bg.toUpperCase() === '#083B2E'))) {
+      cfg.announcement.bgColor = '#00433D';
+    }
+  }
+  if (cfg.navbar) {
+    const txt = cfg.navbar.textColor;
+    if (!txt || (typeof txt === 'string' && (txt.toUpperCase() === '#012B28' || txt.toUpperCase() === '#00472A'))) {
+      cfg.navbar.textColor = '#00433D';
+    }
+    if (Array.isArray(cfg.navbar.items)) {
+      cfg.navbar.items.forEach(item => {
+        if (item.badgeTextColor && (item.badgeTextColor.toUpperCase() === '#012B28' || item.badgeTextColor.toUpperCase() === '#00472A')) {
+          item.badgeTextColor = '#00433D';
+        }
+        if (item.badgeColor && item.badgeColor.toUpperCase() === '#00472A') {
+          item.badgeColor = '#00433D';
+        }
+      });
+    }
+  }
+  if (cfg.hero) {
+    if (cfg.hero.textColor && (cfg.hero.textColor.toUpperCase() === '#00472A' || cfg.hero.textColor === '#00472a')) {
+      cfg.hero.textColor = '#00433D';
+    }
+    if (cfg.hero.ctaBgColor && cfg.hero.ctaBgColor.toUpperCase() === '#00472A') {
+      cfg.hero.ctaBgColor = '#00433D';
+    }
+  }
+  if (cfg.theme) {
+    if (cfg.theme.primaryColor && cfg.theme.primaryColor.toUpperCase() === '#00472A') {
+      cfg.theme.primaryColor = '#00433D';
+    }
+    if (cfg.theme.headingColor && (cfg.theme.headingColor.toUpperCase() === '#012B28' || cfg.theme.headingColor.toUpperCase() === '#00472A')) {
+      cfg.theme.headingColor = '#00433D';
+    }
+  }
+  return cfg;
+}
+
 function getInitialConfig() {
   let base = { ...defaultConfig };
   try {
@@ -116,7 +159,7 @@ function getInitialConfig() {
       bgImage: finalDesktop.length > 0 ? finalDesktop[0] : ''
     };
   }
-  return base;
+  return normalizeColors(base);
 }
 
 export function SiteConfigProvider({ children }) {
@@ -148,7 +191,7 @@ export function SiteConfigProvider({ children }) {
 
         // If IndexedDB has valid data and we haven't received unsaved edits from user
         if (sourceRef.current === 'init' || sourceRef.current === 'storage') {
-          const merged = deepMerge(defaultConfig, stored);
+          const merged = normalizeColors(deepMerge(defaultConfig, stored));
           if (Array.isArray(stored.products) && stored.products.length > 0) {
             merged.products = stored.products;
           }
@@ -267,7 +310,7 @@ export function SiteConfigProvider({ children }) {
         }
 
         const validConfigData = configData || {};
-        const mergedConfig = deepMerge(defaultConfig, validConfigData);
+        const mergedConfig = normalizeColors(deepMerge(defaultConfig, validConfigData));
         
         // Ensure new sections added to defaultConfig are present even if backend has an older sections array
         if (configData.sections && Array.isArray(configData.sections)) {

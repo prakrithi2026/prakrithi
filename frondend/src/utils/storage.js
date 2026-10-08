@@ -6,7 +6,7 @@
 
 import defaultConfig from '../data/defaultConfig';
 
-const LOCAL_CACHE_KEY = 'prakrithi_siteconfig_cache_v13';
+const LOCAL_CACHE_KEY = 'prakrithi_siteconfig_cache_v14';
 const DB_NAME = 'prakrithi_storage';
 const DB_VERSION = 1;
 const STORE_NAME = 'site_config';
