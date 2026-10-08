@@ -14,11 +14,11 @@
   max-width: 1194px;
   border-radius: 24px;
   overflow: hidden;
-  padding: 0;
+  padding: 10px 48px 10px 10px;
   display: flex;
   flex-direction: row;
   align-items: stretch;
-  gap: 0;
+  gap: 36px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
   min-height: 380px;
@@ -26,13 +26,13 @@
 
 /* Media/Image Column (Left 50%) */
 .our-story-media-col {
-  flex: 1 1 50%;
+  flex: 1;
   width: 50%;
-  max-width: 50%;
   position: relative;
   overflow: hidden;
   display: flex;
   align-self: stretch;
+  border-radius: 16px;
 }
 
 .our-story-image-wrapper {
@@ -40,7 +40,7 @@
   width: 100%;
   height: 100%;
   min-height: 100%;
-  border-radius: 0;
+  border-radius: 16px;
   overflow: hidden;
   box-shadow: none;
   display: flex;
@@ -86,7 +86,7 @@
   position: relative;
   width: 100%;
   height: 100%;
-  border-radius: 0;
+  border-radius: 16px;
   overflow: hidden;
   box-shadow: none;
   background: #000000;
@@ -109,14 +109,13 @@
 
 /* Text Column (Right 50%) */
 .our-story-text-col {
-  flex: 1 1 50%;
+  flex: 1;
   width: 50%;
-  max-width: 50%;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  padding: 48px 52px;
+  padding: 32px 0;
   box-sizing: border-box;
 }
 
@@ -187,8 +186,13 @@
     padding: 0 20px;
   }
 
+  .our-story-card {
+    padding: 10px 32px 10px 10px;
+    gap: 28px;
+  }
+
   .our-story-text-col {
-    padding: 36px 32px;
+    padding: 24px 0;
   }
 
   .our-story-heading {
@@ -207,6 +211,8 @@
   .our-story-card {
     flex-direction: column;
     border-radius: 20px;
+    padding: 8px 8px 24px 8px;
+    gap: 20px;
     min-height: auto;
   }
 
@@ -215,17 +221,19 @@
     max-width: 100%;
     height: auto;
     aspect-ratio: 16/10;
+    border-radius: 14px;
   }
 
   .our-story-image-wrapper {
     aspect-ratio: 16/10;
     min-height: 220px;
+    border-radius: 14px;
   }
 
   .our-story-text-col {
     width: 100%;
     max-width: 100%;
-    padding: 28px 20px 32px 20px;
+    padding: 0 8px;
   }
   
   .our-story-heading {
