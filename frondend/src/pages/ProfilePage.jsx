@@ -60,7 +60,7 @@ function WishlistTab({ primaryColor }) {
               aria-label="Remove from wishlist"
               title="Remove from wishlist"
             >
-              <ProductLikeIcon isLiked={true} size={32} />
+              <ProductLikeIcon isLiked={true} size={36} />
             </button>
 
             {/* Discount badge */}
