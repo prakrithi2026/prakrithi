@@ -78,12 +78,7 @@ export default function OurStorySection() {
 
   return (
     <section 
-      className="our-story-section" 
-      style={{ 
-        background: `linear-gradient(to bottom, ${theme.accentColor || '#C5F1A9'} 50%, ${theme.backgroundColor || '#fdfdfd'} 50%)`,
-        width: '100%',
-        margin: 0
-      }}
+      className="our-story-section"
     >
       <div className="our-story-card" style={{ backgroundColor: theme.primaryColor || '#00433D' }}>
         
