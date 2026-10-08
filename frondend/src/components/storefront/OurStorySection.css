@@ -14,7 +14,7 @@
   max-width: 1194px;
   border-radius: 24px;
   overflow: hidden;
-  padding: 10px 48px 10px 10px;
+  padding: 8px 48px 8px 8px;
   display: flex;
   flex-direction: row;
   align-items: stretch;
@@ -187,7 +187,7 @@
   }
 
   .our-story-card {
-    padding: 10px 32px 10px 10px;
+    padding: 8px 32px 8px 8px;
     gap: 28px;
   }
 
