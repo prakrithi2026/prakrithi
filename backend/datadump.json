@@ -157,7 +157,7 @@
                             "id": "sale",
                             "label": "Sale On",
                             "href": "#",
-                            "badge": "10% OFF",
+                            "badge": "10% OFF*",
                             "badgeColor": "#BDD681",
                             "badgeTextColor": "#00433D"
                         },

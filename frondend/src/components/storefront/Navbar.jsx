@@ -202,17 +202,41 @@ export default function Navbar() {
                   onMouseEnter={() => item.hasDropdown && setOpenDropdown(item.id)}
                   onMouseLeave={() => item.hasDropdown && setOpenDropdown(null)}
                 >
-                  {item.badge && (
-                    <span
-                      className={`badge-label ${item.badge.includes('⚡') || item.badge.toLowerCase().includes('trending') || item.id === 'new' ? 'badge-label--trending' : ''}`}
-                      style={{
-                        backgroundColor: item.badgeColor    || '#C5F1A9',
-                        color:           item.badgeTextColor || '#00433D',
-                      }}
-                    >
-                      {item.badge}
-                    </span>
-                  )}
+                  {item.badge && (() => {
+                    const badgeText = item.badge === '10% OFF' ? '10% OFF*' : item.badge;
+                    const isTrending = badgeText.includes('⚡') || badgeText.toLowerCase().includes('trending') || item.id === 'new';
+                    return (
+                      <span
+                        className={`badge-label ${isTrending ? 'badge-label--trending' : ''}`}
+                        style={{
+                          backgroundColor: item.badgeColor    || '#C5F1A9',
+                          color:           item.badgeTextColor || '#00433D',
+                        }}
+                      >
+                        {badgeText.includes('⚡') ? (
+                          <>
+                            <span>{badgeText.replace('⚡', '').trim()}</span>
+                            <svg
+                              className="badge-lightning-icon"
+                              viewBox="0 0 448 512"
+                              width="9"
+                              height="11"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                              aria-hidden="true"
+                            >
+                              <path
+                                d="M349.4 44.6c5.9-13.7 1.5-29.7-10.6-38.5s-28.6-8-39.9 1.8l-256 224c-10 8.8-13.6 22.9-8.9 35.3S50.7 288 64 288l111.5 0L98.6 467.4c-5.9 13.7-1.5 29.7 10.6 38.5s28.6 8 39.9-1.8l256-224c10-8.8 13.6-22.9 8.9-35.3s-16.6-20.7-30-20.7l-111.5 0L349.4 44.6z"
+                                fill={item.badgeTextColor === '#FFFFFF' || !item.badgeTextColor ? '#C5F1A9' : 'currentColor'}
+                              />
+                            </svg>
+                          </>
+                        ) : (
+                          badgeText
+                        )}
+                      </span>
+                    );
+                  })()}
 
                   <NavLink
                     href={href}

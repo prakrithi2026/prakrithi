@@ -41,6 +41,9 @@ function normalizeColors(cfg) {
     }
     if (Array.isArray(cfg.navbar.items)) {
       cfg.navbar.items.forEach(item => {
+        if (item.badge === '10% OFF') {
+          item.badge = '10% OFF*';
+        }
         if (item.badgeTextColor && (item.badgeTextColor.toUpperCase() === '#012B28' || item.badgeTextColor.toUpperCase() === '#00472A')) {
           item.badgeTextColor = '#00433D';
         }

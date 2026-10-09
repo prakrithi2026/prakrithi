@@ -56,7 +56,7 @@
         "id": "sale",
         "label": "Sale On",
         "href": "#",
-        "badge": "10% OFF",
+        "badge": "10% OFF*",
         "badgeColor": "#C5F1A9",
         "badgeTextColor": "#00433D"
       },
