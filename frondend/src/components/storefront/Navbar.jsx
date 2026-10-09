@@ -83,6 +83,7 @@ export default function Navbar() {
   const [searchOpen,     setSearchOpen]     = useState(false);
   const [profileOpen,    setProfileOpen]    = useState(false);
   const profileRef       = useRef(null);
+  const navContainerRef  = useRef(null);
 
   // Close mobile menu whenever the route changes
   useEffect(() => {
@@ -101,9 +102,16 @@ export default function Navbar() {
       if (profileRef.current && !profileRef.current.contains(e.target)) {
         setProfileOpen(false);
       }
+      if (navContainerRef.current && !navContainerRef.current.contains(e.target)) {
+        setMobileOpen(false);
+      }
     };
     document.addEventListener('mousedown', onClick);
-    return () => document.removeEventListener('mousedown', onClick);
+    document.addEventListener('touchstart', onClick);
+    return () => {
+      document.removeEventListener('mousedown', onClick);
+      document.removeEventListener('touchstart', onClick);
+    };
   }, []);
 
   // Active link check
@@ -157,9 +165,30 @@ export default function Navbar() {
       className={`navbar ${isSticky ? 'navbar--scrolled' : ''}`}
       style={{ backgroundColor: navbar.bgColor || '#FFFFFF' }}
     >
-      <div className="nav-container">
+      <div className="nav-container" ref={navContainerRef}>
 
-        {/* ── Logo ── */}
+        {/* ── Mobile Menu Toggle (Left Corner on Mobile) ── */}
+        <button
+          className="navbar-mobile-toggle"
+          onClick={() => setMobileOpen(!mobileOpen)}
+          style={{ color: navbar.textColor || '#00433D' }}
+          aria-label={mobileOpen ? "Close menu" : "Open menu"}
+        >
+          {mobileOpen ? (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          ) : (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          )}
+        </button>
+
+        {/* ── Logo (Centered on Mobile) ── */}
         {(() => {
           const logoSrc = navbar.logo !== undefined ? navbar.logo : defaultConfig.navbar?.logo;
           if (logoSrc) {
@@ -421,16 +450,6 @@ export default function Navbar() {
             )}
           </button>
         </div>
-
-        {/* Mobile toggle */}
-        <button
-          className="navbar-mobile-toggle"
-          onClick={() => setMobileOpen(!mobileOpen)}
-          style={{ color: navbar.textColor }}
-          aria-label="Toggle menu"
-        >
-          {mobileOpen ? '✕' : '☰'}
-        </button>
       </div>
 
       {/* Slide-out Search Drawer */}
