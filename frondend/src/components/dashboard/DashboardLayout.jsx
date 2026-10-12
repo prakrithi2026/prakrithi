@@ -4,7 +4,7 @@ import {
   FiDroplet, FiNavigation, FiImage, FiBox, FiLayout, FiFileText,
   FiArrowLeft, FiRefreshCw, FiExternalLink, FiMonitor, FiSmartphone,
   FiTablet, FiChevronLeft, FiChevronRight, FiChevronDown, FiEye, FiSave, FiCheck, FiShoppingCart,
-  FiLogOut, FiColumns, FiMaximize2
+  FiLogOut, FiColumns, FiMaximize2, FiStar
 } from 'react-icons/fi';
 import { useSiteConfig } from '../../context/SiteConfigContext';
 import NavbarEditor from './NavbarEditor';
@@ -13,6 +13,7 @@ import ProductManager from './ProductManager';
 import SectionManager from './SectionManager';
 import FooterEditor from './FooterEditor';
 import OrderManager from './OrderManager';
+import ReviewManager from './ReviewManager';
 import AdminLogin, { useAdminAuth } from './AdminLogin';
 import './DashboardLayout.css';
 
@@ -31,6 +32,7 @@ const menuGroups = [
     items: [
       { id: 'products', icon: FiBox, label: 'Products', desc: 'Product catalog' },
       { id: 'orders', icon: FiShoppingCart, label: 'Manage Orders', desc: 'View & manage' },
+      { id: 'reviews', icon: FiStar, label: 'Customer Reviews', desc: 'See, reply & delete' },
     ]
   }
 ];
@@ -40,6 +42,7 @@ const editorComponents = {
   hero: HeroEditor,
   products: ProductManager,
   orders: OrderManager,
+  reviews: ReviewManager,
   sections: SectionManager,
   footer: FooterEditor,
 };
@@ -294,7 +297,7 @@ function DashboardContent({ logout }) {
 
         <div className="shopify-dash__header-center">
           {/* View Mode & Viewport switcher */}
-          {activeSection !== 'orders' && activeSection !== 'products' && (
+          {activeSection !== 'orders' && activeSection !== 'products' && activeSection !== 'reviews' && (
             <>
               <div className="shopify-dash__mode-switcher">
                 <button
@@ -455,7 +458,7 @@ function DashboardContent({ logout }) {
         )}
 
         {/* Dynamic Center and Right Layout */}
-        {activeSection === 'orders' || activeSection === 'products' || viewMode === 'editor' ? (
+        {activeSection === 'orders' || activeSection === 'products' || activeSection === 'reviews' || viewMode === 'editor' ? (
           <main className="shopify-dash__center" style={{ background: '#f8f9fb', padding: '32px', overflowY: 'auto', flex: 1, display: 'block' }}>
             <div style={{ maxWidth: '1100px', margin: '0 auto', width: '100%' }}>
               <ActiveEditor />

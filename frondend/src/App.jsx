@@ -18,6 +18,7 @@ import OurStoryPage from './pages/OurStoryPage';
 import TermsPage from './pages/TermsPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import RefundPolicyPage from './pages/RefundPolicyPage';
+import WriteReviewPage from './pages/WriteReviewPage';
 import DashboardLayout from './components/dashboard/DashboardLayout';
 import ScrollToTop from './components/ScrollToTop';
 import './App.css';
@@ -38,6 +39,8 @@ function App() {
                 <Route path="/product"  element={<Navigate to="/shop" replace />} />
                 <Route path="/our-story" element={<OurStoryPage />} />
                 <Route path="/product/:id" element={<ProductPage />} />
+                <Route path="/write-review" element={<WriteReviewPage />} />
+                <Route path="/reviews" element={<WriteReviewPage />} />
                 <Route path="/contact" element={<ContactPage />} />
                 <Route path="/terms-and-conditions" element={<TermsPage />} />
                 <Route path="/terms"   element={<Navigate to="/terms-and-conditions" replace />} />

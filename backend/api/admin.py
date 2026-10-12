@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import SiteConfig, Category, Product, Order, OrderItem
+from .models import SiteConfig, Category, Product, Order, OrderItem, Review
 
 
 class OrderItemInline(admin.TabularInline):
@@ -39,6 +39,15 @@ class SiteConfigAdmin(admin.ModelAdmin):
     readonly_fields = ('updated_at',)
 
 
+@admin.register(Review)
+class ReviewAdmin(admin.ModelAdmin):
+    list_display = ('id', 'customer_name', 'rating', 'product_name', 'created_at', 'replied_at')
+    list_filter = ('rating', 'created_at')
+    search_fields = ('customer_name', 'customer_email', 'comment', 'admin_reply')
+    readonly_fields = ('created_at', 'replied_at')
+
+
 admin.site.site_header = 'Prakrithi Naturals Admin'
 admin.site.site_title = 'Prakrithi Admin'
 admin.site.index_title = 'Store Administration'
+

@@ -14,8 +14,8 @@ from django.core.mail import send_mail
 from datetime import timedelta
 import traceback
 import razorpay
-from .models import SiteConfig, Category, Product, Order, PasswordResetCode
-from .serializers import SiteConfigSerializer, CategorySerializer, ProductSerializer, OrderSerializer
+from .models import SiteConfig, Category, Product, Order, PasswordResetCode, Review
+from .serializers import SiteConfigSerializer, CategorySerializer, ProductSerializer, OrderSerializer, ReviewSerializer
 
 
 
@@ -904,3 +904,48 @@ class OrderTrackView(APIView):
         
         serializer = OrderSerializer(orders, many=True)
         return Response(serializer.data)
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    queryset = Review.objects.all().order_by('-created_at')
+    serializer_class = ReviewSerializer
+
+    def get_queryset(self):
+        qs = Review.objects.all().order_by('-created_at')
+        product_id = self.request.query_params.get('product')
+        if product_id:
+            try:
+                qs = qs.filter(product_id=int(product_id))
+            except (ValueError, TypeError):
+                pass
+        return qs
+
+    def perform_create(self, serializer):
+        product = serializer.validated_data.get('product')
+        product_name = serializer.validated_data.get('product_name')
+        if product and not product_name:
+            product_name = product.name
+        review = serializer.save(product_name=product_name)
+        return review
+
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if 'admin_reply' in request.data:
+            reply_text = (request.data.get('admin_reply') or '').strip()
+            instance.admin_reply = reply_text if reply_text else None
+            instance.replied_at = timezone.now() if reply_text else None
+            instance.save(update_fields=['admin_reply', 'replied_at'])
+            serializer = self.get_serializer(instance)
+            return Response(serializer.data)
+        return super().partial_update(request, *args, **kwargs)
+
+    @action(detail=True, methods=['post', 'patch'])
+    def reply(self, request, pk=None):
+        review = self.get_object()
+        reply_text = (request.data.get('admin_reply') or '').strip()
+        review.admin_reply = reply_text if reply_text else None
+        review.replied_at = timezone.now() if reply_text else None
+        review.save(update_fields=['admin_reply', 'replied_at'])
+        serializer = self.get_serializer(review)
+        return Response(serializer.data)
+

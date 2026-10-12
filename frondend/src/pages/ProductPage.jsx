@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useSiteConfig } from '../context/SiteConfigContext';
 import { useCart } from '../context/CartContext';
@@ -10,6 +10,7 @@ import CartModal from '../components/storefront/CartModal';
 import AnnouncementBar from '../components/storefront/AnnouncementBar';
 import ProductCard from '../components/storefront/ProductCard';
 import ProductLikeIcon from '../components/storefront/ProductLikeIcon';
+import { fetchReviews, deleteReviewById, isOwnReview } from '../utils/reviewsApi';
 import './ProductPage.css';
 
 const StarRating = ({ rating = 0, max = 5 }) => {
@@ -31,18 +32,38 @@ export default function ProductPage() {
   const theme = config.theme || {};
   const { addToCart } = useCart();
   const { toggleWishlist, isWishlisted } = useWishlist();
-  const { isLoggedIn } = useAuth();
+  const { user, isLoggedIn } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   const [quantity, setQuantity] = useState(1);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [addedFlash, setAddedFlash] = useState(false);
+  const [productReviews, setProductReviews] = useState([]);
 
   const product = products.find(p => String(p.id) === String(id));
   const related = products
     .filter(p => p.category === product?.category && p.id !== product?.id)
     .slice(0, 4);
+
+  const loadProductReviews = useCallback(async () => {
+    if (!id) return;
+    const data = await fetchReviews(id);
+    setProductReviews(Array.isArray(data) ? data : []);
+  }, [id]);
+
+  const handleDeleteOwnReview = async (reviewId) => {
+    if (!window.confirm('Delete your review?')) return;
+    await deleteReviewById(reviewId);
+    setProductReviews((prev) => prev.filter((r) => String(r.id) !== String(reviewId)));
+  };
+
+  useEffect(() => {
+    loadProductReviews();
+    const handleSync = () => loadProductReviews();
+    window.addEventListener('prakrithi-reviews-updated', handleSync);
+    return () => window.removeEventListener('prakrithi-reviews-updated', handleSync);
+  }, [loadProductReviews]);
 
   useEffect(() => {
     try {
@@ -107,6 +128,8 @@ export default function ProductPage() {
     fontFamily: theme.fontFamily,
   };
 
+  const totalReviewCount = (Number(product.reviews) || 0) + productReviews.length;
+
   return (
     <div className="product-page storefront" style={themeStyle}>
       <AnnouncementBar />
@@ -159,7 +182,10 @@ export default function ProductPage() {
             <div className="product-rating-row">
               <StarRating rating={parseFloat(product.rating) || 0} />
               <span className="product-rating-score">{product.rating}</span>
-              <span className="product-rating-count">({product.reviews} reviews)</span>
+              <span className="product-rating-count">({totalReviewCount} reviews)</span>
+              <Link to={`/write-review?product=${product.id}`} className="product-write-review-inline">
+                ✍️ Write a review
+              </Link>
             </div>
 
             {/* Price */}
@@ -228,6 +254,79 @@ export default function ProductPage() {
           </div>
         </div>
 
+        {/* Product Customer Reviews Section */}
+        <section className="product-reviews-sec">
+          <div className="product-reviews-sec__header">
+            <div>
+              <h2 className="product-related__title" style={{ marginBottom: '4px' }}>
+                Customer Reviews ({productReviews.length})
+              </h2>
+              <p className="product-reviews-sec__sub">
+                Real feedback from customers who tried {product.name}
+              </p>
+            </div>
+            <Link to={`/write-review?product=${product.id}`} className="product-write-review-btn">
+              ✍️ Write a Review
+            </Link>
+          </div>
+
+          {productReviews.length === 0 ? (
+            <div className="product-reviews-empty">
+              <p>No written reviews for this product yet. Be the first to share your experience!</p>
+            </div>
+          ) : (
+            <div className="product-reviews-list">
+              {productReviews.map((rev) => {
+                const stars = Math.max(1, Math.min(5, Number(rev.rating) || 5));
+                const canDelete = isOwnReview(rev, user);
+                return (
+                  <div key={rev.id} className="product-review-item">
+                    <div className="product-review-item__top">
+                      <div>
+                        <span className="product-review-item__author">{rev.customer_name}</span>
+                        <span className="product-review-item__date">
+                          {rev.created_at
+                            ? new Date(rev.created_at).toLocaleDateString('en-IN', {
+                                day: '2-digit',
+                                month: 'short',
+                                year: 'numeric',
+                              })
+                            : ''}
+                        </span>
+                      </div>
+                      <div className="product-review-item__actions">
+                        <span className="product-review-item__stars">
+                          {'★'.repeat(stars)}
+                        </span>
+                        {canDelete && (
+                          <button
+                            type="button"
+                            className="product-review-item__delete"
+                            onClick={() => handleDeleteOwnReview(rev.id)}
+                            title="Delete your review"
+                          >
+                            🗑️ Delete
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    {rev.title && <h4 className="product-review-item__title">{rev.title}</h4>}
+                    <p className="product-review-item__comment">{rev.comment}</p>
+                    {rev.admin_reply && (
+                      <div className="product-review-item__reply">
+                        <div className="product-review-item__reply-head">
+                          🌿 Response from Prakrithi Naturals Admin
+                        </div>
+                        <p className="product-review-item__reply-text">{rev.admin_reply}</p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </section>
+
         {/* Related Products */}
         {related.length > 0 && (
           <section className="product-related">
@@ -244,3 +343,4 @@ export default function ProductPage() {
     </div>
   );
 }
+

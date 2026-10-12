@@ -4,12 +4,14 @@ from .views import (
     SiteConfigView, CategoryViewSet, ProductViewSet, OrderViewSet,
     OrderTrackView, LoginView, RegisterView,
     ForgotPasswordView, VerifyResetCodeView, ResetPasswordView,
+    ReviewViewSet,
 )
 
 router = DefaultRouter()
 router.register(r'categories', CategoryViewSet)
 router.register(r'products', ProductViewSet)
 router.register(r'orders', OrderViewSet)
+router.register(r'reviews', ReviewViewSet)
 
 urlpatterns = [
     path('config/', SiteConfigView.as_view(), name='site-config'),
@@ -22,4 +24,5 @@ urlpatterns = [
     path('auth/reset-password/',    ResetPasswordView.as_view(),   name='auth-reset-password'),
     path('', include(router.urls)),
 ]
+
 

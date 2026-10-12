@@ -101,3 +101,23 @@ class PasswordResetCode(models.Model):
 
     def __str__(self):
         return f"Reset code for {self.user.email} ({self.code})"
+
+
+class Review(models.Model):
+    customer_name = models.CharField(max_length=255)
+    customer_email = models.EmailField(blank=True, null=True)
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='product_reviews')
+    product_name = models.CharField(max_length=255, blank=True, null=True)
+    rating = models.PositiveSmallIntegerField(default=5)
+    title = models.CharField(max_length=255, blank=True, null=True)
+    comment = models.TextField()
+    admin_reply = models.TextField(blank=True, null=True)
+    replied_at = models.DateTimeField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Review by {self.customer_name} ({self.rating}★)"
+

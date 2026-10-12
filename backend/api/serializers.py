@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import SiteConfig, Category, Product, Order, OrderItem
+from .models import SiteConfig, Category, Product, Order, OrderItem, Review
 
 class SiteConfigSerializer(serializers.ModelSerializer):
     class Meta:
@@ -34,3 +34,12 @@ class OrderSerializer(serializers.ModelSerializer):
         for item_data in items_data:
             OrderItem.objects.create(order=order, **item_data)
         return order
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = [
+            'id', 'customer_name', 'customer_email', 'product', 'product_name',
+            'rating', 'title', 'comment', 'admin_reply', 'replied_at', 'created_at'
+        ]
+
