@@ -6,10 +6,10 @@ import './ReviewSection.css';
 export default function ReviewSection() {
   const { config } = useSiteConfig();
   const { reviewsSection = {}, theme } = config;
-  const { image = '', googleRating = 0, totalReviews = 0, bgGradient, bgColor } = reviewsSection;
+  const { image = '', googleRating = 0, totalReviews = 0 } = reviewsSection;
 
   const dynamicStyle = {
-    background: bgGradient || (bgColor ? bgColor : 'linear-gradient(90deg, #00433D 0%, #A7CF8D 100%)')
+    background: 'linear-gradient(90deg, #00433D 0%, #00433D 32%, #A0D075 100%)'
   };
 
   // Only display image if admin provided an image URL or SVG code, or fallback to default
