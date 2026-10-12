@@ -69,6 +69,15 @@ function normalizeColors(cfg) {
       cfg.theme.headingColor = '#00433D';
     }
   }
+  if (cfg.press && Array.isArray(cfg.press.logos) && Array.isArray(defaultConfig.press?.logos)) {
+    cfg.press.logos = cfg.press.logos.map((logo, i) => {
+      const defLogo = defaultConfig.press.logos[i];
+      if (logo && typeof logo.image === 'string' && logo.image.includes('IzAwNDcyQ') && defLogo?.image) {
+        return { ...logo, image: defLogo.image };
+      }
+      return logo;
+    });
+  }
   return cfg;
 }
 

@@ -507,7 +507,8 @@ def enforce_image_fallbacks(config_data, defaults=None):
         else:
             for idx, d_logo in enumerate(def_press):
                 if idx < len(cur_press):
-                    if not cur_press[idx].get('image') and d_logo.get('image'):
+                    cur_img = cur_press[idx].get('image') or ''
+                    if (not cur_img or 'IzAwNDcyQ' in cur_img) and d_logo.get('image'):
                         cur_press[idx]['image'] = d_logo['image']
                         updated = True
                 else:

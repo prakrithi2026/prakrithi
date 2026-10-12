@@ -41,6 +41,19 @@ export default function PressSection() {
 
   return (
     <section className="press-section" style={{ backgroundColor: press.bgColor || '#C5F1A9' }}>
+      <svg width="0" height="0" style={{ position: 'absolute', pointerEvents: 'none' }} aria-hidden="true">
+        <defs>
+          <filter id="press-logo-brand-tint" colorInterpolationFilters="sRGB">
+            <feColorMatrix
+              type="matrix"
+              values="0 0 0 0 0
+                      0 0 0 0 0.2627451
+                      0 0 0 0 0.2392157
+                      0 0 0 1 0"
+            />
+          </filter>
+        </defs>
+      </svg>
       <div
         ref={containerRef}
         className="press-container"
