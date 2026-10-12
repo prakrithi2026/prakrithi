@@ -25,8 +25,6 @@ export default function WriteReviewPage() {
 
   const theme = config.theme || {};
   const products = Array.isArray(config.products) ? config.products : [];
-  const baseGoogleRating = Number(config.reviewsSection?.googleRating) || 4.9;
-  const baseTotalReviews = Number(config.reviewsSection?.totalReviews) || 1183;
 
   const [reviews, setReviews] = useState([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
@@ -151,16 +149,6 @@ export default function WriteReviewPage() {
       ? reviews
       : reviews.filter((r) => Number(r.rating) === Number(filterRating));
 
-  const combinedCount = baseTotalReviews + reviews.length;
-  const averageRating =
-    reviews.length > 0
-      ? (
-          (baseGoogleRating * baseTotalReviews +
-            reviews.reduce((sum, r) => sum + (Number(r.rating) || 5), 0)) /
-          combinedCount
-        ).toFixed(1)
-      : baseGoogleRating;
-
   const themeStyle = {
     '--primary': theme.primaryColor || '#00433D',
     '--accent': theme.accentColor || '#A0D075',
@@ -179,25 +167,6 @@ export default function WriteReviewPage() {
           <span>/</span>
           <span>Customer Reviews</span>
         </div>
-
-        {/* Hero Banner */}
-        <section className="wr-hero">
-          <div className="wr-hero__content">
-            <span className="wr-hero__badge">⭐ Customer Feedback</span>
-            <h1 className="wr-hero__title">Share Your Experience</h1>
-            <p className="wr-hero__subtitle">
-              Your honest feedback helps us continue crafting 100% pure, natural products and helps fellow shoppers choose with confidence.
-            </p>
-          </div>
-
-          <div className="wr-hero__stats-card">
-            <div className="wr-hero__score">{averageRating}</div>
-            <div className="wr-hero__stars">★★★★★</div>
-            <div className="wr-hero__count">
-              Based on {combinedCount.toLocaleString('en-IN')} reviews
-            </div>
-          </div>
-        </section>
 
         <div className="wr-layout">
           {/* Left / Top: Write a Review Form */}
