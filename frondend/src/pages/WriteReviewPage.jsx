@@ -191,9 +191,15 @@ export default function WriteReviewPage() {
                   >
                     Write Another Review
                   </button>
-                  <Link to="/shop" className="wr-secondary-btn">
-                    Continue Shopping
-                  </Link>
+                  {preselectedProductId ? (
+                    <Link to={`/product/${preselectedProductId}#product-reviews`} className="wr-secondary-btn">
+                      Back to Product
+                    </Link>
+                  ) : (
+                    <Link to="/shop" className="wr-secondary-btn">
+                      Continue Shopping
+                    </Link>
+                  )}
                 </div>
               </div>
             ) : (

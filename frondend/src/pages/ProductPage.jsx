@@ -285,7 +285,7 @@ export default function ProductPage() {
           <div className="product-reviews-sec__header">
             <div>
               <h2 className="product-related__title" style={{ marginBottom: '4px' }}>
-                Customer Reviews ({totalReviewCount})
+                Customer Reviews{productReviews.length > 0 ? ` (${productReviews.length})` : ''}
               </h2>
               <p className="product-reviews-sec__sub">
                 Real feedback from customers who tried {product.name}
@@ -296,17 +296,7 @@ export default function ProductPage() {
             </Link>
           </div>
 
-          {productReviews.length === 0 ? (
-            <div className="product-reviews-empty">
-              <p>No written reviews for this product yet. Be the first to share your experience!</p>
-              <Link
-                to={`/write-review?product=${product.id}`}
-                className="product-write-review-btn product-write-review-btn--empty"
-              >
-                ✍️ Write a Review
-              </Link>
-            </div>
-          ) : (
+          {productReviews.length > 0 && (
             <div className="product-reviews-list">
               {productReviews.map((rev) => {
                 const stars = Math.max(1, Math.min(5, Number(rev.rating) || 5));
