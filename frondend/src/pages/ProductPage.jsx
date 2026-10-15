@@ -292,7 +292,7 @@ export default function ProductPage() {
               </p>
             </div>
             <Link to={`/write-review?product=${product.id}`} className="product-write-review-btn">
-              ✍️ Write a Review
+              Write a Review <span className="product-write-review-btn__arrow">→</span>
             </Link>
           </div>
 
