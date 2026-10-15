@@ -292,7 +292,8 @@ export default function ProductPage() {
               </p>
             </div>
             <Link to={`/write-review?product=${product.id}`} className="product-write-review-btn">
-              Write a Review <span className="product-write-review-btn__arrow">→</span>
+              <span className="product-write-review-btn__text">Write a Review</span>
+              <span className="product-write-review-btn__arrow" aria-hidden="true">→</span>
             </Link>
           </div>
 

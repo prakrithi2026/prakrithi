@@ -487,7 +487,7 @@
 .product-write-review-btn {
   background: transparent;
   color: #00433D;
-  text-decoration: none;
+  text-decoration: none !important;
   padding: 0;
   border: none;
   border-radius: 0;
@@ -504,6 +504,16 @@
 .product-write-review-btn:active,
 .product-write-review-btn:focus-visible {
   color: #002d29;
+  text-decoration: none !important;
+}
+
+.product-write-review-btn__text {
+  text-decoration: none;
+}
+
+.product-write-review-btn:hover .product-write-review-btn__text,
+.product-write-review-btn:active .product-write-review-btn__text,
+.product-write-review-btn:focus-visible .product-write-review-btn__text {
   text-decoration: underline;
   text-underline-offset: 4px;
 }
@@ -512,11 +522,13 @@
   display: inline-block;
   font-size: 0.92rem;
   line-height: 1;
+  text-decoration: none !important;
   transition: transform 0.18s ease;
 }
 
 .product-write-review-btn:hover .product-write-review-btn__arrow {
   transform: translateX(3px);
+  text-decoration: none !important;
 }
 
 .product-reviews-empty {
