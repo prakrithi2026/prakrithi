@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useSiteConfig } from '../context/SiteConfigContext';
 import { useCart } from '../context/CartContext';
@@ -40,6 +40,19 @@ export default function ProductPage() {
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [addedFlash, setAddedFlash] = useState(false);
   const [productReviews, setProductReviews] = useState([]);
+  const reviewsRef = useRef(null);
+
+  const scrollToReviews = (e) => {
+    if (e) e.preventDefault();
+    if (reviewsRef.current) {
+      reviewsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      const el = document.getElementById('product-reviews');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  };
 
   const product = products.find(p => String(p.id) === String(id));
   const related = products
@@ -79,6 +92,14 @@ export default function ProductPage() {
       if (product.variants?.length > 0) setSelectedVariant(product.variants[0]);
     }
   }, [id, product]);
+
+  useEffect(() => {
+    if (location.hash === '#reviews' || location.hash === '#product-reviews') {
+      setTimeout(() => {
+        scrollToReviews();
+      }, 120);
+    }
+  }, [location.hash]);
 
   if (!product) {
     return (
@@ -180,12 +201,17 @@ export default function ProductPage() {
 
             {/* Rating */}
             <div className="product-rating-row">
-              <StarRating rating={parseFloat(product.rating) || 0} />
-              <span className="product-rating-score">{product.rating}</span>
-              <span className="product-rating-count">({totalReviewCount} reviews)</span>
-              <Link to={`/write-review?product=${product.id}`} className="product-write-review-inline">
-                ✍️ Write a review
-              </Link>
+              <button
+                type="button"
+                className="product-rating-clickable"
+                onClick={scrollToReviews}
+                title="Click to view customer reviews"
+                aria-label={`Rated ${product.rating} out of 5 stars from ${totalReviewCount} reviews. Click to see reviews.`}
+              >
+                <StarRating rating={parseFloat(product.rating) || 0} />
+                <span className="product-rating-score">{product.rating}</span>
+                <span className="product-rating-count">({totalReviewCount} reviews)</span>
+              </button>
             </div>
 
             {/* Price */}
@@ -255,11 +281,11 @@ export default function ProductPage() {
         </div>
 
         {/* Product Customer Reviews Section */}
-        <section className="product-reviews-sec">
+        <section className="product-reviews-sec" id="product-reviews" ref={reviewsRef}>
           <div className="product-reviews-sec__header">
             <div>
               <h2 className="product-related__title" style={{ marginBottom: '4px' }}>
-                Customer Reviews ({productReviews.length})
+                Customer Reviews ({totalReviewCount})
               </h2>
               <p className="product-reviews-sec__sub">
                 Real feedback from customers who tried {product.name}
@@ -273,6 +299,12 @@ export default function ProductPage() {
           {productReviews.length === 0 ? (
             <div className="product-reviews-empty">
               <p>No written reviews for this product yet. Be the first to share your experience!</p>
+              <Link
+                to={`/write-review?product=${product.id}`}
+                className="product-write-review-btn product-write-review-btn--empty"
+              >
+                ✍️ Write a Review
+              </Link>
             </div>
           ) : (
             <div className="product-reviews-list">
