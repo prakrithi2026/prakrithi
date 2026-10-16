@@ -531,16 +531,6 @@
   text-decoration: none !important;
 }
 
-.product-reviews-empty {
-  background: #f9fbf9;
-  border: 1.5px dashed #d5e6dd;
-  border-radius: 14px;
-  padding: 32px 20px;
-  text-align: center;
-  color: #6b7280;
-  font-size: 0.9rem;
-}
-
 .product-reviews-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -827,11 +817,6 @@
 .product-review-form__cancel:hover {
   background: #e5e7eb;
   color: #1f2937;
-}
-
-.product-write-review-btn--empty {
-  margin-top: 12px;
-  display: inline-flex;
 }
 
 

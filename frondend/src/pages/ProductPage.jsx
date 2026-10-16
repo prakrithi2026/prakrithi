@@ -515,22 +515,8 @@ export default function ProductPage() {
             </div>
           )}
 
-          {/* Reviews list or Empty state */}
-          {productReviews.length === 0 ? (
-            <div className="product-reviews-empty">
-              <p>No customer reviews for {product.name} yet. Be the first to share your experience!</p>
-              {!showReviewForm && (
-                <button
-                  type="button"
-                  className="product-write-review-btn product-write-review-btn--empty"
-                  onClick={() => setShowReviewForm(true)}
-                >
-                  <span className="product-write-review-btn__text">✍️ Write the First Review</span>
-                  <span className="product-write-review-btn__arrow" aria-hidden="true">→</span>
-                </button>
-              )}
-            </div>
-          ) : (
+          {/* Reviews list */}
+          {productReviews.length > 0 && (
             <div className="product-reviews-list">
               {productReviews.map((rev) => {
                 const stars = Math.max(1, Math.min(5, Number(rev.rating) || 5));
