@@ -41,6 +41,7 @@ export default function WriteReviewPage() {
   const [hoverRating, setHoverRating] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submittedProductId, setSubmittedProductId] = useState(preselectedProductId);
   const [errorMsg, setErrorMsg] = useState('');
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
 
@@ -68,6 +69,7 @@ export default function WriteReviewPage() {
   useEffect(() => {
     if (preselectedProductId) {
       setForm((prev) => ({ ...prev, product: preselectedProductId }));
+      setSubmittedProductId(preselectedProductId);
     }
   }, [preselectedProductId]);
 
@@ -105,6 +107,10 @@ export default function WriteReviewPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!form.product) {
+      setErrorMsg('Please select the product you want to review.');
+      return;
+    }
     if (!form.customer_name.trim()) {
       setErrorMsg('Please enter your name.');
       return;
@@ -128,6 +134,7 @@ export default function WriteReviewPage() {
         comment: form.comment,
       });
       setReviews((prev) => [created, ...prev.filter((r) => r.id !== created.id)]);
+      setSubmittedProductId(form.product);
       setSubmitted(true);
       setForm((prev) => ({
         ...prev,
@@ -181,25 +188,24 @@ export default function WriteReviewPage() {
                 <div className="wr-success-box__icon">🎉</div>
                 <h3>Thank You for Your Review!</h3>
                 <p>
-                  Your review has been submitted and is now visible in our customer reviews below.
+                  Your review has been submitted and is now published under the product.
                 </p>
                 <div className="wr-success-box__actions">
+                  {submittedProductId ? (
+                    <Link to={`/product/${submittedProductId}#product-reviews`} className="wr-submit-btn">
+                      View Review on Product Page →
+                    </Link>
+                  ) : null}
                   <button
                     type="button"
-                    className="wr-submit-btn"
+                    className="wr-secondary-btn"
                     onClick={() => setSubmitted(false)}
                   >
                     Write Another Review
                   </button>
-                  {preselectedProductId ? (
-                    <Link to={`/product/${preselectedProductId}#product-reviews`} className="wr-secondary-btn">
-                      Back to Product
-                    </Link>
-                  ) : (
-                    <Link to="/shop" className="wr-secondary-btn">
-                      Continue Shopping
-                    </Link>
-                  )}
+                  <Link to="/shop" className="wr-secondary-btn">
+                    Continue Shopping
+                  </Link>
                 </div>
               </div>
             ) : (
@@ -266,15 +272,16 @@ export default function WriteReviewPage() {
                 {/* Product Selection & Title */}
                 <div className="wr-row">
                   <div className="wr-field">
-                    <label htmlFor="wr-product" className="wr-label">Product Reviewed (optional)</label>
+                    <label htmlFor="wr-product" className="wr-label">Product Reviewed *</label>
                     <select
                       id="wr-product"
                       name="product"
                       className="wr-select"
                       value={form.product}
                       onChange={handleChange}
+                      required
                     >
-                      <option value="">General Store Experience</option>
+                      <option value="" disabled>-- Select a Product to Review * --</option>
                       {products.map((p) => (
                         <option key={p.id} value={p.id}>
                           {p.name}

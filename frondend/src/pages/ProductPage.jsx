@@ -10,8 +10,16 @@ import CartModal from '../components/storefront/CartModal';
 import AnnouncementBar from '../components/storefront/AnnouncementBar';
 import ProductCard from '../components/storefront/ProductCard';
 import ProductLikeIcon from '../components/storefront/ProductLikeIcon';
-import { fetchReviews, deleteReviewById, isOwnReview } from '../utils/reviewsApi';
+import { fetchReviews, createReview, deleteReviewById, isOwnReview } from '../utils/reviewsApi';
 import './ProductPage.css';
+
+const RATING_LABELS = {
+  1: 'Poor',
+  2: 'Fair',
+  3: 'Good',
+  4: 'Very Good',
+  5: 'Excellent!',
+};
 
 const StarRating = ({ rating = 0, max = 5 }) => {
   const full = Math.floor(rating);
@@ -42,6 +50,29 @@ export default function ProductPage() {
   const [productReviews, setProductReviews] = useState([]);
   const reviewsRef = useRef(null);
 
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewForm, setReviewForm] = useState({
+    rating: 5,
+    customer_name: user?.name || '',
+    customer_email: user?.email || '',
+    title: '',
+    comment: '',
+  });
+  const [hoverRating, setHoverRating] = useState(0);
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [reviewSuccessMsg, setReviewSuccessMsg] = useState('');
+  const [reviewErrorMsg, setReviewErrorMsg] = useState('');
+
+  useEffect(() => {
+    if (user) {
+      setReviewForm((prev) => ({
+        ...prev,
+        customer_name: prev.customer_name || user.name || '',
+        customer_email: prev.customer_email || user.email || '',
+      }));
+    }
+  }, [user]);
+
   const scrollToReviews = (e) => {
     if (e) e.preventDefault();
     if (reviewsRef.current) {
@@ -69,6 +100,55 @@ export default function ProductPage() {
     if (!window.confirm('Delete your review?')) return;
     await deleteReviewById(reviewId);
     setProductReviews((prev) => prev.filter((r) => String(r.id) !== String(reviewId)));
+  };
+
+  const handleReviewFormChange = (e) => {
+    const { name, value } = e.target;
+    setReviewForm((prev) => ({ ...prev, [name]: value }));
+    if (reviewErrorMsg) setReviewErrorMsg('');
+  };
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    if (!reviewForm.customer_name.trim()) {
+      setReviewErrorMsg('Please enter your name.');
+      return;
+    }
+    if (!reviewForm.comment.trim()) {
+      setReviewErrorMsg('Please write your review comment.');
+      return;
+    }
+
+    setSubmittingReview(true);
+    setReviewErrorMsg('');
+    try {
+      const created = await createReview({
+        customer_name: reviewForm.customer_name,
+        customer_email: reviewForm.customer_email,
+        product: product.id,
+        product_name: product.name,
+        rating: reviewForm.rating,
+        title: reviewForm.title,
+        comment: reviewForm.comment,
+      });
+
+      setProductReviews((prev) => [created, ...prev.filter((r) => r.id !== created.id)]);
+      setReviewSuccessMsg(`✓ Thank you! Your review for ${product.name} has been published below.`);
+      setReviewForm((prev) => ({
+        ...prev,
+        rating: 5,
+        title: '',
+        comment: '',
+      }));
+      setShowReviewForm(false);
+      setTimeout(() => {
+        setReviewSuccessMsg('');
+      }, 6000);
+    } catch {
+      setReviewErrorMsg('Something went wrong while submitting your review. Please try again.');
+    } finally {
+      setSubmittingReview(false);
+    }
   };
 
   useEffect(() => {
@@ -291,13 +371,166 @@ export default function ProductPage() {
                 Real feedback from customers who tried {product.name}
               </p>
             </div>
-            <Link to={`/write-review?product=${product.id}`} className="product-write-review-btn">
-              <span className="product-write-review-btn__text">Write a Review</span>
-              <span className="product-write-review-btn__arrow" aria-hidden="true">→</span>
-            </Link>
+            <button
+              type="button"
+              className="product-write-review-btn"
+              onClick={() => {
+                setShowReviewForm((prev) => !prev);
+                setReviewErrorMsg('');
+              }}
+            >
+              <span className="product-write-review-btn__text">
+                {showReviewForm ? '✕ Close Form' : 'Write a Review'}
+              </span>
+              {!showReviewForm && (
+                <span className="product-write-review-btn__arrow" aria-hidden="true">→</span>
+              )}
+            </button>
           </div>
 
-          {productReviews.length > 0 && (
+          {/* Success Banner */}
+          {reviewSuccessMsg && (
+            <div className="product-review-success-alert">
+              {reviewSuccessMsg}
+            </div>
+          )}
+
+          {/* Inline Write a Review Form */}
+          {showReviewForm && (
+            <div className="product-review-form-card">
+              <h3 className="product-review-form-title">
+                ✍️ Write a Review for {product.name}
+              </h3>
+              <form onSubmit={handleReviewSubmit} className="product-review-form">
+                {reviewErrorMsg && (
+                  <div className="product-review-error-alert">{reviewErrorMsg}</div>
+                )}
+
+                {/* Star rating picker */}
+                <div className="product-review-form__field">
+                  <label className="product-review-form__label">Overall Rating *</label>
+                  <div className="product-review-star-picker">
+                    <div
+                      className="product-review-star-picker__stars"
+                      onMouseLeave={() => setHoverRating(0)}
+                    >
+                      {[1, 2, 3, 4, 5].map((star) => {
+                        const activeRating = hoverRating || reviewForm.rating;
+                        return (
+                          <button
+                            key={star}
+                            type="button"
+                            className={`product-review-star-btn ${star <= activeRating ? 'active' : ''}`}
+                            onMouseEnter={() => setHoverRating(star)}
+                            onClick={() => setReviewForm((prev) => ({ ...prev, rating: star }))}
+                            aria-label={`Rate ${star} star`}
+                          >
+                            ★
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <span className="product-review-star-picker__label">
+                      {RATING_LABELS[hoverRating || reviewForm.rating]} ({hoverRating || reviewForm.rating}/5)
+                    </span>
+                  </div>
+                </div>
+
+                <div className="product-review-form__row">
+                  <div className="product-review-form__field">
+                    <label className="product-review-form__label" htmlFor="prf-name">Your Name *</label>
+                    <input
+                      id="prf-name"
+                      name="customer_name"
+                      type="text"
+                      className="product-review-form__input"
+                      placeholder="Enter your full name"
+                      value={reviewForm.customer_name}
+                      onChange={handleReviewFormChange}
+                      required
+                    />
+                  </div>
+
+                  <div className="product-review-form__field">
+                    <label className="product-review-form__label" htmlFor="prf-email">Email Address (optional)</label>
+                    <input
+                      id="prf-email"
+                      name="customer_email"
+                      type="email"
+                      className="product-review-form__input"
+                      placeholder="your@email.com"
+                      value={reviewForm.customer_email}
+                      onChange={handleReviewFormChange}
+                    />
+                  </div>
+                </div>
+
+                <div className="product-review-form__field">
+                  <label className="product-review-form__label" htmlFor="prf-title">Review Headline (optional)</label>
+                  <input
+                    id="prf-title"
+                    name="title"
+                    type="text"
+                    className="product-review-form__input"
+                    placeholder="e.g. Pure, authentic & highly recommended!"
+                    value={reviewForm.title}
+                    onChange={handleReviewFormChange}
+                  />
+                </div>
+
+                <div className="product-review-form__field">
+                  <label className="product-review-form__label" htmlFor="prf-comment">Your Review *</label>
+                  <textarea
+                    id="prf-comment"
+                    name="comment"
+                    rows={4}
+                    className="product-review-form__textarea"
+                    placeholder={`Tell other customers what you loved about ${product.name}...`}
+                    value={reviewForm.comment}
+                    onChange={handleReviewFormChange}
+                    required
+                  />
+                </div>
+
+                <div className="product-review-form__actions">
+                  <button
+                    type="submit"
+                    className="product-review-form__submit"
+                    disabled={submittingReview}
+                  >
+                    {submittingReview ? 'Submitting…' : '✨ Submit Review'}
+                  </button>
+                  <button
+                    type="button"
+                    className="product-review-form__cancel"
+                    onClick={() => {
+                      setShowReviewForm(false);
+                      setReviewErrorMsg('');
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {/* Reviews list or Empty state */}
+          {productReviews.length === 0 ? (
+            <div className="product-reviews-empty">
+              <p>No customer reviews for {product.name} yet. Be the first to share your experience!</p>
+              {!showReviewForm && (
+                <button
+                  type="button"
+                  className="product-write-review-btn product-write-review-btn--empty"
+                  onClick={() => setShowReviewForm(true)}
+                >
+                  <span className="product-write-review-btn__text">✍️ Write the First Review</span>
+                  <span className="product-write-review-btn__arrow" aria-hidden="true">→</span>
+                </button>
+              )}
+            </div>
+          ) : (
             <div className="product-reviews-list">
               {productReviews.map((rev) => {
                 const stars = Math.max(1, Math.min(5, Number(rev.rating) || 5));
@@ -307,6 +540,7 @@ export default function ProductPage() {
                     <div className="product-review-item__top">
                       <div>
                         <span className="product-review-item__author">{rev.customer_name}</span>
+                        {canDelete && <span className="product-review-item__own-badge">Your Review</span>}
                         <span className="product-review-item__date">
                           {rev.created_at
                             ? new Date(rev.created_at).toLocaleDateString('en-IN', {
