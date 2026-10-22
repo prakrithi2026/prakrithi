@@ -21,31 +21,19 @@ export default function DeliverySection() {
             const rawImage = step.image || defaultConfig.delivery?.steps?.[i]?.image || '';
             const stepImage = rawImage ? svgToDataUrl(rawImage) : '';
             return (
-              <div key={i} className="delivery-step-group">
-                <div className="delivery-step">
-                  <div className="step-icon">
-                    {stepImage ? (
-                      <img
-                        src={stepImage}
-                        alt={step.label || `Step ${i + 1}`}
-                        className="step-icon-img"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <span className="step-icon-dot">●</span>
-                    )}
-                  </div>
-                </div>
-                {i < delivery.steps.length - 1 && (
-                  <div className="step-arrow">
+              <div key={i} className="delivery-step">
+                <div className="step-icon">
+                  {stepImage ? (
                     <img
-                      src="/images/arrow.svg"
-                      alt="→"
-                      className="step-arrow-img"
-                      onError={(e) => { e.currentTarget.src = '/images/Arrow.png'; }}
+                      src={stepImage}
+                      alt={step.label || `Step ${i + 1}`}
+                      className="step-icon-img"
+                      loading="lazy"
                     />
-                  </div>
-                )}
+                  ) : (
+                    <span className="step-icon-dot">●</span>
+                  )}
+                </div>
               </div>
             );
           })}

@@ -9,7 +9,7 @@ export default function ReviewSection() {
   const { image = '', googleRating = 0, totalReviews = 0, reviewUrl = '' } = reviewsSection;
 
   const dynamicStyle = {
-    background: 'linear-gradient(90deg, #00433D 0%, #00433D 32%, #A0D075 100%)'
+    background: '#00433D'
   };
 
   // Only display image if admin provided an image URL or SVG code, or fallback to default

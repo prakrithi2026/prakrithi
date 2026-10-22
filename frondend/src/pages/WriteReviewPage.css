@@ -31,7 +31,7 @@
 
 /* ── Hero Banner ── */
 .wr-hero {
-  background: linear-gradient(90deg, #00433D 0%, #00433D 38%, #A0D075 100%);
+  background: #00433D;
   border-radius: 24px;
   padding: 40px 44px;
   color: #ffffff;
