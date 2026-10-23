@@ -347,7 +347,7 @@ const defaultConfig = {
       "badgeColor": "#00433D",
       "badgeTextColor": null,
       "rating": "4.9",
-      "reviews": 28,
+      "reviews": 142,
       "couponNote": null,
       "category": "spices"
     },
