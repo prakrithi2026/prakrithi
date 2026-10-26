@@ -155,14 +155,14 @@ const defaultConfig = {
   },
   "sections": [
     {
-      "id": "shopByCategory",
-      "label": "Shop by Category",
+      "id": "shopByProduct",
+      "label": "Shop by Product",
       "enabled": true,
       "order": 0
     },
     {
-      "id": "shopByProduct",
-      "label": "Shop by Product",
+      "id": "shopByCategory",
+      "label": "Shop by Category",
       "enabled": true,
       "order": 1
     },

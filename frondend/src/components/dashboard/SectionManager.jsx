@@ -30,7 +30,7 @@ export default function SectionManager() {
   };
 
   const sortedSections = [...sections].sort((a, b) => a.order - b.order);
-  const coreSections = ['shopByCategory', 'shopByProduct', 'delivery', 'press', 'reviews', 'ourStory'];
+  const coreSections = ['shopByProduct', 'shopByCategory', 'delivery', 'press', 'reviews', 'ourStory'];
 
   const toggleSection = (id) => {
     const updated = sections.map((s) => s.id === id ? { ...s, enabled: !s.enabled } : s);

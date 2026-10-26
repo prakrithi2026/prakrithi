@@ -16,8 +16,8 @@ import CartModal from '../components/storefront/CartModal';
 import CustomSection from '../components/storefront/CustomSection';
 
 const coreSectionComponents = {
-  shopByCategory: ShopByCategory,
   shopByProduct: ShopByProduct,
+  shopByCategory: ShopByCategory,
   delivery: DeliverySection,
   press: PressSection,
   reviews: ReviewSection,

@@ -123,14 +123,14 @@ function normalizeSections(cfg) {
     }
   });
 
-  // 3. Ensure Shop by Category comes before Shop by Product
-  const catSec = cleaned.find((s) => s.id === 'shopByCategory');
+  // 3. Ensure Shop by Product comes first (order 0), then Shop by Category immediately after (order 1)
   const prodSec = cleaned.find((s) => s.id === 'shopByProduct');
-  if (catSec && prodSec && catSec.order >= prodSec.order) {
-    catSec.order = 0;
-    prodSec.order = 1;
+  const catSec = cleaned.find((s) => s.id === 'shopByCategory');
+  if (prodSec && catSec && (prodSec.order !== 0 || catSec.order !== 1)) {
+    prodSec.order = 0;
+    catSec.order = 1;
     cleaned.forEach((s) => {
-      if (s.id !== 'shopByCategory' && s.id !== 'shopByProduct' && s.order <= 1) {
+      if (s.id !== 'shopByProduct' && s.id !== 'shopByCategory' && s.order <= 1) {
         s.order = s.order + 2;
       }
     });
