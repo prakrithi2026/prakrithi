@@ -171,16 +171,21 @@ function getInitialConfig() {
   if (!Array.isArray(base.sections)) {
     base.sections = defaultConfig.sections || [];
   }
-  // Ensure delivery steps have valid image fallback
-  if (base.delivery && Array.isArray(base.delivery.steps) && Array.isArray(defaultConfig.delivery?.steps)) {
-    base.delivery.steps = base.delivery.steps.map((step, i) => {
-      const defStep = defaultConfig.delivery.steps[i];
+  // Ensure delivery steps have valid image fallback and all default steps are preserved
+  if (base.delivery && Array.isArray(defaultConfig.delivery?.steps)) {
+    const rawSteps = Array.isArray(base.delivery.steps) ? base.delivery.steps : [];
+    base.delivery.steps = defaultConfig.delivery.steps.map((defStep, i) => {
+      const rawStep = rawSteps[i] || {};
       return {
         ...defStep,
-        ...step,
-        image: step.image || defStep?.image || ''
+        ...rawStep,
+        image: rawStep.image || defStep.image || '',
+        label: rawStep.label || defStep.label || '',
       };
     });
+    if (rawSteps.length > defaultConfig.delivery.steps.length) {
+      base.delivery.steps.push(...rawSteps.slice(defaultConfig.delivery.steps.length));
+    }
   }
   // Ensure press logos have valid image fallback
   if (base.press && Array.isArray(base.press.logos) && Array.isArray(defaultConfig.press?.logos)) {
@@ -396,16 +401,21 @@ export function SiteConfigProvider({ children }) {
         }
 
 
-        // Ensure delivery steps have valid image fallback
-        if (mergedConfig.delivery && Array.isArray(mergedConfig.delivery.steps) && Array.isArray(defaultConfig.delivery?.steps)) {
-          mergedConfig.delivery.steps = mergedConfig.delivery.steps.map((step, i) => {
-            const defStep = defaultConfig.delivery.steps[i];
+        // Ensure delivery steps have valid image fallback and all default steps are preserved
+        if (mergedConfig.delivery && Array.isArray(defaultConfig.delivery?.steps)) {
+          const rawSteps = Array.isArray(mergedConfig.delivery.steps) ? mergedConfig.delivery.steps : [];
+          mergedConfig.delivery.steps = defaultConfig.delivery.steps.map((defStep, i) => {
+            const rawStep = rawSteps[i] || {};
             return {
               ...defStep,
-              ...step,
-              image: step.image || defStep?.image || ''
+              ...rawStep,
+              image: rawStep.image || defStep.image || '',
+              label: rawStep.label || defStep.label || '',
             };
           });
+          if (rawSteps.length > defaultConfig.delivery.steps.length) {
+            mergedConfig.delivery.steps.push(...rawSteps.slice(defaultConfig.delivery.steps.length));
+          }
         }
 
         // Ensure press logos have valid image fallback

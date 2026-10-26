@@ -10,6 +10,16 @@ export default function DeliverySection() {
 
   if (!delivery || !delivery.steps) return null;
 
+  // Ensure all steps exist (fallback to defaultConfig steps if fewer than 6 are stored)
+  const steps = (delivery.steps.length >= (defaultConfig.delivery?.steps?.length || 6))
+    ? delivery.steps
+    : (defaultConfig.delivery?.steps || delivery.steps).map((defStep, i) => ({
+        ...defStep,
+        ...(delivery.steps[i] || {}),
+        image: delivery.steps[i]?.image || defStep.image || '',
+        label: delivery.steps[i]?.label || defStep.label || '',
+      }));
+
   return (
     <section className="delivery-section">
       <div className="delivery-banner">
@@ -18,9 +28,11 @@ export default function DeliverySection() {
           {delivery.tcNote && <p className="tc-note">{delivery.tcNote}</p>}
         </div>
         <div className="delivery-steps">
-          {delivery.steps.map((step, i) => {
-            const rawImage = step.image || defaultConfig.delivery?.steps?.[i]?.image || '';
+          {steps.map((step, i) => {
+            const defStep = defaultConfig.delivery?.steps?.[i];
+            const rawImage = step.image || defStep?.image || '';
             const stepImage = rawImage ? svgToDataUrl(rawImage) : '';
+            const stepLabel = step.label || defStep?.label || `Step ${i + 1}`;
             return (
               <Fragment key={i}>
                 <div className="delivery-step">
@@ -28,7 +40,7 @@ export default function DeliverySection() {
                     {stepImage ? (
                       <img
                         src={stepImage}
-                        alt={step.label || `Step ${i + 1}`}
+                        alt={stepLabel}
                         className="step-icon-img"
                         loading="lazy"
                       />
@@ -37,13 +49,14 @@ export default function DeliverySection() {
                     )}
                   </div>
                 </div>
-                {i < delivery.steps.length - 1 && (
+                {i < steps.length - 1 && (
                   <div className="step-arrow" aria-hidden="true">
                     <img
-                      src="/images/delivery_Arrow.png"
+                      src="/images/delivery_Arrow.svg"
                       alt="→"
                       className="step-arrow-img"
                       loading="lazy"
+                      onError={(e) => { e.currentTarget.src = '/images/delivery_Arrow.png'; }}
                     />
                   </div>
                 )}
