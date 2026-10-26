@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useSiteConfig } from '../../context/SiteConfigContext';
+import defaultConfig from '../../data/defaultConfig';
 import './ShopByCategory.css';
 
 const INITIAL_FILL_PERCENT = 25;
@@ -14,12 +15,14 @@ export default function ShopByCategory() {
   const viewAllText = sectionConfig.viewAllText || 'View All →';
   const viewAllLink = sectionConfig.viewAllLink || '/shop';
 
-  // Category cards explicitly added by admin (only if BOTH image and label/title exist)
-  const rawCategories = Array.isArray(sectionConfig.categories)
+  // Category cards explicitly added by admin, or fallback to defaultConfig
+  const rawCategories = (Array.isArray(sectionConfig.categories) && sectionConfig.categories.length > 0)
     ? sectionConfig.categories
-    : (Array.isArray(config.shopByCategory?.categories)
+    : ((Array.isArray(config.shopByCategory?.categories) && config.shopByCategory.categories.length > 0)
       ? config.shopByCategory.categories
-      : (Array.isArray(config.shopByConcern?.categories) ? config.shopByConcern.categories : []));
+      : ((Array.isArray(config.shopByConcern?.categories) && config.shopByConcern.categories.length > 0)
+        ? config.shopByConcern.categories
+        : (defaultConfig.shopByCategory?.categories || [])));
 
   const categories = rawCategories
     .filter((c) => c && c.image && String(c.image).trim() !== '' && (c.label || c.title || c.name) && String(c.label || c.title || c.name).trim() !== '')

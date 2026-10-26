@@ -83,13 +83,66 @@ function normalizeColors(cfg) {
 
 function normalizeSections(cfg) {
   if (!cfg || !Array.isArray(cfg.sections)) return cfg;
-  const sbp = cfg.sections.find(s => s.id === 'shopByProduct');
-  const sbc = cfg.sections.find(s => s.id === 'shopByCategory');
-  const del = cfg.sections.find(s => s.id === 'delivery');
-  if (sbp && sbc && del && sbp.order === 0 && del.order === 1 && sbc.order === 2) {
-    sbc.order = 1;
-    del.order = 2;
+
+  // 1. Canonicalize legacy shopByConcern to shopByCategory and remove duplicates
+  let hasShopByCategory = false;
+  const cleaned = [];
+
+  for (const s of cfg.sections) {
+    if (!s || !s.id) continue;
+    let secId = s.id;
+    let secLabel = s.label;
+
+    if (secId === 'shopByConcern' || secId === 'shopByCategory') {
+      if (hasShopByCategory) {
+        // Skip duplicate category section
+        continue;
+      }
+      hasShopByCategory = true;
+      secId = 'shopByCategory';
+      secLabel = 'Shop by Category';
+    }
+
+    if (cleaned.some((existing) => existing.id === secId)) {
+      continue;
+    }
+
+    cleaned.push({
+      ...s,
+      id: secId,
+      label: secLabel,
+    });
   }
+
+  // 2. Ensure all core sections from defaultConfig are present
+  const existingIds = new Set(cleaned.map((s) => s.id));
+  (defaultConfig.sections || []).forEach((defSec) => {
+    if (!existingIds.has(defSec.id)) {
+      cleaned.push({ ...defSec });
+      existingIds.add(defSec.id);
+    }
+  });
+
+  // 3. Ensure Shop by Category comes before Shop by Product
+  const catSec = cleaned.find((s) => s.id === 'shopByCategory');
+  const prodSec = cleaned.find((s) => s.id === 'shopByProduct');
+  if (catSec && prodSec && catSec.order >= prodSec.order) {
+    catSec.order = 0;
+    prodSec.order = 1;
+    cleaned.forEach((s) => {
+      if (s.id !== 'shopByCategory' && s.id !== 'shopByProduct' && s.order <= 1) {
+        s.order = s.order + 2;
+      }
+    });
+  }
+
+  // 4. Sort and re-index orders to 0, 1, 2, ...
+  cleaned.sort((a, b) => a.order - b.order);
+  cleaned.forEach((s, idx) => {
+    s.order = idx;
+  });
+
+  cfg.sections = cleaned;
   return cfg;
 }
 
@@ -335,14 +388,11 @@ export function SiteConfigProvider({ children }) {
 
         const validConfigData = configData || {};
         const mergedConfig = normalizeSections(normalizeColors(deepMerge(defaultConfig, validConfigData)));
-        
-        // Ensure new sections added to defaultConfig are present even if backend has an older sections array
+
+        // Ensure backend sections are fully merged, deduplicated and normalized
         if (configData.sections && Array.isArray(configData.sections)) {
-          const existingIds = new Set(configData.sections.map(s => s.id));
-          const newSections = defaultConfig.sections.filter(s => !existingIds.has(s.id));
-          if (newSections.length > 0) {
-            mergedConfig.sections = [...configData.sections, ...newSections];
-          }
+          mergedConfig.sections = configData.sections;
+          normalizeSections(mergedConfig);
         }
 
 

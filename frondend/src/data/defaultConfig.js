@@ -155,14 +155,14 @@ const defaultConfig = {
   },
   "sections": [
     {
-      "id": "shopByProduct",
-      "label": "Shop by Product",
+      "id": "shopByCategory",
+      "label": "Shop by Category",
       "enabled": true,
       "order": 0
     },
     {
-      "id": "shopByCategory",
-      "label": "Shop by Category",
+      "id": "shopByProduct",
+      "label": "Shop by Product",
       "enabled": true,
       "order": 1
     },
@@ -195,7 +195,36 @@ const defaultConfig = {
     "title": "Shop By Category",
     "viewAllText": "View All →",
     "viewAllLink": "/shop",
-    "categories": []
+    "categories": [
+      {
+        "id": "category-kerala-spices",
+        "label": "Kerala Spices",
+        "category": "spices",
+        "image": "/images/categories/kerala-spices-clean.webp",
+        "link": "/shop?category=spices"
+      },
+      {
+        "id": "category-organic-cow-ghee",
+        "label": "Organic Cow Ghee",
+        "category": "ghee",
+        "image": "/images/categories/organic-cow-ghee-clean.webp",
+        "link": "/shop?category=ghee"
+      },
+      {
+        "id": "category-blended-spices",
+        "label": "Blended Spices",
+        "category": "blended-spices",
+        "image": "/images/categories/blended-spices-clean.webp",
+        "link": "/shop?category=blended-spices"
+      },
+      {
+        "id": "category-raw-honey",
+        "label": "Raw Honey",
+        "category": "honey",
+        "image": "/images/categories/raw-honey-clean.webp",
+        "link": "/shop?category=honey"
+      }
+    ]
   },
   "shopByConcern": {
     "title": "Shop By Category",

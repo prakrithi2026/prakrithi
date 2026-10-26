@@ -15,12 +15,10 @@ import Footer from '../components/storefront/Footer';
 import CartModal from '../components/storefront/CartModal';
 import CustomSection from '../components/storefront/CustomSection';
 
-
 const coreSectionComponents = {
+  shopByCategory: ShopByCategory,
   shopByProduct: ShopByProduct,
   delivery: DeliverySection,
-  shopByCategory: ShopByCategory,
-  shopByConcern: ShopByCategory,
   press: PressSection,
   reviews: ReviewSection,
   ourStory: OurStorySection,
@@ -37,8 +35,6 @@ export default function HomePage() {
     document.title = `${config.navbar?.brandName || 'Prakrithi'} — 100% Natural Products`;
   }, [config.navbar?.brandName]);
 
-
-
   // Apply theme CSS variables dynamically
   const themeStyle = {
     '--primary': theme.primaryColor,
@@ -51,10 +47,21 @@ export default function HomePage() {
     fontFamily: theme.fontFamily,
   };
 
-  // Sort sections by order and render enabled ones
+  // Sort sections by order, deduplicate core sections, and render enabled ones
+  const renderedCoreSections = new Set();
   const sortedSections = [...sections]
-    .filter((s) => s.enabled)
-    .sort((a, b) => a.order - b.order);
+    .filter((s) => s && s.enabled)
+    .sort((a, b) => a.order - b.order)
+    .filter((s) => {
+      const canonicalId = s.id === 'shopByConcern' ? 'shopByCategory' : s.id;
+      if (coreSectionComponents[canonicalId]) {
+        if (renderedCoreSections.has(canonicalId)) {
+          return false;
+        }
+        renderedCoreSections.add(canonicalId);
+      }
+      return true;
+    });
 
   return (
     <div className="storefront" style={themeStyle}>
@@ -63,9 +70,10 @@ export default function HomePage() {
       <HeroSection />
 
       {sortedSections.map((section) => {
+        const canonicalId = section.id === 'shopByConcern' ? 'shopByCategory' : section.id;
         // Core section
-        const CoreComponent = coreSectionComponents[section.id];
-        if (CoreComponent) return <CoreComponent key={section.id} />;
+        const CoreComponent = coreSectionComponents[canonicalId];
+        if (CoreComponent) return <CoreComponent key={canonicalId} />;
 
         // Custom section (banner, textBlock, cta, etc.)
         return <CustomSection key={section.id} sectionData={section} />;

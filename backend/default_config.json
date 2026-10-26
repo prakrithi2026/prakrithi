@@ -64,7 +64,7 @@
         "id": "new",
         "label": "New arrivals",
         "href": "#",
-        "badge": "Trending ⚡",
+        "badge": "Trending âš¡",
         "badgeColor": "#00433D",
         "badgeTextColor": "#FFFFFF"
       },
@@ -140,13 +140,13 @@
     "productImages": [
       {
         "id": 1,
-        "emoji": "🌿",
+        "emoji": "ðŸŒ¿",
         "label": "Kerala\nSpices",
         "image": ""
       },
       {
         "id": 2,
-        "emoji": "🌶️",
+        "emoji": "ðŸŒ¶ï¸",
         "label": "Black\nPepper",
         "image": ""
       }
@@ -155,15 +155,15 @@
   },
   "sections": [
     {
-      "id": "shopByProduct",
-      "label": "Shop by Product",
+      "id": "shopByCategory",
+      "label": "Shop by Category",
       "enabled": true,
       "order": 0,
       "bgImage": ""
     },
     {
-      "id": "shopByCategory",
-      "label": "Shop by Category",
+      "id": "shopByProduct",
+      "label": "Shop by Product",
       "enabled": true,
       "order": 1,
       "bgImage": ""
@@ -248,7 +248,7 @@
     "bgColor": "#C5F1A9",
     "logos": [
       {
-        "name": "മാതൃഭൂമി",
+        "name": "à´®à´¾à´¤àµƒà´­àµ‚à´®à´¿",
         "style": "malayalam",
         "image": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjIxIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDIyMSAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0yNC45NDY3IDU3Ljk0OTlDMjUuMTY3OSA1OC4yNzIzIDI1LjQ5NDIgNTguNDg3NiAyNS44NTY4IDU4LjU1MDNDMjYuMjE5NCA1OC42MTMgMjYuNTg5OSA1OC41MTgzIDI2Ljg5MDMgNTguMjg2MUwzMC4yNDk5IDU1LjQxMzJDMzEuMzMyNyA1NC40MDQ2IDMxLjI0OTQgNTMuODg1IDMwLjI0OTkgNTMuMjczN0MyMy42NDE4IDQ5LjE0NzcgMjguMDU2NCAzOC42MzM5IDM1LjI3NTMgMzkuMDAwNkM0Mi40OTQzIDM5LjM2NzQgNDEuOTM5IDQ5Ljc1OSAzNS45Njk1IDU0LjI4MjNDMjkuMzg5MSA1OS44MTQzIDI1LjUwMiA2MC4zOTUgMjIuMDg2OSA1OS43MjI2QzIxLjQyMDYgNjEuNzA5MyAyMC43ODIgNjMuNjk1OSAyMC4xNDM0IDY1LjgzNTNINTMuNDYxNUM1MS4wODk4IDU5LjcyNzEgNDkuNTM3MyA1My4yNzE5IDQ4Ljg1MjUgNDYuNjcyTDQzLjkxMDMgNTUuMDc3TDQ1LjQzNzQgNjAuNzYxOEwzMy43MjA1IDYwLjk0NTJDNDIuMjcyMiA1Ny4wOTQyIDQ3LjI2OTkgNTIuMDUxMiA0Ny4wMiA0NC45OTExQzQ2Ljc3MDEgMzcuOTMwOSA0MS42MzM2IDMzLjk1NzcgMzMuNTI2MiAzNC40NDY3QzIyLjQyMDEgMzQuNzIxNyAxNS45Nzg2IDQ4LjkzMzcgMjQuOTQ2NyA1OC4xMDI4VjU3Ljk0OTlaIiBmaWxsPSIjMDA0MzNEIi8+CjxwYXRoIGQ9Ik01OC4zNzU1IDQ3LjI4MzRMNTIuODIyNSA0NC4yMjcxQzUxLjIzOTkgNDMuMTg3OSA1MS4yMzk5IDQxLjcyMDkgNTIuODIyNSAzOS43OTU0QzYwLjk1NzcgMjkuNjc4OSA3My4xNDY2IDM2LjczOSA3Mi44OTY3IDUwLjg1OTNDNzIuODk2NyA2Ni42MzAxIDU2LjczNzQgNzAuNzU2MSA1Mi4yMTE3IDU5LjExMTVMNTYuNzkyOSA1Ni4wNTUxQzU4LjI5MjIgNjAuMTIwMSA1OS41Njk0IDYxLjAwNjQgNjEuMDQxIDYxLjA5ODFDNjQuODcyNiA2MS4zNDI2IDY2LjU5NCA1Ni44NDk4IDY2LjU5NCA1MS4wNDI3QzY2LjU5NCA0NC4yMjcxIDY1LjY3NzcgMzkuODg3MSA2Mi4xMjM4IDM5LjIxNDdDNTkuMzQ3MyAzOC42OTUxIDU2LjkwNCA0MS41OTg2IDU4LjIzNjcgNDcuMjIyM0w1OC4zNzU1IDQ3LjI4MzRaIiBmaWxsPSIjMDA0MzNEIi8+CjxwYXRoIGQ9Ik0xNjQuNDY2IDU3Ljk1MDdDMTY0LjY3MyA1OC4yNzM4IDE2NC45ODggNTguNDkzNyAxNjUuMzQyIDU4LjU2MjRDMTY1LjY5NSA1OC42MzExIDE2Ni4wNTkgNTguNTQzMSAxNjYuMzU0IDU4LjMxNzVMMTY2LjUyMSA1OC4xNjQ3TDE2OS44ODEgNTUuMjkxN0MxNzAuOTYzIDU0LjI4MzEgMTcwLjg4IDUzLjc2MzYgMTY5Ljg4MSA1My4xNTIzQzE2My4yNDUgNDkuMDI2MiAxNjcuNjU5IDM4LjUxMjQgMTc0LjkwNiAzOC44NzkyQzE4Mi4xNTMgMzkuMjQ1OSAxODEuNTcgNDkuNjM3NSAxNzUuNiA1NC4xNjA5QzE2OS4wMiA1OS42OTI5IDE2NS4xMDUgNjAuMjczNiAxNjEuNzE4IDU5LjYwMTJMMTU5Ljc3NCA2NS43MTM5SDE5My4wOTJDMTkwLjc1NiA1OS42Njg3IDE4OS4yMTQgNTMuMjg4MyAxODguNTExIDQ2Ljc2NDVMMTgzLjU2OSA1NS4xNjk1QzE4NC4wOTYgNTcuMDMzOCAxODQuNTk2IDU4Ljk4OTkgMTg1LjEyNCA2MC44NTQzTDE3My4zNzkgNjEuMDM3N0MxODEuOTMxIDU3LjE4NjcgMTg2LjkyOCA1Mi4xNDM3IDE4Ni42NzggNDUuMDgzNUMxODYuNDI5IDM4LjAyMzQgMTgxLjMyIDM0LjAxOTYgMTczLjIxMiAzNC4zNTU4QzE2Mi4xMDYgMzQuNjMwOSAxNTUuNjM3IDQ4Ljg0MjggMTY0LjYzMyA1OC4wMTE5TDE2NC40NjYgNTcuOTUwN1oiIGZpbGw9IiMwMDQzM0QiLz4KPHBhdGggZD0iTTE4MS43MDkgMzQuNzUzNUwxNzQuNTE4IDMyLjcwNThDMTc1Ljk4OSAyNS43Njc5IDE4Ni4wOTYgMjEuOTQ3NCAxOTMuNzAzIDI4LjA2MDFDMTk1Ljc4IDI5LjUyMjMgMTk3LjUwMyAzMS41MTkxIDE5OC43MjIgMzMuODc4MUMxOTkuOTQxIDM2LjIzNzEgMjAwLjYyIDM4Ljg4NzIgMjAwLjcgNDEuNTk5N0wyMDAuOTIyIDY1LjcxNDNIMTk0LjA5MkwxOTMuNjIgNDMuNjE2OUMxOTMuNjIgMzUuMTgxNCAxOTIuMjYgMzEuNzg4OSAxODkuMDY3IDMwLjMyMThDMTg4LjM4MSAzMC4wNDM4IDE4Ny42NTMgMjkuOTE3MyAxODYuOTIzIDI5Ljk0OTdDMTg2LjE5MyAyOS45ODIxIDE4NS40NzYgMzAuMTcyNyAxODQuODEzIDMwLjUxMDVDMTg0LjE1IDMwLjg0ODQgMTgzLjU1NSAzMS4zMjY5IDE4My4wNiAzMS45MTg2QzE4Mi41NjUgMzIuNTEwMyAxODIuMTgyIDMzLjIwMzcgMTgxLjkzMSAzMy45NTg5QzE4MS45MzEgMzQuMjY0NSAxODEuNzY0IDM0LjU3MDEgMTgxLjcwOSAzNC44NzU4VjM0Ljc1MzVaIiBmaWxsPSIjMDA0MzNEIi8+CjxwYXRoIGQ9Ik05NC44MzE4IDM2LjE4OTlDODcuOTQ2MSAzMi43MDU3IDc2LjA5MDQgMzguNTEyNyA3NS4wNjMxIDUwLjM3MTNDNzQuNTM1NSA1Ny4zMzk4IDc2Ljg0IDYxLjUyNyA4MS4zMTAyIDY2LjA4MDlMODQuNTAzMiA2MS43MTA0QzgyLjMzNDIgNjAuNjMwNiA4MC41NzU4IDU4Ljc1MTEgNzkuNTMxNiA1Ni4zOTYzQzc4LjQ4NzMgNTQuMDQxNSA3OC4yMjI4IDUxLjM1OTIgNzguNzgzNiA0OC44MTI2Qzc5LjEwOTUgNDYuMjgxNyA4MC4yNTAzIDQzLjk2MzkgODEuOTk4MiA0Mi4yODFDODMuNzQ2MiA0MC41OTgyIDg1Ljk4NDkgMzkuNjYyMiA4OC4zMDcgMzkuNjQzNkM4NC4zNjQ0IDQ0LjQxMTUgODIuNzU0IDQ4LjI2MjUgODMuMTQyNyA1My4zMzZDODMuNTMxNCA1OC40MDk1IDg1LjQxOTUgNjQuODU4NCA5Mi4zODg1IDY1LjI1NTdDOTguMjE5MiA2NS42NTMxIDEwMi41NzggNTkuODE1NCAxMDMuMjcyIDUzLjk3NzhDMTAzLjQ1NCA1MS4yNzYgMTAzLjEzNiA0OC41NjE4IDEwMi4zMzkgNDUuOTk4NUMxMDEuNTQyIDQzLjQzNTMgMTAwLjI4MyA0MS4wNzYxIDk4LjYzNTcgMzkuMDYyOUMxMDUuMDQ5IDQwLjA3MTUgMTA3LjU3NiA0NS4xNzU2IDEwNy44ODEgNTMuMjQ0M0MxMDcuOTIzIDU2LjcxNiAxMDcuMTUxIDYwLjE0MDggMTA1LjYzOCA2My4xODc0QzEwNC4xMjUgNjYuMjM0IDEwMS45MjQgNjguNzk5MyA5OS4yNDY1IDcwLjYzNDlDOTUuNTU0MyA3Mi4zNDQyIDkxLjQwMzcgNzIuNDA5OSA4Ny42Njg0IDcwLjgxODNDODcuMDAyMSA3MC4yNjgxIDg3LjIyNDIgNjkuODA5NyA4OC4xNjgyIDY5LjUwNDFDOTEuMzUxMyA2OC44MjE2IDk0LjY0ODMgNjkuMjM3OSA5Ny42MDgzIDcwLjY5Nkw5OS42NjMgNjguNjQ4M0M5Ny41MTc1IDY3LjIyMjEgOTUuMTI1NyA2Ni4zMDM1IDkyLjYzOTkgNjUuOTUwOUM5MC4xNTQxIDY1LjU5ODMgODcuNjI4OSA2NS44MTk2IDg1LjIyNTEgNjYuNjAwNUM4NC42NzU5IDY2Ljc1NTcgODQuMTY2OSA2Ny4wNDg5IDgzLjczODEgNjcuNDU3M0M4My4zMDkzIDY3Ljg2NTcgODIuOTcyNCA2OC4zNzggODIuNzU0IDY4Ljk1MzlDODIuODE3NiA2OS41NjQ3IDgyLjk5OTEgNzAuMTUzNCA4My4yODY1IDcwLjY4MDZDODMuNTczOCA3MS4yMDc3IDgzLjk2MDIgNzEuNjYxMSA4NC40MTk5IDcyLjAxMDNDOTQuMTM3NyA3OS42ODE3IDExMy4yMTIgNzIuMDEwMyAxMTQuNDM0IDU1LjY1ODhDMTE1LjI5NSA0MC45ODg0IDEwNS43OTkgMzMuNDY5OCA5NC44MzE4IDM2LjE4OTlaTTkyLjA1NTMgNTguNDQwMUM4Ny43MjM5IDU4LjY1NCA4NS4xOTczIDUwLjAzNTEgODkuODYxOSA0My4xNTg0QzkxLjM4ODkgNDAuODM1NiA5Mi40NzE4IDQwLjk4ODQgOTMuOTQzMyA0My4zNzIzQzk3LjYwODMgNDguODczNyA5Ny4wNTMgNTguMDEyMiA5MS45NzIgNTguNDQwMUg5Mi4wNTUzWiIgZmlsbD0iIzAwNDMzRCIvPgo8cGF0aCBkPSJNMTI1Ljk1NyA3Mi40NjQ3QzEzMC44MzQgNzQuNDU3IDEzNi4wNjUgNzUuMTcxMSAxNDEuMjM3IDc0LjU1MDRDMTQ2LjQwOCA3My45Mjk3IDE1MS4zNzcgNzEuOTkxMiAxNTUuNzQ5IDY4Ljg4ODhDMTU3LjI3NiA2Ny42MzU3IDE1Ny41NTQgNjYuNzQ5NCAxNTcuMDU0IDY1LjgzMjVDMTU1Ljg4MSA2NC4xNDgzIDE1NC4zNDUgNjIuODEzOSAxNTIuNTg0IDYxLjk1MDlDMTU0Ljc0MSA2MC4xNDQ3IDE1Ni40NTEgNTcuNzY5MSAxNTcuNTU0IDU1LjA0MzZDMTU3Ljk3IDUzLjk3MzggMTU3Ljk3IDUzLjM2MjYgMTU3LjE2NSA1My4yNzA5QzE1Mi4xNDQgNTMuOTQ4MyAxNDcuMDQ5IDUzLjQ4MDEgMTQyLjIgNTEuODk1NUMxNDAuNjQ1IDUxLjI1MzcgMTQxLjM2NyA0OS44MTcyIDE0Mi45MjIgNDkuNjMzOEMxNTEuNTAxIDQ4LjU2NDEgMTU0LjAyOCA0Ni4wMjczIDE1NC4wMjggNDIuNzI2NUMxNTMuNTU2IDM4LjE3MjUgMTQ1LjY5OCAzMy4zNDM1IDEzOC45MjMgMzQuMTA3NkMxMjUuNjI0IDM1LjIwNzkgMTIwLjQ4NyA1MC45NDgxIDEyMy44NDcgNjUuMzQzNEwxMzEuODQzIDY1LjUyNjhDMTMzLjk1MyA2NS41MjY4IDEzMy40MjYgNjQuOTc2NyAxMzIuMDEgNjIuOTI4OUMxMzAuNzc0IDYwLjgyNTUgMTI5Ljk2NSA1OC40NTMgMTI5LjYzOSA1NS45NzM3QzEyOS4zMTMgNTMuNDk0NCAxMjkuNDc4IDUwLjk2NjkgMTMwLjEyMiA0OC41NjQxQzEzMS43NiA0Mi42OTU5IDEzNS4wNjQgMzguMjAzMSAxNDEuNTYxIDM4LjkwNjFDMTQzLjcyNyAzOS4yNzI4IDE0Ni4zOTIgNDEuOTYyNCAxNDQuMzM4IDQzLjc5NjJDMTQyLjI4MyA0NS42MyAxMzkuMDkgNDYuMzAyNCAxMzYuNjc0IDQ4LjQxMTNDMTM0LjczMSA0OS45MDg5IDEzNC42MiA1MC44MjU4IDEzNi4wNjQgNTIuOTM0N0MxMzkuMTM2IDU2LjM1NTcgMTQzLjA5MSA1OC42NTAzIDE0Ny4zOTIgNTkuNTA1OEMxNDguMTY5IDU5LjcxOTggMTQ4LjY0MSA1OS43NTAzIDE0Ny44MDggNjAuMzAwNUMxNDUuODUzIDYwLjg2NjQgMTQzLjc4NiA2MC43NDg5IDE0MS44OTQgNTkuOTY0M0MxNDAuODExIDU5LjYyODEgMTM5Ljk1MSA1OS43ODA5IDEzOS42MTcgNjEuMDAzNEwxMzcuNzU3IDY2LjE2ODdDMTM3LjQyNCA2Ny4xNzcyIDEzOC44MTIgNjYuOTMyNyAxMzkuMzEyIDY2LjcxODhDMTQ0LjQ3NiA2NC4yNDMyIDE0OS43NzkgNjQuNDI2NSAxNDguOTc0IDY2Ljk2MzNDMTQ3LjAzMSA3My4zODE2IDEyNS4xOCA3MS41Nzg0IDEyMi40MDMgNjQuNTE4MkMxMTkuNjI3IDU2Ljc4NTcgMTIwLjA5OSA0Mi4yMzc1IDEyNi4wNCAzNC43OEwxMTYuNDg5IDM1LjA4NTZWNTQuMTg3OEMxMTYuMzIzIDYzLjY5MyAxMTguNzY2IDY4LjY3NDggMTI2LjA2OCA3Mi41MjU4TDEyNS45NTcgNzIuNDY0N1oiIGZpbGw9IiMwMDQzM0QiLz4KPC9zdmc+"
       },
@@ -283,7 +283,7 @@
   "footer": {
     "brandName": "Prakrithi Origins",
     "trademark": true,
-    "aboutText": "Founded In 2024, Prakrithi Pure Organics brings you the pure essence of nature from the lush hills of Idukki and wayanad, kerala. We're dedicated to offering authentic, Natural products crafted with care — Straight from nature's heart to your home.",
+    "aboutText": "Founded In 2024, Prakrithi Pure Organics brings you the pure essence of nature from the lush hills of Idukki and wayanad, kerala. We're dedicated to offering authentic, Natural products crafted with care â€” Straight from nature's heart to your home.",
     "columns": [
       {
         "title": "Shop For",
@@ -335,7 +335,7 @@
       "instagram": "#",
       "whatsapp": "#"
     },
-    "copyright": "© 2026, Prakrithi Naturals"
+    "copyright": "Â© 2026, Prakrithi Naturals"
   },
   "products": [
     {
@@ -373,7 +373,7 @@
       "badgeTextColor": "#00433D",
       "rating": "4.9",
       "reviews": 28,
-      "couponNote": "*Best Price ₹180 with coupon",
+      "couponNote": "*Best Price â‚¹180 with coupon",
       "category": "spices"
     },
     {
@@ -541,7 +541,36 @@
     "title": "Shop By Category",
     "viewAllText": "View All →",
     "viewAllLink": "/shop",
-    "categories": []
+    "categories": [
+      {
+        "id": "category-kerala-spices",
+        "label": "Kerala Spices",
+        "category": "spices",
+        "image": "/images/categories/kerala-spices-clean.webp",
+        "link": "/shop?category=spices"
+      },
+      {
+        "id": "category-organic-cow-ghee",
+        "label": "Organic Cow Ghee",
+        "category": "ghee",
+        "image": "/images/categories/organic-cow-ghee-clean.webp",
+        "link": "/shop?category=ghee"
+      },
+      {
+        "id": "category-blended-spices",
+        "label": "Blended Spices",
+        "category": "blended-spices",
+        "image": "/images/categories/blended-spices-clean.webp",
+        "link": "/shop?category=blended-spices"
+      },
+      {
+        "id": "category-raw-honey",
+        "label": "Raw Honey",
+        "category": "honey",
+        "image": "/images/categories/raw-honey-clean.webp",
+        "link": "/shop?category=honey"
+      }
+    ]
   },
   "shopByConcern": {
     "title": "Shop By Category",

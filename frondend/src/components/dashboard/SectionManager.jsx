@@ -7,7 +7,9 @@ import StoryMediaUploader from './StoryMediaUploader';
 import defaultConfig from '../../data/defaultConfig';
 import './SectionManager.css';
 
-const DEFAULT_CATEGORY_CARDS = [];
+const DEFAULT_CATEGORY_CARDS = Array.isArray(defaultConfig.shopByCategory?.categories)
+  ? defaultConfig.shopByCategory.categories
+  : [];
 
 export default function SectionManager() {
   const { config, updateConfig, saveConfig, hasUnsavedChanges } = useSiteConfig();
@@ -28,7 +30,7 @@ export default function SectionManager() {
   };
 
   const sortedSections = [...sections].sort((a, b) => a.order - b.order);
-  const coreSections = ['shopByProduct', 'delivery', 'shopByCategory', 'shopByConcern', 'press', 'reviews', 'ourStory'];
+  const coreSections = ['shopByCategory', 'shopByProduct', 'delivery', 'press', 'reviews', 'ourStory'];
 
   const toggleSection = (id) => {
     const updated = sections.map((s) => s.id === id ? { ...s, enabled: !s.enabled } : s);
@@ -231,7 +233,7 @@ export default function SectionManager() {
               </div>
 
               <div className="section-item__info">
-                <h4 className="section-item__label">{section.id === 'shopByConcern' || section.id === 'shopByCategory' ? 'Shop by Category' : section.label}</h4>
+                <h4 className="section-item__label">{section.id === 'shopByCategory' ? 'Shop by Category' : section.label}</h4>
                 <div className="section-item__meta">
                   <span className="section-item__id">{section.id}</span>
                   {coreSections.includes(section.id) && <span className="section-item__core-badge">Core</span>}
