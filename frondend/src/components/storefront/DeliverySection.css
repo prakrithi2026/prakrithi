@@ -6,12 +6,6 @@
   box-sizing: border-box;
 }
 
-@media (max-width: 1280px) {
-  .delivery-section {
-    padding: 0 40px;
-  }
-}
-
 @media (max-width: 1024px) {
   .delivery-section {
     padding: 0 20px;
@@ -27,13 +21,13 @@
 
 .delivery-banner {
   width: 100%;
-  min-height: 220px;
+  min-height: 200px;
   color: #fff;
   border-radius: 12px;
   display: flex;
   align-items: center;
-  padding: 24px 36px;
-  gap: 28px;
+  padding: 20px 28px;
+  gap: 20px;
   position: relative;
   overflow: hidden;
   background: #00433D;
@@ -41,17 +35,17 @@
 }
 
 .delivery-left {
-  flex: 0 0 240px;
-  max-width: 260px;
+  flex: 0 0 200px;
+  max-width: 220px;
   margin-top: 0;
 }
 
 .delivery-left h3 {
   font-family: var(--font-heading, 'Jost', sans-serif);
-  font-size: 25px;
+  font-size: 24px;
   font-weight: 700;
   line-height: 1.25;
-  margin: 0 0 10px;
+  margin: 0 0 8px;
   color: #fff;
 }
 
@@ -68,7 +62,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 6px;
+  gap: 4px;
 }
 
 .delivery-step {
@@ -94,8 +88,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: clamp(56px, 5.6vw, 84px);
-  height: clamp(56px, 5.6vw, 84px);
+  width: clamp(48px, 4.6vw, 72px);
+  height: clamp(48px, 4.6vw, 72px);
   flex-shrink: 0;
 }
 
@@ -118,8 +112,8 @@
 .step-icon-img {
   width: 100%;
   height: 100%;
-  max-width: 84px;
-  max-height: 84px;
+  max-width: 72px;
+  max-height: 72px;
   object-fit: contain;
   transition: transform 0.25s ease;
 }
@@ -133,34 +127,44 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
 }
 
 .step-arrow-img {
-  width: 16px;
-  height: 11px;
+  width: 14px;
+  height: 10px;
   object-fit: contain;
   display: block;
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1024px) {
   .delivery-banner {
     padding: 20px 24px;
-    gap: 20px;
+    gap: 16px;
   }
 
   .delivery-left {
-    flex: 0 0 200px;
+    flex: 0 0 180px;
   }
 
   .delivery-left h3 {
-    font-size: 22px;
+    font-size: 21px;
+  }
+
+  .step-icon {
+    width: 60px;
+    height: 60px;
+  }
+
+  .step-icon-img {
+    max-width: 60px;
+    max-height: 60px;
   }
 
   .step-arrow-img {
-    width: 14px;
-    height: 10px;
+    width: 13px;
+    height: 9px;
   }
 }
 
@@ -191,17 +195,19 @@
   }
 
   .step-icon {
-    width: 76px;
-    height: 76px;
+    width: 72px;
+    height: 72px;
   }
 
   .step-icon-img {
-    width: 76px;
-    height: 76px;
+    width: 72px;
+    height: 72px;
+    max-width: 72px;
+    max-height: 72px;
   }
 
   .delivery-step {
-    min-width: 76px;
+    min-width: 72px;
   }
 
   .step-arrow {
