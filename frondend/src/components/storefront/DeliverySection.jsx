@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { useSiteConfig } from '../../context/SiteConfigContext';
 import defaultConfig from '../../data/defaultConfig';
 import { svgToDataUrl } from '../../utils/imageOptimizer';
@@ -21,20 +22,32 @@ export default function DeliverySection() {
             const rawImage = step.image || defaultConfig.delivery?.steps?.[i]?.image || '';
             const stepImage = rawImage ? svgToDataUrl(rawImage) : '';
             return (
-              <div key={i} className="delivery-step">
-                <div className="step-icon">
-                  {stepImage ? (
+              <Fragment key={i}>
+                <div className="delivery-step">
+                  <div className="step-icon">
+                    {stepImage ? (
+                      <img
+                        src={stepImage}
+                        alt={step.label || `Step ${i + 1}`}
+                        className="step-icon-img"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <span className="step-icon-dot">●</span>
+                    )}
+                  </div>
+                </div>
+                {i < delivery.steps.length - 1 && (
+                  <div className="step-arrow" aria-hidden="true">
                     <img
-                      src={stepImage}
-                      alt={step.label || `Step ${i + 1}`}
-                      className="step-icon-img"
+                      src="/images/delivery_Arrow.png"
+                      alt="→"
+                      className="step-arrow-img"
                       loading="lazy"
                     />
-                  ) : (
-                    <span className="step-icon-dot">●</span>
-                  )}
-                </div>
-              </div>
+                  </div>
+                )}
+              </Fragment>
             );
           })}
         </div>

@@ -129,8 +129,9 @@
 
 .step-arrow-img {
   width: 20px;
-  height: 18px;
+  height: 14px;
   object-fit: contain;
+  display: block;
 }
 
 @media (max-width: 1024px) {
