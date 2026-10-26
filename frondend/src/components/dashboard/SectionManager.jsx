@@ -1,10 +1,13 @@
 import { useState } from 'react';
-import { FiPlus, FiTrash2, FiCopy, FiCheck, FiX, FiSave, FiRefreshCw } from 'react-icons/fi';
+import { FiPlus, FiTrash2, FiCopy, FiCheck, FiX, FiSave, FiRefreshCw, FiUpload, FiImage } from 'react-icons/fi';
+import { compressImage } from '../../utils/imageOptimizer';
 import { useSiteConfig } from '../../context/SiteConfigContext';
 import ImageUploader from './ImageUploader';
 import StoryMediaUploader from './StoryMediaUploader';
 import defaultConfig from '../../data/defaultConfig';
 import './SectionManager.css';
+
+const DEFAULT_CATEGORY_CARDS = [];
 
 export default function SectionManager() {
   const { config, updateConfig, saveConfig, hasUnsavedChanges } = useSiteConfig();
@@ -25,7 +28,7 @@ export default function SectionManager() {
   };
 
   const sortedSections = [...sections].sort((a, b) => a.order - b.order);
-  const coreSections = ['shopByProduct', 'delivery', 'shopByConcern', 'press', 'reviews', 'ourStory'];
+  const coreSections = ['shopByProduct', 'delivery', 'shopByCategory', 'shopByConcern', 'press', 'reviews', 'ourStory'];
 
   const toggleSection = (id) => {
     const updated = sections.map((s) => s.id === id ? { ...s, enabled: !s.enabled } : s);
@@ -71,6 +74,73 @@ export default function SectionManager() {
       setCopiedId(sectionId);
       setTimeout(() => setCopiedId(null), 2000);
     }
+  };
+
+  const [uploadingCardIndex, setUploadingCardIndex] = useState(null);
+
+  const getCategoryCards = () => {
+    if (Array.isArray(config.shopByCategory?.categories) && config.shopByCategory.categories.length > 0) {
+      return config.shopByCategory.categories;
+    }
+    if (Array.isArray(config.shopByConcern?.categories) && config.shopByConcern.categories.length > 0) {
+      return config.shopByConcern.categories;
+    }
+    return DEFAULT_CATEGORY_CARDS;
+  };
+
+  const updateCategoryCard = (index, field, value) => {
+    const cards = [...getCategoryCards()];
+    cards[index] = { ...cards[index], [field]: value };
+    if (field === 'category' && value) {
+      cards[index].link = `/shop?category=${value}`;
+    }
+    updateConfig('shopByCategory.categories', cards);
+    updateConfig('shopByConcern.categories', cards);
+  };
+
+  const handleCardImageUpload = async (index, file) => {
+    if (!file) return;
+    setUploadingCardIndex(index);
+    try {
+      const compressed = await compressImage(file, 800, 1000, 0.85);
+      updateCategoryCard(index, 'image', compressed);
+    } catch (err) {
+      alert('Failed to process image: ' + (err.message || 'Unknown error'));
+    } finally {
+      setUploadingCardIndex(null);
+    }
+  };
+
+  const addCategoryCard = () => {
+    const cards = [...getCategoryCards()];
+    const newCard = {
+      id: `category-${Date.now()}`,
+      label: 'New Category',
+      category: 'spices',
+      image: '',
+      link: '/shop?category=spices',
+    };
+    const updated = [...cards, newCard];
+    updateConfig('shopByCategory.categories', updated);
+    updateConfig('shopByConcern.categories', updated);
+  };
+
+  const removeCategoryCard = (index) => {
+    const cards = [...getCategoryCards()];
+    const updated = cards.filter((_, i) => i !== index);
+    updateConfig('shopByCategory.categories', updated);
+    updateConfig('shopByConcern.categories', updated);
+  };
+
+  const moveCategoryCard = (index, direction) => {
+    const cards = [...getCategoryCards()];
+    const target = index + direction;
+    if (target < 0 || target >= cards.length) return;
+    const temp = cards[index];
+    cards[index] = cards[target];
+    cards[target] = temp;
+    updateConfig('shopByCategory.categories', cards);
+    updateConfig('shopByConcern.categories', cards);
   };
 
   /* ── Delivery step helpers ── */
@@ -161,7 +231,7 @@ export default function SectionManager() {
               </div>
 
               <div className="section-item__info">
-                <h4 className="section-item__label">{section.label}</h4>
+                <h4 className="section-item__label">{section.id === 'shopByConcern' || section.id === 'shopByCategory' ? 'Shop by Category' : section.label}</h4>
                 <div className="section-item__meta">
                   <span className="section-item__id">{section.id}</span>
                   {coreSections.includes(section.id) && <span className="section-item__core-badge">Core</span>}
@@ -304,25 +374,230 @@ export default function SectionManager() {
         </button>
       </div>
 
-      {/* ── Shop by Concern Settings ── */}
+      {/* ── Shop by Category Settings ── */}
       <div className="dash-panel">
-        <h3 className="dash-panel__title">🔍 Shop by Concern Settings</h3>
-        <p className="dash-panel__subtitle">Configure section title and product categories</p>
+        <h3 className="dash-panel__title">📁 Shop by Category Settings</h3>
+        <p className="dash-panel__subtitle">Configure section title, category cards with custom image uploads, and view all button</p>
 
         <div className="dash-row">
           <div className="dash-field">
             <label className="dash-field__label">Section Title</label>
-            <input className="dash-field__input" value={config.shopByConcern?.title || 'Shop By Concern'}
-              onChange={(e) => updateConfig('shopByConcern.title', e.target.value)} />
+            <input className="dash-field__input"
+              value={config.shopByCategory?.title || config.shopByConcern?.title || 'Shop By Category'}
+              onChange={(e) => {
+                updateConfig('shopByCategory.title', e.target.value);
+                updateConfig('shopByConcern.title', e.target.value);
+              }} />
           </div>
           <div className="dash-field">
             <label className="dash-field__label">View All Text</label>
-            <input className="dash-field__input" value={config.shopByConcern?.viewAllText || 'View All'}
-              onChange={(e) => updateConfig('shopByConcern.viewAllText', e.target.value)} />
+            <input className="dash-field__input"
+              value={config.shopByCategory?.viewAllText || config.shopByConcern?.viewAllText || 'View All →'}
+              onChange={(e) => {
+                updateConfig('shopByCategory.viewAllText', e.target.value);
+                updateConfig('shopByConcern.viewAllText', e.target.value);
+              }} />
+          </div>
+          <div className="dash-field">
+            <label className="dash-field__label">View All Link</label>
+            <input className="dash-field__input"
+              value={config.shopByCategory?.viewAllLink || '/shop'}
+              onChange={(e) => updateConfig('shopByCategory.viewAllLink', e.target.value)} />
           </div>
         </div>
 
-        <h4 style={{ marginTop: '16px', marginBottom: '10px', fontSize: '0.88rem', fontWeight: 600 }}>Categories</h4>
+        {/* ── Category Cards Editor with Image Upload ── */}
+        <div style={{ marginTop: '24px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+            <div>
+              <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>Category Cards</h4>
+              <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: '#64748b' }}>
+                Cards displayed in the category scroller. Upload image photos directly for each card.
+              </p>
+            </div>
+            <button
+              type="button"
+              className="dash-btn dash-btn--primary"
+              onClick={addCategoryCard}
+              style={{ fontSize: '0.8rem', padding: '6px 14px' }}
+            >
+              <FiPlus size={14} style={{ marginRight: '4px' }} /> Add Card
+            </button>
+          </div>
+
+          {getCategoryCards().length === 0 ? (
+            <div style={{ padding: '24px', textAlign: 'center', background: '#f8fafc', borderRadius: '10px', border: '1px dashed #cbd5e1', color: '#64748b', fontSize: '0.88rem' }}>
+              No category cards added yet. Click <strong>+ Add Card</strong> above to add a category card with an image and title.
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
+              {getCategoryCards().map((card, i) => (
+              <div
+                key={card.id || i}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '10px',
+                  padding: '14px',
+                  borderRadius: '12px',
+                  border: '1px solid #e2e8f0',
+                  background: '#f8fafc',
+                  position: 'relative'
+                }}
+              >
+                {/* Header row: Card number & reorder/delete actions */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontWeight: 600, fontSize: '0.85rem', color: '#00433D' }}>Card #{i + 1}</span>
+                  <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                    <button
+                      type="button"
+                      className="dash-btn dash-btn--ghost"
+                      style={{ padding: '2px 8px', fontSize: '11px', height: '24px', lineHeight: 1 }}
+                      disabled={i === 0}
+                      onClick={() => moveCategoryCard(i, -1)}
+                      title="Move Left/Up"
+                    >
+                      ↑
+                    </button>
+                    <button
+                      type="button"
+                      className="dash-btn dash-btn--ghost"
+                      style={{ padding: '2px 8px', fontSize: '11px', height: '24px', lineHeight: 1 }}
+                      disabled={i === getCategoryCards().length - 1}
+                      onClick={() => moveCategoryCard(i, 1)}
+                      title="Move Right/Down"
+                    >
+                      ↓
+                    </button>
+                    <button
+                      type="button"
+                      className="crud-list__delete"
+                      onClick={() => removeCategoryCard(i)}
+                      title="Delete Card"
+                      style={{ marginLeft: '4px' }}
+                    >
+                      <FiTrash2 size={13} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Image Preview & Upload Controls */}
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                  <div
+                    style={{
+                      width: '64px',
+                      height: '88px',
+                      borderRadius: '8px',
+                      backgroundColor: '#00433D',
+                      overflow: 'hidden',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                      border: '1px solid #cbd5e1'
+                    }}
+                  >
+                    {card.image ? (
+                      <img
+                        src={card.image}
+                        alt={card.label}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                    ) : (
+                      <FiImage size={24} color="#94a3b8" />
+                    )}
+                  </div>
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label
+                      className="dash-btn dash-btn--outline"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        padding: '6px 12px',
+                        fontSize: '0.78rem',
+                        cursor: 'pointer',
+                        width: 'fit-content'
+                      }}
+                    >
+                      <FiUpload size={13} />
+                      <span>{uploadingCardIndex === i ? 'Uploading...' : 'Upload Image'}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleCardImageUpload(i, file);
+                          e.target.value = '';
+                        }}
+                      />
+                    </label>
+                    {card.image && (
+                      <button
+                        type="button"
+                        className="dash-btn dash-btn--ghost"
+                        onClick={() => updateCategoryCard(i, 'image', '')}
+                        style={{ color: '#ef4444', fontSize: '0.72rem', padding: '2px 4px', width: 'fit-content', height: 'auto' }}
+                      >
+                        Remove image
+                      </button>
+                    )}
+                    <input
+                      className="dash-field__input"
+                      value={card.image?.startsWith('data:') ? 'Image uploaded (base64)' : (card.image || '')}
+                      onChange={(e) => updateCategoryCard(i, 'image', e.target.value)}
+                      placeholder="Or paste image URL"
+                      style={{ fontSize: '0.75rem', padding: '4px 8px' }}
+                    />
+                  </div>
+                </div>
+
+                {/* Card Title */}
+                <div className="dash-field" style={{ margin: 0 }}>
+                  <label className="dash-field__label" style={{ fontSize: '0.75rem', marginBottom: '3px' }}>Card Title</label>
+                  <input
+                    className="dash-field__input"
+                    value={card.label || ''}
+                    onChange={(e) => updateCategoryCard(i, 'label', e.target.value)}
+                    placeholder="e.g. Kerala Spices"
+                    style={{ fontSize: '0.82rem' }}
+                  />
+                </div>
+
+                {/* Target Category / Link */}
+                <div className="dash-field" style={{ margin: 0 }}>
+                  <label className="dash-field__label" style={{ fontSize: '0.75rem', marginBottom: '3px' }}>Target Category / Link</label>
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    <select
+                      className="dash-field__input"
+                      value={card.category || ''}
+                      onChange={(e) => updateCategoryCard(i, 'category', e.target.value)}
+                      style={{ fontSize: '0.78rem', maxWidth: '140px' }}
+                    >
+                      <option value="">-- Choose Category --</option>
+                      {config.categories?.filter(c => c.id !== 'all').map(cat => (
+                        <option key={cat.id} value={cat.id}>{cat.label}</option>
+                      ))}
+                    </select>
+                    <input
+                      className="dash-field__input"
+                      value={card.link || ''}
+                      onChange={(e) => updateCategoryCard(i, 'link', e.target.value)}
+                      placeholder="/shop?category=..."
+                      style={{ fontSize: '0.78rem', flex: 1 }}
+                    />
+                  </div>
+                </div>
+              </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* ── Taxonomy Categories ── */}
+        <h4 style={{ marginTop: '24px', marginBottom: '8px', fontSize: '0.88rem', fontWeight: 600 }}>Product Categories Taxonomy</h4>
         <div className="crud-list">
           {config.categories.map((cat, i) => (
             <div key={i} className="crud-list__row">

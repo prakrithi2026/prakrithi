@@ -7,7 +7,7 @@ import Navbar from '../components/storefront/Navbar';
 import HeroSection from '../components/storefront/HeroSection';
 import ShopByProduct from '../components/storefront/ShopByProduct';
 import DeliverySection from '../components/storefront/DeliverySection';
-import ShopByConcern from '../components/storefront/ShopByConcern';
+import ShopByCategory from '../components/storefront/ShopByCategory';
 import PressSection from '../components/storefront/PressSection';
 import ReviewSection from '../components/storefront/ReviewSection';
 import OurStorySection from '../components/storefront/OurStorySection';
@@ -19,7 +19,8 @@ import CustomSection from '../components/storefront/CustomSection';
 const coreSectionComponents = {
   shopByProduct: ShopByProduct,
   delivery: DeliverySection,
-  shopByConcern: ShopByConcern,
+  shopByCategory: ShopByCategory,
+  shopByConcern: ShopByCategory,
   press: PressSection,
   reviews: ReviewSection,
   ourStory: OurStorySection,

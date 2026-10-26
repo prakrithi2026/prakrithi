@@ -20,9 +20,11 @@ const emptyProduct = {
 };
 
 export default function ProductManager() {
-  const { config, addProduct, updateProduct, deleteProduct, saveConfig } = useSiteConfig();
+  const { config, updateConfig, addProduct, updateProduct, deleteProduct, saveConfig } = useSiteConfig();
   const products = Array.isArray(config.products) ? config.products : [];
   const categories = Array.isArray(config.categories) ? config.categories : [];
+
+  // Product modal state
   const [editing, setEditing] = useState(null); // null or product object
   const [isNew, setIsNew] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -30,11 +32,18 @@ export default function ProductManager() {
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
-  const openNew = (isConcern) => {
-    setEditing({ 
-      ...emptyProduct,
-      tags: isConcern ? ['concern'] : []
-    });
+  // Category card modal state (Only Image, Title, Link to category - NO PRICES)
+  const [editingCategory, setEditingCategory] = useState(null);
+  const [editingCategoryIndex, setEditingCategoryIndex] = useState(null);
+  const [isNewCategory, setIsNewCategory] = useState(false);
+
+  const categoryCards = Array.isArray(config.shopByCategory?.categories)
+    ? config.shopByCategory.categories
+    : (Array.isArray(config.shopByConcern?.categories) ? config.shopByConcern.categories : []);
+
+  // ── Product Handlers ──
+  const openNew = () => {
+    setEditing({ ...emptyProduct });
     setIsNew(true);
   };
 
@@ -69,16 +78,6 @@ export default function ProductManager() {
       await saveConfig({ products: updatedProducts });
     } catch (err) {
       console.warn('Auto-save product failed:', err);
-    }
-  };
-
-  const handleManualSave = async () => {
-    setSaving(true);
-    const res = await saveConfig({ products });
-    setSaving(false);
-    if (res?.success) {
-      setSaveSuccess(true);
-      setTimeout(() => setSaveSuccess(false), 2500);
     }
   };
 
@@ -134,15 +133,167 @@ export default function ProductManager() {
     });
   };
 
+  // ── Category Card Handlers (Title, Image, Link only - NO PRICES) ──
+  const openNewCategory = () => {
+    setEditingCategory({
+      id: `cat-${Date.now()}`,
+      title: '',
+      label: '',
+      image: '',
+      category: '',
+      link: '/shop',
+    });
+    setEditingCategoryIndex(null);
+    setIsNewCategory(true);
+  };
+
+  const openEditCategory = (card, index) => {
+    setEditingCategory({
+      id: card.id || `cat-${index}`,
+      title: card.title || card.label || '',
+      label: card.label || card.title || '',
+      image: card.image || '',
+      category: card.category || '',
+      link: card.link || (card.category ? `/shop?category=${card.category}` : '/shop'),
+    });
+    setEditingCategoryIndex(index);
+    setIsNewCategory(false);
+  };
+
+  const closeCategory = () => {
+    setEditingCategory(null);
+    setEditingCategoryIndex(null);
+    setIsNewCategory(false);
+  };
+
+  const saveCategory = async () => {
+    if (!editingCategory) return;
+    const title = (editingCategory.title || editingCategory.label || '').trim();
+    if (!title) return alert('Category title is required');
+    if (!editingCategory.image || !editingCategory.image.trim()) return alert('Category image is required');
+
+    const cardToSave = {
+      id: editingCategory.id || `cat-${Date.now()}`,
+      title: title,
+      label: title,
+      image: editingCategory.image.trim(),
+      category: editingCategory.category || '',
+      link: editingCategory.link?.trim() || (editingCategory.category ? `/shop?category=${editingCategory.category}` : '/shop'),
+    };
+
+    let updatedCards;
+    if (isNewCategory || editingCategoryIndex === null || editingCategoryIndex === undefined) {
+      updatedCards = [...categoryCards, cardToSave];
+    } else {
+      updatedCards = categoryCards.map((c, i) => (i === editingCategoryIndex ? cardToSave : c));
+    }
+
+    const updatedShopByCategory = {
+      ...(config.shopByCategory || {}),
+      title: config.shopByCategory?.title || 'Shop By Category',
+      viewAllText: config.shopByCategory?.viewAllText || 'View All →',
+      viewAllLink: config.shopByCategory?.viewAllLink || '/shop',
+      categories: updatedCards,
+    };
+
+    const updatedShopByConcern = {
+      ...(config.shopByConcern || {}),
+      title: config.shopByConcern?.title || 'Shop By Category',
+      viewAllText: config.shopByConcern?.viewAllText || 'View All →',
+      viewAllLink: config.shopByConcern?.viewAllLink || '/shop',
+      categories: updatedCards,
+    };
+
+    if (typeof updateConfig === 'function') {
+      updateConfig('shopByCategory.categories', updatedCards);
+      updateConfig('shopByConcern.categories', updatedCards);
+    }
+    closeCategory();
+
+    try {
+      await saveConfig({
+        ...config,
+        shopByCategory: updatedShopByCategory,
+        shopByConcern: updatedShopByConcern,
+      });
+    } catch (err) {
+      console.warn('Auto-save category card failed:', err);
+    }
+  };
+
+  const handleDeleteCategory = async (index) => {
+    if (window.confirm('Are you sure you want to delete this category card?')) {
+      const updatedCards = categoryCards.filter((_, i) => i !== index);
+      const updatedShopByCategory = {
+        ...(config.shopByCategory || {}),
+        categories: updatedCards,
+      };
+      const updatedShopByConcern = {
+        ...(config.shopByConcern || {}),
+        categories: updatedCards,
+      };
+      if (typeof updateConfig === 'function') {
+        updateConfig('shopByCategory.categories', updatedCards);
+        updateConfig('shopByConcern.categories', updatedCards);
+      }
+      try {
+        await saveConfig({
+          ...config,
+          shopByCategory: updatedShopByCategory,
+          shopByConcern: updatedShopByConcern,
+        });
+      } catch (err) {
+        console.warn('Delete category card failed:', err);
+      }
+    }
+  };
+
+  // ── Manual Save All Changes ──
+  const handleManualSave = async () => {
+    setSaving(true);
+    const res = await saveConfig({
+      ...config,
+      products,
+      shopByCategory: {
+        ...(config.shopByCategory || {}),
+        title: config.shopByCategory?.title || 'Shop By Category',
+        viewAllText: config.shopByCategory?.viewAllText || 'View All →',
+        viewAllLink: config.shopByCategory?.viewAllLink || '/shop',
+        categories: categoryCards,
+      },
+      shopByConcern: {
+        ...(config.shopByConcern || {}),
+        title: config.shopByConcern?.title || 'Shop By Category',
+        viewAllText: config.shopByConcern?.viewAllText || 'View All →',
+        viewAllLink: config.shopByConcern?.viewAllLink || '/shop',
+        categories: categoryCards,
+      },
+    });
+    setSaving(false);
+    if (res?.success) {
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 2500);
+    }
+  };
+
+  // Filtered lists
   const baseFiltered = products.filter((p) => {
     const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = filterCategory === 'all' || p.category === filterCategory;
     return matchesSearch && matchesCategory;
   });
 
-  const shopByProducts = baseFiltered.filter((p) => !p.tags || !p.tags.includes('concern'));
-  const concernProducts = baseFiltered.filter((p) => p.tags && p.tags.includes('concern'));
+  const shopByProducts = baseFiltered.filter((p) => !p.tags || (!p.tags.includes('category') && !p.tags.includes('concern')));
 
+  const filteredCategoryCards = categoryCards.filter((card) => {
+    const title = (card.title || card.label || '').toLowerCase();
+    const cat = (card.category || '').toLowerCase();
+    const matchesSearch = title.includes(searchQuery.toLowerCase()) || cat.includes(searchQuery.toLowerCase());
+    const matchesCategory = filterCategory === 'all' || card.category === filterCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  // Render Product Item (with Price)
   const renderProductItem = (p) => (
     <div key={p.id} className="pm-item">
       <div className="pm-item__image">
@@ -172,15 +323,62 @@ export default function ProductManager() {
         )}
       </div>
       <div className="pm-item__actions">
-        <button className="pm-action-btn pm-action-btn--edit" onClick={() => openEdit(p)}>
+        <button className="pm-action-btn pm-action-btn--edit" title="Edit Product" onClick={() => openEdit(p)}>
           <FiEdit2 size={14} />
         </button>
-        <button className="pm-action-btn pm-action-btn--delete" onClick={() => handleDelete(p.id)}>
+        <button className="pm-action-btn pm-action-btn--delete" title="Delete Product" onClick={() => handleDelete(p.id)}>
           <FiTrash2 size={14} />
         </button>
       </div>
     </div>
   );
+
+  // Render Category Card Item (Title, Image, Link - STRICTLY NO PRICE)
+  const renderCategoryItem = (card, index) => {
+    const title = card.title || card.label || 'Untitled Category';
+    const linkTarget = card.link || (card.category ? `/shop?category=${card.category}` : '/shop');
+    return (
+      <div key={card.id || index} className="pm-item">
+        <div className="pm-item__image">
+          {card.image ? (
+            <img src={card.image} alt={title} />
+          ) : (
+            <span className="pm-item__emoji">📁</span>
+          )}
+        </div>
+        <div className="pm-item__info">
+          <h4 className="pm-item__name">{title}</h4>
+          <div className="pm-item__meta">
+            <span className="pm-item__category" style={{ background: '#e0f2fe', color: '#0369a1' }}>
+              {card.category || 'Category Card'}
+            </span>
+            <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
+              {linkTarget}
+            </span>
+          </div>
+        </div>
+        {/* Strictly NO price displayed here */}
+        <div className="pm-item__actions">
+          <button
+            type="button"
+            className="pm-action-btn pm-action-btn--edit"
+            title="Edit Category Card"
+            onClick={() => openEditCategory(card, index)}
+          >
+            <FiEdit2 size={14} />
+          </button>
+          <button
+            type="button"
+            className="pm-action-btn pm-action-btn--delete"
+            title="Delete Category Card"
+            onClick={() => handleDeleteCategory(index)}
+          >
+            <FiTrash2 size={14} />
+          </button>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div>
@@ -188,7 +386,9 @@ export default function ProductManager() {
         <div className="pm-header">
           <div>
             <h2 className="dash-panel__title">📦 Product Manager</h2>
-            <p className="dash-panel__subtitle">{products.length} products total</p>
+            <p className="dash-panel__subtitle">
+              {shopByProducts.length} products • {categoryCards.length} category cards
+            </p>
           </div>
         </div>
 
@@ -196,7 +396,7 @@ export default function ProductManager() {
         <div className="pm-filters">
           <input
             className="dash-field__input pm-search"
-            placeholder="Search products..."
+            placeholder="Search products or categories..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -212,13 +412,18 @@ export default function ProductManager() {
           </select>
         </div>
 
-        {/* Shop by Product Section */}
+        {/* ── Shop by Product Section ── */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px', padding: '0 20px' }}>
-           <h3 style={{ fontSize: '1.1rem', color: '#00433D' }}>Shop by Product</h3>
-           <button className="dash-btn dash-btn--primary" onClick={() => openNew(false)}>
-             <FiPlus size={16} style={{ marginRight: '6px' }} />
-             Add Product
-           </button>
+          <div>
+            <h3 style={{ fontSize: '1.1rem', color: '#00433D', margin: 0 }}>Shop by Product</h3>
+            <p style={{ margin: '2px 0 0', fontSize: '0.8rem', color: '#64748b' }}>
+              Standard products with prices, ratings, and variants.
+            </p>
+          </div>
+          <button className="dash-btn dash-btn--primary" onClick={openNew}>
+            <FiPlus size={16} style={{ marginRight: '6px' }} />
+            Add Product
+          </button>
         </div>
         <div className="pm-list">
           {shopByProducts.map(renderProductItem)}
@@ -227,22 +432,29 @@ export default function ProductManager() {
           )}
         </div>
 
-        {/* Shop By Concern Section */}
+        {/* ── Shop by Category Section (NO PRICES) ── */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '30px', padding: '20px 20px 0', borderTop: '1px solid #eee' }}>
-           <h3 style={{ fontSize: '1.1rem', color: '#00433D' }}>Shop By Concern</h3>
-           <button className="dash-btn dash-btn--primary" onClick={() => openNew(true)}>
-             <FiPlus size={16} style={{ marginRight: '6px' }} />
-             Add Concern Product
-           </button>
+          <div>
+            <h3 style={{ fontSize: '1.1rem', color: '#00433D', margin: 0 }}>Shop by Category</h3>
+            <p style={{ margin: '2px 0 0', fontSize: '0.8rem', color: '#64748b' }}>
+              Category cards with image, title, and link shown on the storefront scroller.
+            </p>
+          </div>
+          <button className="dash-btn dash-btn--primary" onClick={openNewCategory}>
+            <FiPlus size={16} style={{ marginRight: '6px' }} />
+            Add Category
+          </button>
         </div>
         <div className="pm-list">
-          {concernProducts.map(renderProductItem)}
-          {concernProducts.length === 0 && (
-            <p style={{ textAlign: 'center', color: '#9ca3af', padding: '20px 0' }}>No products found.</p>
+          {filteredCategoryCards.map(renderCategoryItem)}
+          {filteredCategoryCards.length === 0 && (
+            <p style={{ textAlign: 'center', color: '#9ca3af', padding: '24px 0', fontSize: '0.9rem' }}>
+              No categories added yet. Click &quot;Add Category&quot; to upload an image, title, and category link.
+            </p>
           )}
         </div>
 
-        {/* ── Save Product Changes Bottom Bar ── */}
+        {/* ── Save Changes Bottom Bar ── */}
         <div style={{ marginTop: '30px', display: 'flex', justifyContent: 'flex-end', gap: '12px', padding: '20px 20px 10px', borderTop: '1px solid #eee' }}>
           <button
             type="button"
@@ -261,12 +473,12 @@ export default function ProductManager() {
             }}
           >
             {saving ? <FiRefreshCw className="spin" size={16} /> : (saveSuccess ? <FiCheck size={16} /> : <FiSave size={16} />)}
-            <span>{saving ? 'Saving...' : (saveSuccess ? 'Saved to Server!' : 'Save Product Changes')}</span>
+            <span>{saving ? 'Saving...' : (saveSuccess ? 'Saved to Server!' : 'Save All Changes')}</span>
           </button>
         </div>
       </div>
 
-      {/* Edit / Add Modal */}
+      {/* ── Product Edit / Add Modal ── */}
       {editing && (
         <div className="pm-modal-overlay" onClick={close}>
           <div className="pm-modal" onClick={(e) => e.stopPropagation()}>
@@ -307,7 +519,7 @@ export default function ProductManager() {
                 />
               </div>
 
-              {/* ── Product Image Upload ── */}
+              {/* Product Image Upload */}
               <div className="dash-field">
                 <ProductImageUploader
                   label="Product Image"
@@ -392,6 +604,7 @@ export default function ProductManager() {
                   {['on-sale', 'new-arrival', 'best-seller'].map((tag) => (
                     <button
                       key={tag}
+                      type="button"
                       className={`pm-tag ${editing.tags.includes(tag) ? 'pm-tag--active' : ''}`}
                       onClick={() => toggleTag(tag)}
                     >
@@ -428,6 +641,86 @@ export default function ProductManager() {
               <button className="dash-btn dash-btn--primary" onClick={save}>
                 <FiSave size={16} style={{ marginRight: '6px' }} />
                 {isNew ? 'Add Product' : 'Save Changes'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Category Card Modal (ONLY Title, Image Upload, Category Link - NO PRICES) ── */}
+      {editingCategory && (
+        <div className="pm-modal-overlay" onClick={closeCategory}>
+          <div className="pm-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="pm-modal__header">
+              <h3>{isNewCategory ? 'Add Category Card' : 'Edit Category Card'}</h3>
+              <button className="pm-modal__close" onClick={closeCategory}><FiX size={20} /></button>
+            </div>
+            <div className="pm-modal__body">
+              <div className="dash-field">
+                <label className="dash-field__label">Category Title *</label>
+                <input
+                  className="dash-field__input"
+                  placeholder="e.g. Spices, Hair Care, Cold-Pressed Oils"
+                  value={editingCategory.title || editingCategory.label || ''}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setEditingCategory((prev) => ({ ...prev, title: val, label: val }));
+                  }}
+                  autoFocus
+                />
+              </div>
+
+              {/* Category Image Upload */}
+              <div className="dash-field">
+                <ProductImageUploader
+                  label="Category Card Image *"
+                  value={editingCategory.image || ''}
+                  onChange={(val) => setEditingCategory((prev) => ({ ...prev, image: val }))}
+                  maxWidth={800}
+                  maxHeight={1000}
+                  quality={0.85}
+                  helperText="Upload an image (PNG, JPG, WEBP) or enter an image URL for this category card."
+                />
+              </div>
+
+              {/* Link to Category */}
+              <div className="dash-row">
+                <div className="dash-field">
+                  <label className="dash-field__label">Select Category</label>
+                  <select
+                    className="dash-field__input"
+                    value={editingCategory.category || ''}
+                    onChange={(e) => {
+                      const catVal = e.target.value;
+                      setEditingCategory((prev) => ({
+                        ...prev,
+                        category: catVal,
+                        link: catVal ? `/shop?category=${catVal}` : prev.link || '/shop'
+                      }));
+                    }}
+                  >
+                    <option value="">Select Category...</option>
+                    {categories.filter(c => c.id !== 'all').map((c) => (
+                      <option key={c.id} value={c.id}>{c.label}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="dash-field">
+                  <label className="dash-field__label">Link / URL</label>
+                  <input
+                    className="dash-field__input"
+                    placeholder="/shop?category=spices"
+                    value={editingCategory.link || ''}
+                    onChange={(e) => setEditingCategory((prev) => ({ ...prev, link: e.target.value }))}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="pm-modal__footer">
+              <button className="dash-btn dash-btn--ghost" onClick={closeCategory}>Cancel</button>
+              <button className="dash-btn dash-btn--primary" onClick={saveCategory}>
+                <FiSave size={16} style={{ marginRight: '6px' }} />
+                {isNewCategory ? 'Add Category' : 'Save Changes'}
               </button>
             </div>
           </div>

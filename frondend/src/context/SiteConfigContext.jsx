@@ -81,6 +81,18 @@ function normalizeColors(cfg) {
   return cfg;
 }
 
+function normalizeSections(cfg) {
+  if (!cfg || !Array.isArray(cfg.sections)) return cfg;
+  const sbp = cfg.sections.find(s => s.id === 'shopByProduct');
+  const sbc = cfg.sections.find(s => s.id === 'shopByCategory');
+  const del = cfg.sections.find(s => s.id === 'delivery');
+  if (sbp && sbc && del && sbp.order === 0 && del.order === 1 && sbc.order === 2) {
+    sbc.order = 1;
+    del.order = 2;
+  }
+  return cfg;
+}
+
 function getInitialConfig() {
   let base = { ...defaultConfig };
   try {
@@ -171,7 +183,7 @@ function getInitialConfig() {
       bgImage: finalDesktop.length > 0 ? finalDesktop[0] : ''
     };
   }
-  return normalizeColors(base);
+  return normalizeSections(normalizeColors(base));
 }
 
 export function SiteConfigProvider({ children }) {
@@ -203,7 +215,7 @@ export function SiteConfigProvider({ children }) {
 
         // If IndexedDB has valid data and we haven't received unsaved edits from user
         if (sourceRef.current === 'init' || sourceRef.current === 'storage') {
-          const merged = normalizeColors(deepMerge(defaultConfig, stored));
+          const merged = normalizeSections(normalizeColors(deepMerge(defaultConfig, stored)));
           if (Array.isArray(stored.products) && stored.products.length > 0) {
             merged.products = stored.products;
           }
@@ -322,7 +334,7 @@ export function SiteConfigProvider({ children }) {
         }
 
         const validConfigData = configData || {};
-        const mergedConfig = normalizeColors(deepMerge(defaultConfig, validConfigData));
+        const mergedConfig = normalizeSections(normalizeColors(deepMerge(defaultConfig, validConfigData)));
         
         // Ensure new sections added to defaultConfig are present even if backend has an older sections array
         if (configData.sections && Array.isArray(configData.sections)) {
