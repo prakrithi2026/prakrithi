@@ -232,8 +232,8 @@ const defaultConfig = {
     "viewAllLink": "/shop"
   },
   "delivery": {
-    "title": "How We Deliver",
-    "subtitle": "Fresh Natural Products",
+    "title": "How we deliver",
+    "subtitle": "fresh natural products",
     "tcNote": "*T&C Apply.",
     "steps": [
       {

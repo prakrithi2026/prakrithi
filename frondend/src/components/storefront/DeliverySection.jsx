@@ -24,7 +24,12 @@ export default function DeliverySection() {
     <section className="delivery-section">
       <div className="delivery-banner">
         <div className="delivery-left">
-          <h3>{delivery.title}<br/>{delivery.subtitle}</h3>
+          <h3>
+            <span className="delivery-title-line">{delivery.title}</span>
+            {delivery.subtitle && (
+              <span className="delivery-title-line">{delivery.subtitle}</span>
+            )}
+          </h3>
           {delivery.tcNote && <p className="tc-note">{delivery.tcNote}</p>}
         </div>
         <div className="delivery-steps">
