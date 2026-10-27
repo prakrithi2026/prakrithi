@@ -294,7 +294,7 @@ export default function ShopByCategory() {
             <Link
               to={viewAllLink}
               className="btn-view-all"
-              style={{ color: '#FFFFFF' }}
+              style={{ color: theme.primaryColor || '#00433D' }}
             >
               {viewAllText}
             </Link>

@@ -153,10 +153,10 @@
 
 .view-all-row {
   display: inline-flex;
-  padding: 4px 12px;
+  padding: 4px 14px;
   justify-content: center;
   align-items: center;
-  border-radius: 8px;
+  border-radius: 9999px;
   border: 1px solid #00433D;
   flex-shrink: 0;
 }
