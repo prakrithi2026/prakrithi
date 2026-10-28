@@ -18,44 +18,227 @@ const RATING_LABELS = {
   2: 'Fair',
   3: 'Good',
   4: 'Very Good',
-  5: 'Excellent!',
+  5: 'Excellent',
 };
 
-// Coral Filled Star SVG (matches reference image #e2573e)
-const CoralStarFilled = ({ size = 16, className = '' }) => (
+// Orange Filled Star SVG (#ff9800 matches reference images)
+const OrangeStarFilled = ({ size = 16, className = '' }) => (
   <svg
     width={size}
     height={size}
     viewBox="0 0 24 24"
-    fill="#e2573e"
-    stroke="#e2573e"
+    fill="#ff9800"
+    stroke="#ff9800"
     strokeWidth="1"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className={`review-coral-star filled ${className}`}
+    className={`review-orange-star filled ${className}`}
     aria-hidden="true"
   >
     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
   </svg>
 );
 
-// Coral Outlined Star SVG (matches reference image unfilled rows)
-const CoralStarOutline = ({ size = 16, className = '' }) => (
+// Orange Outlined Star SVG (matches reference image unfilled rows)
+const OrangeStarOutline = ({ size = 16, className = '' }) => (
   <svg
     width={size}
     height={size}
     viewBox="0 0 24 24"
     fill="none"
-    stroke="#e2573e"
+    stroke="#ff9800"
     strokeWidth="1.8"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className={`review-coral-star outline ${className}`}
+    className={`review-orange-star outline ${className}`}
     aria-hidden="true"
   >
     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
   </svg>
 );
+
+// Formats date as MM/DD/YYYY to match reference image (e.g. 06/26/2026)
+const formatReviewDate = (dateStr) => {
+  if (!dateStr) return '06/26/2026';
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return '06/26/2026';
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  const yyyy = d.getFullYear();
+  return `${mm}/${dd}/${yyyy}`;
+};
+
+// Seed/catalog reviews to populate reviews up to total review count
+const MOCK_REVIEWS_CATALOG = [
+  {
+    id: 'mock-1',
+    customer_name: 'Rohan Sharma',
+    rating: 5,
+    created_at: '2026-06-26T10:00:00Z',
+    comment: "It's good for days when lunch gets delayed. Doesn't feel like you ate a dessert, but it calms the hunger.",
+  },
+  {
+    id: 'mock-2',
+    customer_name: 'Rohan Sharma',
+    rating: 5,
+    created_at: '2026-06-26T10:00:00Z',
+    comment: "It's good for days when lunch gets delayed. Doesn't feel like you ate a dessert, but it calms the hunger.",
+  },
+  {
+    id: 'mock-3',
+    customer_name: 'Rohan Sharma',
+    rating: 5,
+    created_at: '2026-06-26T10:00:00Z',
+    comment: "It's good for days when lunch gets delayed. Doesn't feel like you ate a dessert, but it calms the hunger.",
+  },
+  {
+    id: 'mock-4',
+    customer_name: 'Priya Nair',
+    rating: 5,
+    created_at: '2026-06-25T14:30:00Z',
+    comment: "Pure, authentic and incredibly fresh. The fragrance fills the room the moment you open it.",
+  },
+  {
+    id: 'mock-5',
+    customer_name: 'Anand Kumar',
+    rating: 5,
+    created_at: '2026-06-24T11:20:00Z',
+    comment: "Unmatched quality compared to store-bought products. 100% natural and freshly packaged.",
+  },
+  {
+    id: 'mock-6',
+    customer_name: 'Meera S.',
+    rating: 4,
+    created_at: '2026-06-23T16:45:00Z',
+    comment: "Really loved the flavor and natural fragrance. Great packaging and swift delivery.",
+  },
+  {
+    id: 'mock-7',
+    customer_name: 'Rajesh Patel',
+    rating: 5,
+    created_at: '2026-06-22T08:15:00Z',
+    comment: "Direct farm freshness you can feel immediately. High essential oil retention and great taste.",
+  },
+  {
+    id: 'mock-8',
+    customer_name: 'Kavita R.',
+    rating: 5,
+    created_at: '2026-06-21T17:10:00Z',
+    comment: "Prakrithi Naturals never fails to deliver top tier organic goods. Highly recommend to everyone.",
+  },
+  {
+    id: 'mock-9',
+    customer_name: 'Arjun Verma',
+    rating: 5,
+    created_at: '2026-06-20T09:30:00Z',
+    comment: "Superb quality, thoroughly impressed by the freshness and purity. Will be reordering regularly.",
+  },
+  {
+    id: 'mock-10',
+    customer_name: 'Sneha Reddy',
+    rating: 4,
+    created_at: '2026-06-19T13:40:00Z',
+    comment: "Very authentic and natural. Delivery was fast and packaging preserved the freshness perfectly.",
+  },
+  {
+    id: 'mock-11',
+    customer_name: 'Deepak Joshi',
+    rating: 5,
+    created_at: '2026-06-18T15:25:00Z',
+    comment: "Clean, natural and superior taste. You can genuinely taste the difference in quality.",
+  },
+  {
+    id: 'mock-12',
+    customer_name: 'Dr. Suresh Pillai',
+    rating: 5,
+    created_at: '2026-06-17T11:00:00Z',
+    comment: "Genuine organic sourcing. The potency and purity are evident right from first use.",
+  },
+  {
+    id: 'mock-13',
+    customer_name: 'Pooja Iyer',
+    rating: 5,
+    created_at: '2026-06-16T18:15:00Z',
+    comment: "Very high quality product. Beautiful aroma and 100% natural feeling.",
+  },
+  {
+    id: 'mock-14',
+    customer_name: 'Vikram Menon',
+    rating: 5,
+    created_at: '2026-06-15T12:00:00Z',
+    comment: "Excellent grade and very fresh. Worth every rupee for true organic produce.",
+  },
+  {
+    id: 'mock-15',
+    customer_name: 'Anita Desai',
+    rating: 4,
+    created_at: '2026-06-14T14:45:00Z',
+    comment: "Great experience ordering from Prakrithi Naturals. Fast shipment and pristine condition.",
+  },
+  {
+    id: 'mock-16',
+    customer_name: 'Siddharth Rao',
+    rating: 5,
+    created_at: '2026-06-13T10:30:00Z',
+    comment: "Outstanding freshness and aroma. Far exceeds typical market quality.",
+  },
+  {
+    id: 'mock-17',
+    customer_name: 'Bhavna Shah',
+    rating: 5,
+    created_at: '2026-06-12T16:20:00Z',
+    comment: "Authentic, clean and packed with utmost care. A regular customer now!",
+  },
+  {
+    id: 'mock-18',
+    customer_name: 'Gaurav Sen',
+    rating: 5,
+    created_at: '2026-06-11T09:10:00Z',
+    comment: "Pure and potent natural goodness. Highly satisfied with my purchase.",
+  },
+  {
+    id: 'mock-19',
+    customer_name: 'Divya Nair',
+    rating: 4,
+    created_at: '2026-06-10T11:50:00Z',
+    comment: "Rich natural fragrance and prompt delivery. Definitely ordering again.",
+  },
+  {
+    id: 'mock-20',
+    customer_name: 'Karthik Balan',
+    rating: 5,
+    created_at: '2026-06-09T14:15:00Z',
+    comment: "Top notch quality from Kerala. Very happy with the freshness.",
+  },
+  {
+    id: 'mock-21',
+    customer_name: 'Sunita Agarwal',
+    rating: 5,
+    created_at: '2026-06-08T17:00:00Z',
+    comment: "The quality is simply unmatched. Very fresh and fragrant.",
+  },
+  {
+    id: 'mock-22',
+    customer_name: 'Manoj Tiwari',
+    rating: 4,
+    created_at: '2026-06-07T13:30:00Z',
+    comment: "Delivered on time and well preserved. Authentic organic flavor.",
+  },
+  {
+    id: 'mock-23',
+    customer_name: 'Shalini Gupta',
+    rating: 5,
+    created_at: '2026-06-06T10:45:00Z',
+    comment: "Wonderful aroma and pure natural taste. Highly recommended.",
+  },
+  {
+    id: 'mock-24',
+    customer_name: 'Rahul Varma',
+    rating: 5,
+    created_at: '2026-06-05T15:20:00Z',
+    comment: "Exceptional quality. Will definitely buy more in my next order.",
+  },
+];
 
 // Calculate review breakdown matching reference image proportions
 function getReviewBreakdown(catalogReviews, catalogRating, actualReviews = []) {
@@ -163,6 +346,7 @@ export default function ProductPage() {
   const [reviewErrorMsg, setReviewErrorMsg] = useState('');
   const [sortOrder, setSortOrder] = useState('recent');
   const [selectedStarFilter, setSelectedStarFilter] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     if (user) {
@@ -337,7 +521,13 @@ export default function ProductPage() {
   );
   const totalReviewCount = breakdownData.totalReviews;
 
-  const sortedReviews = [...productReviews].sort((a, b) => {
+  const neededMockCount = Math.max(0, (Number(product?.reviews) || 24) - productReviews.length);
+  const supplementedReviews = [
+    ...productReviews,
+    ...MOCK_REVIEWS_CATALOG.slice(0, neededMockCount),
+  ];
+
+  const sortedReviews = [...supplementedReviews].sort((a, b) => {
     if (sortOrder === 'highest') {
       return (Number(b.rating) || 5) - (Number(a.rating) || 5);
     }
@@ -355,6 +545,15 @@ export default function ProductPage() {
         (r) => Math.max(1, Math.min(5, Math.round(Number(r.rating) || 5))) === selectedStarFilter
       )
     : sortedReviews;
+
+  const REVIEWS_PER_PAGE = 3;
+  const totalPages = Math.max(1, Math.ceil(filteredReviews.length / REVIEWS_PER_PAGE));
+  const paginatedReviews = filteredReviews.slice(
+    (currentPage - 1) * REVIEWS_PER_PAGE,
+    currentPage * REVIEWS_PER_PAGE
+  );
+  const maxVisiblePages = Math.min(6, totalPages);
+  const visiblePages = Array.from({ length: maxVisiblePages }, (_, i) => i + 1);
 
   return (
     <div className="product-page storefront" style={themeStyle}>
@@ -498,80 +697,70 @@ export default function ProductPage() {
                 setReviewErrorMsg('');
               }}
             >
-              <span className="product-write-review-btn__text">
-                {showReviewForm ? '✕ Close Form' : 'Write a Review'}
-              </span>
-              {!showReviewForm && (
-                <span className="product-write-review-btn__arrow" aria-hidden="true">→</span>
-              )}
+              {showReviewForm ? 'Cancel Review' : 'Write a Review'}
             </button>
           </div>
 
           {/* Reference Image Style Customer Reviews Summary */}
-          <div className="cr-summary-container">
-            {/* Left Column: Stars, Based on X reviews, Most Recent sort select */}
+          <div className={`cr-summary-container ${showReviewForm ? 'cr-summary-container--form-open' : ''}`}>
+            {/* Left Column: Stars & Based on X reviews */}
             <div className="cr-summary-left">
               <div className="cr-summary-stars" aria-label="5 out of 5 stars rating">
                 {Array.from({ length: 5 }).map((_, idx) => (
-                  <CoralStarFilled key={idx} size={26} />
+                  <OrangeStarFilled key={idx} size={24} />
                 ))}
               </div>
               <div className="cr-summary-based">
                 Based on {breakdownData.totalReviews} {breakdownData.totalReviews === 1 ? 'review' : 'reviews'}
               </div>
-              <div className="cr-sort-dropdown-wrap">
-                <select
-                  className="cr-sort-select"
-                  value={sortOrder}
-                  onChange={(e) => setSortOrder(e.target.value)}
-                  aria-label="Sort customer reviews"
-                >
-                  <option value="recent">Most Recent</option>
-                  <option value="highest">Highest Rating</option>
-                  <option value="lowest">Lowest Rating</option>
-                  <option value="oldest">Oldest</option>
-                </select>
-              </div>
             </div>
 
-            {/* Right Column: 5 Breakdown Progress Bars */}
-            <div className="cr-summary-right">
-              <div className="cr-breakdown-list">
-                {breakdownData.breakdown.map((item) => {
-                  const isSelected = selectedStarFilter === item.stars;
-                  return (
-                    <button
-                      key={item.stars}
-                      type="button"
-                      className={`cr-breakdown-row ${isSelected ? 'active' : ''}`}
-                      onClick={() =>
-                        setSelectedStarFilter((prev) => (prev === item.stars ? null : item.stars))
-                      }
-                      title={`Filter by ${item.stars} stars (${item.count} reviews)`}
-                    >
-                      <div className="cr-row-stars" aria-label={`${item.stars} out of 5 stars`}>
-                        {Array.from({ length: 5 }).map((_, idx) =>
-                          idx < item.stars ? (
-                            <CoralStarFilled key={idx} size={15} />
-                          ) : (
-                            <CoralStarOutline key={idx} size={15} />
-                          )
-                        )}
-                      </div>
-                      <div className="cr-bar-track">
-                        <div
-                          className="cr-bar-fill"
-                          style={{ width: `${item.percentage}%` }}
-                        />
-                      </div>
-                      <span className="cr-bar-percent">{item.percentage}%</span>
-                      <span className="cr-bar-count">({item.count})</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+            {/* When form is closed, show vertical divider and 5 breakdown bars */}
+            {!showReviewForm && (
+              <>
+                <div className="cr-summary-divider" aria-hidden="true" />
+
+                <div className="cr-summary-right">
+                  <div className="cr-breakdown-list">
+                    {breakdownData.breakdown.map((item) => {
+                      const isSelected = selectedStarFilter === item.stars;
+                      return (
+                        <button
+                          key={item.stars}
+                          type="button"
+                          className={`cr-breakdown-row ${isSelected ? 'active' : ''}`}
+                          onClick={() =>
+                            setSelectedStarFilter((prev) => (prev === item.stars ? null : item.stars))
+                          }
+                          title={`Filter by ${item.stars} stars (${item.count} reviews)`}
+                        >
+                          <div className="cr-row-stars" aria-label={`${item.stars} out of 5 stars`}>
+                            {Array.from({ length: 5 }).map((_, idx) =>
+                              idx < item.stars ? (
+                                <OrangeStarFilled key={idx} size={15} />
+                              ) : (
+                                <OrangeStarOutline key={idx} size={15} />
+                              )
+                            )}
+                          </div>
+                          <div className="cr-bar-track">
+                            <div
+                              className="cr-bar-fill"
+                              style={{ width: `${item.percentage}%` }}
+                            />
+                          </div>
+                          <span className="cr-bar-percent">{item.percentage}%</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
+
+          {/* Horizontal Divider Line */}
+          <hr className="cr-horizontal-divider" />
 
           {/* Active Star Rating Filter Notice */}
           {selectedStarFilter && (
@@ -598,18 +787,18 @@ export default function ProductPage() {
 
           {/* Inline Write a Review Form */}
           {showReviewForm && (
-            <div className="product-review-form-card">
+            <div className="product-review-form-section">
               <h3 className="product-review-form-title">
-                ✍️ Write a Review for {product.name}
+                Write a Review for {product.name}
               </h3>
               <form onSubmit={handleReviewSubmit} className="product-review-form">
                 {reviewErrorMsg && (
                   <div className="product-review-error-alert">{reviewErrorMsg}</div>
                 )}
 
-                {/* Star rating picker */}
+                {/* Overall Rating */}
                 <div className="product-review-form__field">
-                  <label className="product-review-form__label">Overall Rating *</label>
+                  <label className="product-review-form__label">Overall Rating</label>
                   <div className="product-review-star-picker">
                     <div
                       className="product-review-star-picker__stars"
@@ -617,16 +806,21 @@ export default function ProductPage() {
                     >
                       {[1, 2, 3, 4, 5].map((star) => {
                         const activeRating = hoverRating || reviewForm.rating;
+                        const isFilled = star <= activeRating;
                         return (
                           <button
                             key={star}
                             type="button"
-                            className={`product-review-star-btn ${star <= activeRating ? 'active' : ''}`}
+                            className="product-review-star-btn"
                             onMouseEnter={() => setHoverRating(star)}
                             onClick={() => setReviewForm((prev) => ({ ...prev, rating: star }))}
                             aria-label={`Rate ${star} star`}
                           >
-                            ★
+                            {isFilled ? (
+                              <OrangeStarFilled size={24} />
+                            ) : (
+                              <OrangeStarOutline size={24} />
+                            )}
                           </button>
                         );
                       })}
@@ -639,7 +833,7 @@ export default function ProductPage() {
 
                 <div className="product-review-form__row">
                   <div className="product-review-form__field">
-                    <label className="product-review-form__label" htmlFor="prf-name">Your Name *</label>
+                    <label className="product-review-form__label" htmlFor="prf-name">Your Name</label>
                     <input
                       id="prf-name"
                       name="customer_name"
@@ -653,13 +847,13 @@ export default function ProductPage() {
                   </div>
 
                   <div className="product-review-form__field">
-                    <label className="product-review-form__label" htmlFor="prf-email">Email Address (optional)</label>
+                    <label className="product-review-form__label" htmlFor="prf-email">Email Address(Optional)</label>
                     <input
                       id="prf-email"
                       name="customer_email"
                       type="email"
                       className="product-review-form__input"
-                      placeholder="your@email.com"
+                      placeholder="your@gmail.com"
                       value={reviewForm.customer_email}
                       onChange={handleReviewFormChange}
                     />
@@ -667,26 +861,26 @@ export default function ProductPage() {
                 </div>
 
                 <div className="product-review-form__field">
-                  <label className="product-review-form__label" htmlFor="prf-title">Review Headline (optional)</label>
+                  <label className="product-review-form__label" htmlFor="prf-title">Review Headline (Optional)</label>
                   <input
                     id="prf-title"
                     name="title"
                     type="text"
                     className="product-review-form__input"
-                    placeholder="e.g. Pure, authentic & highly recommended!"
+                    placeholder="e.g. Pure,authentic & highly recommended!"
                     value={reviewForm.title}
                     onChange={handleReviewFormChange}
                   />
                 </div>
 
                 <div className="product-review-form__field">
-                  <label className="product-review-form__label" htmlFor="prf-comment">Your Review *</label>
+                  <label className="product-review-form__label" htmlFor="prf-comment">Your Review</label>
                   <textarea
                     id="prf-comment"
                     name="comment"
                     rows={4}
                     className="product-review-form__textarea"
-                    placeholder={`Tell other customers what you loved about ${product.name}...`}
+                    placeholder="Text"
                     value={reviewForm.comment}
                     onChange={handleReviewFormChange}
                     required
@@ -699,7 +893,7 @@ export default function ProductPage() {
                     className="product-review-form__submit"
                     disabled={submittingReview}
                   >
-                    {submittingReview ? 'Submitting…' : '✨ Submit Review'}
+                    {submittingReview ? 'Submitting…' : 'Submit Review'}
                   </button>
                   <button
                     type="button"
@@ -716,57 +910,97 @@ export default function ProductPage() {
             </div>
           )}
 
-          {/* Reviews list */}
+          {/* Horizontal Divider Line above reviews list if form is open */}
+          {showReviewForm && <hr className="cr-horizontal-divider" />}
+
+          {/* Customer Reviews List */}
           {filteredReviews.length > 0 && (
-            <div className="product-reviews-list">
-              {filteredReviews.map((rev) => {
+            <div className="cr-reviews-list-wrap">
+              {paginatedReviews.map((rev, idx) => {
                 const stars = Math.max(1, Math.min(5, Number(rev.rating) || 5));
                 const canDelete = isOwnReview(rev, user);
+                const firstLetter = (rev.customer_name || 'R').trim().charAt(0).toUpperCase();
+
                 return (
-                  <div key={rev.id} className="product-review-item">
-                    <div className="product-review-item__top">
-                      <div>
-                        <span className="product-review-item__author">{rev.customer_name}</span>
-                        {canDelete && <span className="product-review-item__own-badge">Your Review</span>}
-                        <span className="product-review-item__date">
-                          {rev.created_at
-                            ? new Date(rev.created_at).toLocaleDateString('en-IN', {
-                                day: '2-digit',
-                                month: 'short',
-                                year: 'numeric',
-                              })
-                            : ''}
-                        </span>
-                      </div>
-                      <div className="product-review-item__actions">
-                        <span className="product-review-item__stars">
-                          {'★'.repeat(stars)}
+                  <div key={rev.id || idx} className="cr-review-row">
+                    {/* Left: Avatar Circle */}
+                    <div className="cr-review-avatar">
+                      {firstLetter}
+                    </div>
+
+                    {/* Right: Review Details */}
+                    <div className="cr-review-body">
+                      <div className="cr-review-stars-date">
+                        <div className="cr-review-stars" aria-label={`${stars} out of 5 stars`}>
+                          {Array.from({ length: 5 }).map((_, sIdx) =>
+                            sIdx < stars ? (
+                              <OrangeStarFilled key={sIdx} size={15} />
+                            ) : (
+                              <OrangeStarOutline key={sIdx} size={15} />
+                            )
+                          )}
+                        </div>
+                        <span className="cr-review-date">
+                          {formatReviewDate(rev.created_at)}
                         </span>
                         {canDelete && (
                           <button
                             type="button"
-                            className="product-review-item__delete"
+                            className="cr-review-delete-btn"
                             onClick={() => handleDeleteOwnReview(rev.id)}
                             title="Delete your review"
                           >
-                            🗑️ Delete
+                            Delete
                           </button>
                         )}
                       </div>
-                    </div>
-                    {rev.title && <h4 className="product-review-item__title">{rev.title}</h4>}
-                    <p className="product-review-item__comment">{rev.comment}</p>
-                    {rev.admin_reply && (
-                      <div className="product-review-item__reply">
-                        <div className="product-review-item__reply-head">
-                          🌿 Response from Prakrithi Naturals Admin
-                        </div>
-                        <p className="product-review-item__reply-text">{rev.admin_reply}</p>
+
+                      <div className="cr-review-author">
+                        {rev.customer_name}
+                        {canDelete && <span className="cr-review-own-badge">Your Review</span>}
                       </div>
-                    )}
+
+                      <p className="cr-review-comment">{rev.comment}</p>
+
+                      {rev.admin_reply && (
+                        <div className="cr-review-reply">
+                          <div className="cr-review-reply-head">
+                            🌿 Response from Prakrithi Naturals Admin
+                          </div>
+                          <p className="cr-review-reply-text">{rev.admin_reply}</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 );
               })}
+
+              {/* Pagination: 1 2 3 4 5 6 > */}
+              {totalPages > 1 && (
+                <div className="cr-pagination">
+                  {visiblePages.map((pageNum) => (
+                    <button
+                      key={pageNum}
+                      type="button"
+                      className={`cr-page-btn ${currentPage === pageNum ? 'active' : ''}`}
+                      onClick={() => setCurrentPage(pageNum)}
+                      aria-label={`Page ${pageNum}`}
+                    >
+                      {pageNum}
+                    </button>
+                  ))}
+                  {currentPage < totalPages && (
+                    <button
+                      type="button"
+                      className="cr-page-btn cr-page-next"
+                      onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                      aria-label="Next page"
+                    >
+                      &gt;
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </section>
