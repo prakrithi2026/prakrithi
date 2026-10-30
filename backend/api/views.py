@@ -705,6 +705,13 @@ class SiteConfigView(APIView):
                         name = prod.get('name', '')
                         description = prod.get('description', '')
                         image = prod.get('image', '')
+                        images = prod.get('images', [])
+                        if not isinstance(images, list):
+                            images = [images] if images else []
+                        if not images and image:
+                            images = [image]
+                        if images and not image:
+                            image = images[0]
                         tags = prod.get('tags', []) if isinstance(prod.get('tags'), list) else []
                         variants = prod.get('variants', []) if isinstance(prod.get('variants'), list) else []
                         badge = prod.get('badge') or None
@@ -721,6 +728,7 @@ class SiteConfigView(APIView):
                                 (existing.salePrice is not None and float(existing.salePrice) != sale_price_num) or
                                 (existing.salePrice is None and sale_price_num is not None) or
                                 existing.image != image or
+                                existing.images != images or
                                 existing.category_id != (category_obj.category_id if category_obj else None) or
                                 existing.tags != tags or
                                 existing.variants != variants or
@@ -737,6 +745,7 @@ class SiteConfigView(APIView):
                                 existing.price = price_num
                                 existing.salePrice = sale_price_num
                                 existing.image = image
+                                existing.images = images
                                 existing.category = category_obj
                                 existing.tags = tags
                                 existing.variants = variants
@@ -755,6 +764,7 @@ class SiteConfigView(APIView):
                                 price=price_num,
                                 salePrice=sale_price_num,
                                 image=image,
+                                images=images,
                                 category=category_obj,
                                 tags=tags,
                                 variants=variants,

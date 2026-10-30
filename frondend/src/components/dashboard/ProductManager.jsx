@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { FiPlus, FiEdit2, FiTrash2, FiX, FiSave, FiRefreshCw, FiCheck } from 'react-icons/fi';
 import { useSiteConfig } from '../../context/SiteConfigContext';
 import ProductImageUploader from './ProductImageUploader';
+import MultiProductImageUploader from './MultiProductImageUploader';
 import './ProductManager.css';
 
 const emptyProduct = {
@@ -10,6 +11,7 @@ const emptyProduct = {
   price: 0,
   salePrice: null,
   image: '',
+  images: [],
   category: 'spices',
   tags: [],
   badge: null,
@@ -43,12 +45,15 @@ export default function ProductManager() {
 
   // ── Product Handlers ──
   const openNew = () => {
-    setEditing({ ...emptyProduct });
+    setEditing({ ...emptyProduct, images: [] });
     setIsNew(true);
   };
 
   const openEdit = (product) => {
-    setEditing({ ...product });
+    const rawImages = Array.isArray(product.images) && product.images.length > 0 
+      ? product.images 
+      : (product.image ? [product.image] : []);
+    setEditing({ ...product, images: rawImages });
     setIsNew(false);
   };
 
@@ -59,7 +64,16 @@ export default function ProductManager() {
 
   const save = async () => {
     if (!editing || !editing.name.trim()) return alert('Product name is required');
-    const productToSave = { ...editing };
+    const images = Array.isArray(editing.images) ? editing.images.filter(Boolean) : [];
+    if (images.length === 0 && editing.image) {
+      images.push(editing.image);
+    }
+    const primaryImage = images.length > 0 ? images[0] : (editing.image || '');
+    const productToSave = {
+      ...editing,
+      image: primaryImage,
+      images: images,
+    };
 
     let updatedProducts;
     if (isNew) {
@@ -297,7 +311,9 @@ export default function ProductManager() {
   const renderProductItem = (p) => (
     <div key={p.id} className="pm-item">
       <div className="pm-item__image">
-        {p.image ? (
+        {(Array.isArray(p.images) && p.images.length > 0) ? (
+          <img src={p.images[0]} alt={p.name} />
+        ) : p.image ? (
           <img src={p.image} alt={p.name} />
         ) : (
           <span className="pm-item__emoji">
@@ -519,16 +535,23 @@ export default function ProductManager() {
                 />
               </div>
 
-              {/* Product Image Upload */}
+              {/* Product Multi-Image Upload */}
               <div className="dash-field">
-                <ProductImageUploader
-                  label="Product Image"
-                  value={editing.image}
-                  onChange={(val) => setEditing((prev) => ({ ...prev, image: val }))}
+                <MultiProductImageUploader
+                  label="Product Images *"
+                  images={editing.images || (editing.image ? [editing.image] : [])}
+                  onChange={(newImages) => {
+                    const primary = newImages.length > 0 ? newImages[0] : '';
+                    setEditing((prev) => ({
+                      ...prev,
+                      images: newImages,
+                      image: primary,
+                    }));
+                  }}
                   maxWidth={800}
                   maxHeight={800}
                   quality={0.85}
-                  helperText="Upload a product image (PNG, JPG, WEBP) or enter an image URL."
+                  helperText="Upload multiple product photos (PNG, JPG, WEBP). First photo is the cover photo shown on product cards. Drag, reorder, or click 'Set as Cover'."
                 />
               </div>
 

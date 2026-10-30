@@ -16,13 +16,28 @@ def run_db_image_optimization():
             
             # Optimize Products
             for p in Product.objects.all():
+                prod_changed = False
                 if p.image and p.image.startswith("data:image/"):
-                    # If it's a huge unoptimized PNG/WebP, compress it
                     if len(p.image) > 50000:
                         optimized = compress_base64_image(p.image, max_width=800, max_height=800, quality=80)
                         if len(optimized) < len(p.image):
                             p.image = optimized
-                            p.save()
+                            prod_changed = True
+                if p.images and isinstance(p.images, list):
+                    new_images = []
+                    for img in p.images:
+                        if img and isinstance(img, str) and img.startswith("data:image/") and len(img) > 50000:
+                            opt_img = compress_base64_image(img, max_width=800, max_height=800, quality=80)
+                            if len(opt_img) < len(img):
+                                new_images.append(opt_img)
+                                prod_changed = True
+                            else:
+                                new_images.append(img)
+                        else:
+                            new_images.append(img)
+                    p.images = new_images
+                if prod_changed:
+                    p.save()
                             
             # Optimize SiteConfig
             # Optimize SiteConfig

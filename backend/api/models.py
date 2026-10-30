@@ -28,6 +28,7 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     salePrice = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     image = models.TextField(blank=True, null=True)
+    images = models.JSONField(default=list, blank=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='products')
     
     # Store arrays as JSON
@@ -46,6 +47,32 @@ class Product(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
+        if self.images is None:
+            self.images = []
+        elif not isinstance(self.images, list):
+            self.images = [self.images]
+
+        if not self.images and self.image:
+            self.images = [self.image]
+        elif self.images and not self.image:
+            self.image = self.images[0]
+        elif self.images and self.image and self.image not in self.images:
+            self.images.insert(0, self.image)
+
+        if self.images:
+            compressed_list = []
+            for img in self.images:
+                if img and isinstance(img, str) and img.startswith('data:image/') and not img.startswith('data:image/webp;base64,') and not img.startswith('data:image/svg+xml'):
+                    try:
+                        from .utils import compress_base64_image
+                        img = compress_base64_image(img, max_width=800, max_height=800, quality=80)
+                    except Exception:
+                        pass
+                compressed_list.append(img)
+            self.images = compressed_list
+            if self.images:
+                self.image = self.images[0]
+
         if self.image and isinstance(self.image, str) and self.image.startswith('data:image/') and not self.image.startswith('data:image/webp;base64,') and not self.image.startswith('data:image/svg+xml'):
             try:
                 from .utils import compress_base64_image
@@ -120,4 +147,3 @@ class Review(models.Model):
 
     def __str__(self):
         return f"Review by {self.customer_name} ({self.rating}★)"
-

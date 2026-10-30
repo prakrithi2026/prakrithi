@@ -9,6 +9,7 @@ import Footer from '../components/storefront/Footer';
 import CartModal from '../components/storefront/CartModal';
 import AnnouncementBar from '../components/storefront/AnnouncementBar';
 import ProductCard from '../components/storefront/ProductCard';
+import ProductImageGallery from '../components/storefront/ProductImageGallery';
 import ProductLikeIcon from '../components/storefront/ProductLikeIcon';
 import { fetchReviews, createReview, deleteReviewById, isOwnReview } from '../utils/reviewsApi';
 import './ProductPage.css';
@@ -616,30 +617,19 @@ export default function ProductPage() {
 
         {/* Product Hero */}
         <div className="product-hero">
-          {/* Image */}
+          {/* Image Gallery with Multi-Image Swipe Support */}
           <div className="product-image-section">
-            <div className="product-image-main">
-              {product.badge && (
-                <span className="product-badge" style={{ backgroundColor: product.badgeColor || theme.primaryColor, color: product.badgeTextColor || '#fff' }}>
-                  {product.badge}
-                </span>
-              )}
-              {discount > 0 && (
-                <span className="product-discount-badge">-{discount}% OFF</span>
-              )}
-              <button
-                className={`product-wish-btn ${isWishlisted(product.id) ? 'active' : ''}`}
-                onClick={handleWishlist}
-                aria-label="Wishlist"
-              >
-                <ProductLikeIcon isLiked={isWishlisted(product.id)} size={36} />
-              </button>
-              {product.image ? (
-                <img src={product.image} alt={product.name} className="product-img" />
-              ) : (
-                <div className="product-img-placeholder">🌿</div>
-              )}
-            </div>
+            <ProductImageGallery
+              product={product}
+              images={Array.isArray(product.images) && product.images.length > 0 ? product.images : (product.image ? [product.image] : [])}
+              badge={product.badge}
+              badgeColor={product.badgeColor}
+              badgeTextColor={product.badgeTextColor}
+              discount={discount}
+              isWishlisted={isWishlisted(product.id)}
+              onWishlistClick={handleWishlist}
+              primaryColor={theme.primaryColor}
+            />
           </div>
 
           {/* Info */}

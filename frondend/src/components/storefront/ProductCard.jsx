@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useSiteConfig } from '../../context/SiteConfigContext';
 import { useCart } from '../../context/CartContext';
@@ -15,6 +16,39 @@ export default function ProductCard({ product }) {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const [activeImgIndex, setActiveImgIndex] = useState(0);
+  const timerRef = useRef(null);
+
+  const rawImages = Array.isArray(product.images) && product.images.length > 0
+    ? product.images.filter(Boolean)
+    : (product.image ? [product.image] : []);
+
+  const hasMultipleImages = rawImages.length > 1;
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, []);
+
+  const handleMouseEnter = () => {
+    if (!hasMultipleImages) return;
+    setActiveImgIndex(1); // Immediately switch to the next image
+
+    if (rawImages.length > 2) {
+      if (timerRef.current) clearInterval(timerRef.current);
+      timerRef.current = setInterval(() => {
+        setActiveImgIndex((prev) => (prev + 1) % rawImages.length);
+      }, 1600);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (!hasMultipleImages) return;
+    if (timerRef.current) clearInterval(timerRef.current);
+    setActiveImgIndex(0); // Return to primary cover image
+  };
+
   const requireAuth = (action) => {
     if (!isLoggedIn) {
       const redirect = encodeURIComponent(location.pathname + location.search);
@@ -23,6 +57,8 @@ export default function ProductCard({ product }) {
     }
     return true;
   };
+
+  const currentDisplayImage = rawImages[activeImgIndex] || rawImages[0] || '';
 
   return (
     <div className="product-card">
@@ -50,10 +86,14 @@ export default function ProductCard({ product }) {
 
       {/* Image */}
       <Link to={`/product/${product.id}`} className="card-image-link">
-        <div className="card-image">
-          {product.image ? (
+        <div
+          className="card-image"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
+          {currentDisplayImage ? (
             <img
-              src={product.image}
+              src={currentDisplayImage}
               alt={product.name}
               loading="lazy"
               decoding="async"

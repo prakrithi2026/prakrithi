@@ -120,3 +120,35 @@ class ProductConfigPersistenceTests(TestCase):
         # Conditional request with ETag must return 304 Not Modified
         res_304 = self.client.get('/api/config/', HTTP_IF_NONE_MATCH=etag)
         self.assertEqual(res_304.status_code, 304)
+    def test_product_multiple_images_persistence(self):
+        """Products can have multiple images and they persist correctly."""
+        payload = {
+            "products": [
+                {
+                    "id": 1,
+                    "name": "Product 1 Multi",
+                    "price": 120.0,
+                    "image": "https://example.com/img1.jpg",
+                    "images": [
+                        "https://example.com/img1.jpg",
+                        "https://example.com/img2.jpg",
+                        "https://example.com/img3.jpg"
+                    ],
+                    "category": "spices"
+                }
+            ]
+        }
+        res = self.client.put('/api/config/', data=payload, format='json')
+        self.assertEqual(res.status_code, 200)
+
+        p1 = Product.objects.get(id=1)
+        self.assertEqual(len(p1.images), 3)
+        self.assertEqual(p1.image, "https://example.com/img1.jpg")
+        self.assertEqual(p1.images[1], "https://example.com/img2.jpg")
+
+        # GET /api/config/ returns all images
+        res_cfg = self.client.get('/api/config/')
+        self.assertEqual(res_cfg.status_code, 200)
+        p1_data = next((p for p in res_cfg.data['products'] if p['id'] == 1), None)
+        self.assertIsNotNone(p1_data)
+        self.assertEqual(len(p1_data['images']), 3)

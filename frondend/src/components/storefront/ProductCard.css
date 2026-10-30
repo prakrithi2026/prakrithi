@@ -63,6 +63,7 @@
 
 /* Card image */
 .card-image {
+  position: relative;
   height: 178px;
   margin: 8px 8px 0 8px;
   border-radius: 8px;
@@ -74,7 +75,13 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.4, 1), opacity 0.25s ease;
 }
+
+.card-image:hover img {
+  transform: scale(1.04);
+}
+
 
 .card-image__placeholder {
   width: 100%;

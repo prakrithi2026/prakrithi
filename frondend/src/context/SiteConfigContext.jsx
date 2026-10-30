@@ -498,9 +498,13 @@ export function SiteConfigProvider({ children }) {
             const validImage = (p.image !== undefined && p.image !== null && p.image !== '') 
               ? p.image 
               : (def?.image || '');
+            const validImages = Array.isArray(p.images) && p.images.length > 0
+              ? p.images
+              : (validImage ? [validImage] : (Array.isArray(def?.images) && def.images.length > 0 ? def.images : []));
             return {
               ...p,
-              image: validImage,
+              image: validImage || (validImages[0] || ''),
+              images: validImages,
               description: (p.description !== undefined && p.description !== null) 
                 ? p.description 
                 : (def?.description || ''),
@@ -657,6 +661,19 @@ export function SiteConfigProvider({ children }) {
       } else {
         configToSave.hero.bgImage = configToSave.hero.images[0];
       }
+    }
+    if (configToSave.products && Array.isArray(configToSave.products)) {
+      configToSave.products = configToSave.products.map((p) => {
+        const images = Array.isArray(p.images) && p.images.length > 0 
+          ? p.images 
+          : (p.image ? [p.image] : []);
+        const primaryImage = images.length > 0 ? images[0] : (p.image || '');
+        return {
+          ...p,
+          images,
+          image: primaryImage,
+        };
+      });
     }
 
     try {
