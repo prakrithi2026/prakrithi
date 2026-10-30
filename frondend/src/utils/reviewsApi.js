@@ -1,4 +1,33 @@
 import API_BASE_URL from './api';
+import { compressImage } from './imageOptimizer';
+
+export function processReviewMedia(file) {
+  return new Promise((resolve, reject) => {
+    if (!file) {
+      reject(new Error('No file selected.'));
+      return;
+    }
+    if (file.type.startsWith('image/')) {
+      compressImage(file, 900, 900, 0.78)
+        .then((url) => resolve({ url, type: 'image' }))
+        .catch((err) => reject(new Error('Failed to process image: ' + (err.message || 'unknown error'))));
+      return;
+    }
+    if (file.type.startsWith('video/')) {
+      const maxSizeBytes = 20 * 1024 * 1024;
+      if (file.size > maxSizeBytes) {
+        reject(new Error('Video size exceeds 20MB. Please choose a smaller or shorter video clip.'));
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => resolve({ url: reader.result, type: 'video' });
+      reader.onerror = () => reject(new Error('Failed to read video file.'));
+      reader.readAsDataURL(file);
+      return;
+    }
+    reject(new Error('Unsupported file format. Please upload an image (PNG, JPG, WEBP) or video (MP4, WEBM).'));
+  });
+}
 
 const STORAGE_KEY = 'prakrithi_customer_reviews';
 const MY_REVIEWS_KEY = 'prakrithi_my_review_ids';
@@ -13,6 +42,8 @@ const DEFAULT_SEED_REVIEWS = [
     rating: 5,
     title: 'Pure, authentic & highly recommended!',
     comment: 'The aroma when opening the package is intoxicating. Pure, whole green pods of the highest grade with incredible essential oil content. Truly organic and fresh.',
+    media_url: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=700&q=80',
+    media_type: 'image',
     admin_reply: 'Thank you Priya! We source our cardamom directly from certified organic farmers in Idukki.',
     replied_at: '2026-10-15T10:00:00Z',
     created_at: '2026-10-14T09:30:00Z',
@@ -52,6 +83,8 @@ const DEFAULT_SEED_REVIEWS = [
     rating: 5,
     title: 'Fresh harvest quality',
     comment: 'Pods are vibrant green and completely filled with dark seeds. You can immediately tell it is direct from Kerala hills.',
+    media_url: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=700&q=80',
+    media_type: 'image',
     admin_reply: null,
     replied_at: null,
     created_at: '2026-10-21T08:20:00Z',
@@ -220,6 +253,8 @@ export async function createReview(payload) {
     rating: Number(payload.rating) || 5,
     title: (payload.title || '').trim() || null,
     comment: (payload.comment || '').trim(),
+    media_url: payload.media_url || null,
+    media_type: payload.media_type || null,
   };
 
   try {

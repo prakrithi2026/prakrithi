@@ -11,7 +11,7 @@ import AnnouncementBar from '../components/storefront/AnnouncementBar';
 import ProductCard from '../components/storefront/ProductCard';
 import ProductImageGallery from '../components/storefront/ProductImageGallery';
 import ProductLikeIcon from '../components/storefront/ProductLikeIcon';
-import { fetchReviews, createReview, deleteReviewById, isOwnReview } from '../utils/reviewsApi';
+import { fetchReviews, createReview, deleteReviewById, isOwnReview, processReviewMedia } from '../utils/reviewsApi';
 import './ProductPage.css';
 
 const RATING_LABELS = {
@@ -133,6 +133,8 @@ const MOCK_REVIEWS_CATALOG = [
     rating: 5,
     created_at: '2026-06-25T14:30:00Z',
     comment: "Pure, authentic and incredibly fresh. The fragrance fills the room the moment you open it.",
+    media_url: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=700&q=80',
+    media_type: 'image',
   },
   {
     id: 'mock-5',
@@ -154,6 +156,8 @@ const MOCK_REVIEWS_CATALOG = [
     rating: 5,
     created_at: '2026-06-22T08:15:00Z',
     comment: "Direct farm freshness you can feel immediately. High essential oil retention and great taste.",
+    media_url: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=700&q=80',
+    media_type: 'image',
   },
   {
     id: 'mock-8',
@@ -182,6 +186,8 @@ const MOCK_REVIEWS_CATALOG = [
     rating: 5,
     created_at: '2026-06-18T15:25:00Z',
     comment: "Clean, natural and superior taste. You can genuinely taste the difference in quality.",
+    media_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    media_type: 'video',
   },
   {
     id: 'mock-12',
@@ -263,9 +269,9 @@ const MOCK_REVIEWS_CATALOG = [
   {
     id: 'mock-23',
     customer_name: 'Shalini Gupta',
-    rating: 5,
+    rating: 3,
     created_at: '2026-06-06T10:45:00Z',
-    comment: "Wonderful aroma and pure natural taste. Highly recommended.",
+    comment: "Good aroma and natural taste. Delivery took a little longer, but quality is decent.",
   },
   {
     id: 'mock-24',
@@ -384,11 +390,17 @@ export default function ProductPage() {
     customer_email: user?.email || '',
     title: '',
     comment: '',
+    media_url: '',
+    media_type: '',
   });
   const [hoverRating, setHoverRating] = useState(0);
   const [submittingReview, setSubmittingReview] = useState(false);
   const [reviewSuccessMsg, setReviewSuccessMsg] = useState('');
   const [reviewErrorMsg, setReviewErrorMsg] = useState('');
+  const [mediaLoading, setMediaLoading] = useState(false);
+  const [mediaError, setMediaError] = useState('');
+  const [activeMediaModal, setActiveMediaModal] = useState(null);
+  const mediaInputRef = useRef(null);
   const [sortOrder, setSortOrder] = useState('recent');
   const [selectedStarFilter, setSelectedStarFilter] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -438,6 +450,36 @@ export default function ProductPage() {
     if (reviewErrorMsg) setReviewErrorMsg('');
   };
 
+  const handleMediaSelect = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setMediaLoading(true);
+    setMediaError('');
+    try {
+      const res = await processReviewMedia(file);
+      setReviewForm((prev) => ({
+        ...prev,
+        media_url: res.url,
+        media_type: res.type,
+      }));
+    } catch (err) {
+      setMediaError(err.message || 'Failed to attach file.');
+    } finally {
+      setMediaLoading(false);
+      if (mediaInputRef.current) mediaInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveMedia = () => {
+    setReviewForm((prev) => ({
+      ...prev,
+      media_url: '',
+      media_type: '',
+    }));
+    setMediaError('');
+    if (mediaInputRef.current) mediaInputRef.current.value = '';
+  };
+
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
     if (!reviewForm.customer_name.trim()) {
@@ -460,6 +502,8 @@ export default function ProductPage() {
         rating: reviewForm.rating,
         title: reviewForm.title,
         comment: reviewForm.comment,
+        media_url: reviewForm.media_url || null,
+        media_type: reviewForm.media_type || null,
       });
 
       setProductReviews((prev) => [created, ...prev.filter((r) => r.id !== created.id)]);
@@ -469,7 +513,10 @@ export default function ProductPage() {
         rating: 5,
         title: '',
         comment: '',
+        media_url: '',
+        media_type: '',
       }));
+      setMediaError('');
       setShowReviewForm(false);
       setTimeout(() => {
         setReviewSuccessMsg('');
@@ -574,13 +621,14 @@ export default function ProductPage() {
 
   const sortedReviews = [...supplementedReviews].sort((a, b) => {
     if (sortOrder === 'highest') {
-      return (Number(b.rating) || 5) - (Number(a.rating) || 5);
+      const diff = (Number(b.rating) || 5) - (Number(a.rating) || 5);
+      if (diff !== 0) return diff;
+      return new Date(b.created_at || 0) - new Date(a.created_at || 0);
     }
     if (sortOrder === 'lowest') {
-      return (Number(a.rating) || 5) - (Number(b.rating) || 5);
-    }
-    if (sortOrder === 'oldest') {
-      return new Date(a.created_at || 0) - new Date(b.created_at || 0);
+      const diff = (Number(a.rating) || 5) - (Number(b.rating) || 5);
+      if (diff !== 0) return diff;
+      return new Date(b.created_at || 0) - new Date(a.created_at || 0);
     }
     return new Date(b.created_at || 0) - new Date(a.created_at || 0);
   });
@@ -744,6 +792,21 @@ export default function ProductPage() {
               </div>
               <div className="cr-summary-based">
                 Based on {breakdownData.totalReviews} {breakdownData.totalReviews === 1 ? 'review' : 'reviews'}
+              </div>
+              <div className="cr-sort-dropdown-wrap">
+                <select
+                  className="cr-sort-select"
+                  value={sortOrder}
+                  onChange={(e) => {
+                    setSortOrder(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  aria-label="Sort customer reviews"
+                >
+                  <option value="recent">Most Recent</option>
+                  <option value="highest">Highest Rating</option>
+                  <option value="lowest">Lowest Rating</option>
+                </select>
               </div>
             </div>
 
@@ -919,6 +982,76 @@ export default function ProductPage() {
                   />
                 </div>
 
+                {/* Optional Photo or Video Upload */}
+                <div className="product-review-form__field">
+                  <label className="product-review-form__label">
+                    Add Photo or Video <span className="prf-optional-hint">(Optional)</span>
+                  </label>
+                  <input
+                    ref={mediaInputRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp,video/mp4,video/webm,video/quicktime"
+                    onChange={handleMediaSelect}
+                    style={{ display: 'none' }}
+                  />
+
+                  {!reviewForm.media_url ? (
+                    <button
+                      type="button"
+                      className="prf-media-upload-zone"
+                      onClick={() => mediaInputRef.current?.click()}
+                      disabled={mediaLoading}
+                    >
+                      <div className="prf-media-upload-zone__icons">
+                        <span className="prf-media-icon-pill">📷 Add Photo</span>
+                        <span className="prf-media-icon-pill">🎥 Add Video</span>
+                      </div>
+                      <div className="prf-media-upload-zone__title">
+                        {mediaLoading ? 'Processing file, please wait…' : 'Click to attach an image or video'}
+                      </div>
+                      <p className="prf-media-upload-zone__sub">
+                        Share genuine photos (JPG, PNG, WEBP) or short videos (MP4, WEBM up to 20MB)
+                      </p>
+                    </button>
+                  ) : (
+                    <div className="prf-media-preview-box">
+                      <div className="prf-media-preview-header">
+                        <span className="prf-media-badge">
+                          {reviewForm.media_type === 'video' ? '🎥 Video Attached' : '📷 Photo Attached'}
+                        </span>
+                        <button
+                          type="button"
+                          className="prf-media-remove-btn"
+                          onClick={handleRemoveMedia}
+                          title="Remove attached file"
+                        >
+                          ✕ Remove
+                        </button>
+                      </div>
+
+                      <div className="prf-media-preview-content">
+                        {reviewForm.media_type === 'video' ? (
+                          <video
+                            src={reviewForm.media_url}
+                            controls
+                            className="prf-preview-video-player"
+                          />
+                        ) : (
+                          <img
+                            src={reviewForm.media_url}
+                            alt="Attached preview"
+                            className="prf-preview-img-thumb"
+                          />
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {mediaError && (
+                    <p className="prf-media-error-text">⚠️ {mediaError}</p>
+                  )}
+                </div>
+
                 <div className="product-review-form__actions">
                   <button
                     type="submit"
@@ -946,7 +1079,7 @@ export default function ProductPage() {
           {showReviewForm && <hr className="cr-horizontal-divider" />}
 
           {/* Customer Reviews List */}
-          {filteredReviews.length > 0 && (
+          {filteredReviews.length > 0 ? (
             <div className="cr-reviews-list-wrap">
               {paginatedReviews.map((rev, idx) => {
                 const stars = Math.max(1, Math.min(5, Number(rev.rating) || 5));
@@ -994,6 +1127,40 @@ export default function ProductPage() {
 
                       <p className="cr-review-comment">{rev.comment}</p>
 
+                      {/* Attached Image or Video Display */}
+                      {rev.media_url && (
+                        <div className="cr-review-media-box">
+                          {rev.media_type === 'video' || (typeof rev.media_url === 'string' && (rev.media_url.includes('data:video') || rev.media_url.endsWith('.mp4') || rev.media_url.endsWith('.webm') || rev.media_url.endsWith('.mov'))) ? (
+                            <div className="cr-review-video-wrapper">
+                              <video
+                                src={rev.media_url}
+                                controls
+                                preload="metadata"
+                                className="cr-review-video-elem"
+                              />
+                            </div>
+                          ) : (
+                            <div className="cr-review-photo-wrapper">
+                              <img
+                                src={rev.media_url}
+                                alt={`Review photo by ${rev.customer_name}`}
+                                className="cr-review-photo-elem"
+                                onClick={() => setActiveMediaModal(rev.media_url)}
+                                title="Click to view full photo"
+                              />
+                              <button
+                                type="button"
+                                className="cr-review-photo-zoom-btn"
+                                onClick={() => setActiveMediaModal(rev.media_url)}
+                                title="Click to enlarge photo"
+                              >
+                                🔍 Click to enlarge
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
                       {rev.admin_reply && (
                         <div className="cr-review-reply">
                           <div className="cr-review-reply-head">
@@ -1034,6 +1201,10 @@ export default function ProductPage() {
                 </div>
               )}
             </div>
+          ) : (
+            <div className="cr-reviews-empty">
+              <p>No customer reviews match the selected filter.</p>
+            </div>
           )}
         </section>
 
@@ -1047,6 +1218,32 @@ export default function ProductPage() {
           </section>
         )}
       </main>
+
+      {/* Customer Review Image Lightbox Modal */}
+      {activeMediaModal && (
+        <div
+          className="cr-lightbox-overlay"
+          onClick={() => setActiveMediaModal(null)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="cr-lightbox-content" onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              className="cr-lightbox-close-btn"
+              onClick={() => setActiveMediaModal(null)}
+              aria-label="Close photo preview"
+            >
+              ✕
+            </button>
+            <img
+              src={activeMediaModal}
+              alt="Enlarged customer photo"
+              className="cr-lightbox-img"
+            />
+          </div>
+        </div>
+      )}
 
       <Footer />
       <CartModal />

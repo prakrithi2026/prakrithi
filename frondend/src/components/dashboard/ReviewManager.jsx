@@ -337,6 +337,29 @@ export default function ReviewManager() {
 
                     <p className="rm-card__comment">{review.comment}</p>
 
+                    {/* Attached Media (Photo or Video) */}
+                    {review.media_url && (
+                      <div className="rm-card__media">
+                        {review.media_type === 'video' || (typeof review.media_url === 'string' && (review.media_url.includes('data:video') || review.media_url.endsWith('.mp4') || review.media_url.endsWith('.webm') || review.media_url.endsWith('.mov'))) ? (
+                          <div className="rm-video-container">
+                            <span className="rm-media-badge">🎥 Video Attached</span>
+                            <video src={review.media_url} controls className="rm-video-preview" />
+                          </div>
+                        ) : (
+                          <div className="rm-image-container">
+                            <span className="rm-media-badge">📷 Photo Attached</span>
+                            <img
+                              src={review.media_url}
+                              alt="Customer attachment"
+                              className="rm-image-preview"
+                              onClick={() => window.open(review.media_url, '_blank')}
+                              title="Click to view full image in new tab"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )}
+
                     {/* Existing Admin Reply */}
                     {hasReply && !isEditingReply && (
                       <div className="rm-reply-display">

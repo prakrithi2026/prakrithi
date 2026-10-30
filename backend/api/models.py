@@ -138,6 +138,8 @@ class Review(models.Model):
     rating = models.PositiveSmallIntegerField(default=5)
     title = models.CharField(max_length=255, blank=True, null=True)
     comment = models.TextField()
+    media_url = models.TextField(blank=True, null=True)
+    media_type = models.CharField(max_length=20, blank=True, null=True)
     admin_reply = models.TextField(blank=True, null=True)
     replied_at = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)

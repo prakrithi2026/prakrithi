@@ -267,6 +267,55 @@
   white-space: pre-line;
 }
 
+/* ── Customer Review Attached Media ── */
+.rm-card__media {
+  margin-top: 10px;
+}
+
+.rm-media-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #00433D;
+  background: #e6f4ea;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-bottom: 6px;
+}
+
+.rm-image-container {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.rm-image-preview {
+  max-width: 140px;
+  max-height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.rm-image-preview:hover {
+  transform: scale(1.03);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.rm-video-container {
+  max-width: 260px;
+}
+
+.rm-video-preview {
+  width: 100%;
+  max-height: 160px;
+  border-radius: 8px;
+  background: #000000;
+  display: block;
+}
+
 /* ── Admin Reply Display ── */
 .rm-reply-display {
   margin-top: 14px;

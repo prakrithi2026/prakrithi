@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useSiteConfig } from '../context/SiteConfigContext';
 import { useAuth } from '../context/AuthContext';
@@ -6,7 +6,7 @@ import Navbar from '../components/storefront/Navbar';
 import Footer from '../components/storefront/Footer';
 import CartModal from '../components/storefront/CartModal';
 import AnnouncementBar from '../components/storefront/AnnouncementBar';
-import { fetchReviews, createReview, deleteReviewById, isOwnReview } from '../utils/reviewsApi';
+import { fetchReviews, createReview, deleteReviewById, isOwnReview, processReviewMedia } from '../utils/reviewsApi';
 import './WriteReviewPage.css';
 
 const RATING_LABELS = {
@@ -29,6 +29,7 @@ export default function WriteReviewPage() {
   const [reviews, setReviews] = useState([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
   const [filterRating, setFilterRating] = useState('all');
+  const [sortOrder, setSortOrder] = useState('recent');
 
   const [form, setForm] = useState({
     customer_name: user?.name || '',
@@ -37,6 +38,8 @@ export default function WriteReviewPage() {
     rating: 5,
     title: '',
     comment: '',
+    media_url: '',
+    media_type: '',
   });
   const [hoverRating, setHoverRating] = useState(0);
   const [submitting, setSubmitting] = useState(false);
@@ -44,6 +47,10 @@ export default function WriteReviewPage() {
   const [submittedProductId, setSubmittedProductId] = useState(preselectedProductId);
   const [errorMsg, setErrorMsg] = useState('');
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+  const [mediaLoading, setMediaLoading] = useState(false);
+  const [mediaError, setMediaError] = useState('');
+  const [activeMediaModal, setActiveMediaModal] = useState(null);
+  const mediaInputRef = useRef(null);
 
   const handleDeleteOwnReview = async (reviewId) => {
     await deleteReviewById(reviewId);
@@ -105,6 +112,36 @@ export default function WriteReviewPage() {
     if (errorMsg) setErrorMsg('');
   };
 
+  const handleMediaSelect = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setMediaLoading(true);
+    setMediaError('');
+    try {
+      const res = await processReviewMedia(file);
+      setForm((prev) => ({
+        ...prev,
+        media_url: res.url,
+        media_type: res.type,
+      }));
+    } catch (err) {
+      setMediaError(err.message || 'Failed to attach file.');
+    } finally {
+      setMediaLoading(false);
+      if (mediaInputRef.current) mediaInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveMedia = () => {
+    setForm((prev) => ({
+      ...prev,
+      media_url: '',
+      media_type: '',
+    }));
+    setMediaError('');
+    if (mediaInputRef.current) mediaInputRef.current.value = '';
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.product) {
@@ -132,6 +169,8 @@ export default function WriteReviewPage() {
         rating: form.rating,
         title: form.title,
         comment: form.comment,
+        media_url: form.media_url || null,
+        media_type: form.media_type || null,
       });
       setReviews((prev) => [created, ...prev.filter((r) => r.id !== created.id)]);
       setSubmittedProductId(form.product);
@@ -141,7 +180,10 @@ export default function WriteReviewPage() {
         rating: 5,
         title: '',
         comment: '',
+        media_url: '',
+        media_type: '',
       }));
+      setMediaError('');
     } catch {
       setErrorMsg('Something went wrong while submitting your review. Please try again.');
     } finally {
@@ -155,6 +197,20 @@ export default function WriteReviewPage() {
     filterRating === 'all'
       ? reviews
       : reviews.filter((r) => Number(r.rating) === Number(filterRating));
+
+  const sortedReviews = [...filteredReviews].sort((a, b) => {
+    if (sortOrder === 'highest') {
+      const diff = (Number(b.rating) || 5) - (Number(a.rating) || 5);
+      if (diff !== 0) return diff;
+      return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+    }
+    if (sortOrder === 'lowest') {
+      const diff = (Number(a.rating) || 5) - (Number(b.rating) || 5);
+      if (diff !== 0) return diff;
+      return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+    }
+    return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+  });
 
   const themeStyle = {
     '--primary': theme.primaryColor || '#00433D',
@@ -319,6 +375,76 @@ export default function WriteReviewPage() {
                   />
                 </div>
 
+                {/* Media Upload (Optional) */}
+                <div className="wr-field">
+                  <label className="wr-label">
+                    Add Photo or Video <span className="wr-optional-hint">(Optional)</span>
+                  </label>
+                  <input
+                    ref={mediaInputRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp,video/mp4,video/webm,video/quicktime"
+                    onChange={handleMediaSelect}
+                    style={{ display: 'none' }}
+                  />
+
+                  {!form.media_url ? (
+                    <button
+                      type="button"
+                      className="wr-media-upload-zone"
+                      onClick={() => mediaInputRef.current?.click()}
+                      disabled={mediaLoading}
+                    >
+                      <div className="wr-media-upload-zone__icons">
+                        <span className="wr-media-pill">📷 Add Photo</span>
+                        <span className="wr-media-pill">🎥 Add Video</span>
+                      </div>
+                      <div className="wr-media-upload-zone__title">
+                        {mediaLoading ? 'Processing file, please wait…' : 'Attach an image or short video'}
+                      </div>
+                      <p className="wr-media-upload-zone__sub">
+                        Showcase the product in real life (JPG, PNG, WEBP, or MP4 up to 20MB)
+                      </p>
+                    </button>
+                  ) : (
+                    <div className="wr-media-preview-box">
+                      <div className="wr-media-preview-header">
+                        <span className="wr-media-badge">
+                          {form.media_type === 'video' ? '🎥 Video Attached' : '📷 Photo Attached'}
+                        </span>
+                        <button
+                          type="button"
+                          className="wr-media-remove-btn"
+                          onClick={handleRemoveMedia}
+                          title="Remove attached file"
+                        >
+                          ✕ Remove
+                        </button>
+                      </div>
+
+                      <div className="wr-media-preview-content">
+                        {form.media_type === 'video' ? (
+                          <video
+                            src={form.media_url}
+                            controls
+                            className="wr-preview-video-player"
+                          />
+                        ) : (
+                          <img
+                            src={form.media_url}
+                            alt="Attached preview"
+                            className="wr-preview-img-thumb"
+                          />
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {mediaError && (
+                    <p className="wr-media-error-text">⚠️ {mediaError}</p>
+                  )}
+                </div>
+
                 <button
                   type="submit"
                   className="wr-submit-btn"
@@ -342,17 +468,32 @@ export default function WriteReviewPage() {
                 </p>
               </div>
 
-              <div className="wr-filter-pills">
-                {['all', 5, 4, 3, 2, 1].map((f) => (
-                  <button
-                    key={f}
-                    type="button"
-                    className={`wr-filter-pill ${String(filterRating) === String(f) ? 'active' : ''}`}
-                    onClick={() => setFilterRating(f)}
+              <div className="wr-header-controls">
+                <div className="wr-filter-pills">
+                  {['all', 5, 4, 3, 2, 1].map((f) => (
+                    <button
+                      key={f}
+                      type="button"
+                      className={`wr-filter-pill ${String(filterRating) === String(f) ? 'active' : ''}`}
+                      onClick={() => setFilterRating(f)}
+                    >
+                      {f === 'all' ? 'All' : `${f} ★`}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="wr-sort-wrap">
+                  <select
+                    className="wr-sort-select"
+                    value={sortOrder}
+                    onChange={(e) => setSortOrder(e.target.value)}
+                    aria-label="Sort customer reviews"
                   >
-                    {f === 'all' ? 'All' : `${f} ★`}
-                  </button>
-                ))}
+                    <option value="recent">Most Recent</option>
+                    <option value="highest">Highest Rating</option>
+                    <option value="lowest">Lowest Rating</option>
+                  </select>
+                </div>
               </div>
             </div>
 
@@ -376,7 +517,7 @@ export default function WriteReviewPage() {
               </div>
             ) : (
               <div className="wr-reviews-list">
-                {filteredReviews.map((rev) => {
+                {sortedReviews.map((rev) => {
                   const initials = (rev.customer_name || 'Customer')
                     .split(' ')
                     .map((n) => n[0])
@@ -473,6 +614,40 @@ export default function WriteReviewPage() {
 
                       <p className="wr-review-card__comment">{rev.comment}</p>
 
+                      {/* Attached Image or Video Display */}
+                      {rev.media_url && (
+                        <div className="wr-review-media-box">
+                          {rev.media_type === 'video' || (typeof rev.media_url === 'string' && (rev.media_url.includes('data:video') || rev.media_url.endsWith('.mp4') || rev.media_url.endsWith('.webm') || rev.media_url.endsWith('.mov'))) ? (
+                            <div className="wr-review-video-wrapper">
+                              <video
+                                src={rev.media_url}
+                                controls
+                                preload="metadata"
+                                className="wr-review-video-elem"
+                              />
+                            </div>
+                          ) : (
+                            <div className="wr-review-photo-wrapper">
+                              <img
+                                src={rev.media_url}
+                                alt={`Customer photo by ${rev.customer_name}`}
+                                className="wr-review-photo-elem"
+                                onClick={() => setActiveMediaModal(rev.media_url)}
+                                title="Click to view full photo"
+                              />
+                              <button
+                                type="button"
+                                className="wr-review-photo-zoom-btn"
+                                onClick={() => setActiveMediaModal(rev.media_url)}
+                                title="Click to enlarge"
+                              >
+                                🔍 Click to enlarge
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
                       {/* Admin Reply Display */}
                       {rev.admin_reply && (
                         <div className="wr-admin-reply">
@@ -501,6 +676,32 @@ export default function WriteReviewPage() {
           </section>
         </div>
       </main>
+
+      {/* Customer Review Image Lightbox Modal */}
+      {activeMediaModal && (
+        <div
+          className="cr-lightbox-overlay"
+          onClick={() => setActiveMediaModal(null)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="cr-lightbox-content" onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              className="cr-lightbox-close-btn"
+              onClick={() => setActiveMediaModal(null)}
+              aria-label="Close photo preview"
+            >
+              ✕
+            </button>
+            <img
+              src={activeMediaModal}
+              alt="Enlarged customer photo"
+              className="cr-lightbox-img"
+            />
+          </div>
+        </div>
+      )}
 
       <Footer />
       <CartModal />

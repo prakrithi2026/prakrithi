@@ -40,6 +40,6 @@ class ReviewSerializer(serializers.ModelSerializer):
         model = Review
         fields = [
             'id', 'customer_name', 'customer_email', 'product', 'product_name',
-            'rating', 'title', 'comment', 'admin_reply', 'replied_at', 'created_at'
+            'rating', 'title', 'comment', 'media_url', 'media_type', 'admin_reply', 'replied_at', 'created_at'
         ]
 
