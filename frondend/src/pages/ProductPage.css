@@ -376,15 +376,27 @@
 .trust-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   font-size: 0.82rem;
-  color: #555;
+  color: #333;
   background: #f9f9f9;
+  border: 1px solid #f0f0f0;
   border-radius: 8px;
   padding: 8px 12px;
 }
 
-.trust-item span { font-weight: 500; }
+.trust-item svg {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  flex-shrink: 0;
+  display: block;
+}
+
+.trust-item span {
+  font-weight: 500;
+  line-height: 1.25;
+}
 
 /* Related products */
 .product-related {
