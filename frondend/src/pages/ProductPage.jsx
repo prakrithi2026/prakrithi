@@ -57,6 +57,41 @@ const OrangeStarOutline = ({ size = 16, className = '' }) => (
   </svg>
 );
 
+// Orange Half / Partial Star (clean outline base with 50% filled overlay)
+const OrangeStarHalf = ({ size = 16, className = '', percent = 50 }) => (
+  <span
+    className={`review-orange-star half ${className}`}
+    style={{
+      position: 'relative',
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'flex-start',
+      width: `${size}px`,
+      height: `${size}px`,
+      lineHeight: 1,
+      flexShrink: 0,
+    }}
+    aria-hidden="true"
+  >
+    <OrangeStarOutline size={size} />
+    <span
+      className="star-half-clip"
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: `${percent}%`,
+        height: '100%',
+        overflow: 'hidden',
+        display: 'inline-flex',
+        alignItems: 'center',
+      }}
+    >
+      <OrangeStarFilled size={size} />
+    </span>
+  </span>
+);
+
 // Formats date as MM/DD/YYYY to match reference image (e.g. 06/26/2026)
 const formatReviewDate = (dateStr) => {
   if (!dateStr) return '06/26/2026';
@@ -303,14 +338,23 @@ function getReviewBreakdown(catalogReviews, catalogRating, actualReviews = []) {
   return { totalReviews, breakdown };
 }
 
-const StarRating = ({ rating = 0, max = 5 }) => {
-  const full = Math.floor(rating);
-  const half = rating - full >= 0.5;
+const StarRating = ({ rating = 0, max = 5, size = 16 }) => {
+  const numRating = parseFloat(rating) || 0;
   return (
-    <span className="star-rating">
-      {Array.from({ length: max }).map((_, i) => (
-        <span key={i} className={i < full ? 'star full' : i === full && half ? 'star half' : 'star empty'}>★</span>
-      ))}
+    <span className="star-rating" aria-hidden="true">
+      {Array.from({ length: max }).map((_, i) => {
+        const diff = numRating - i;
+        if (diff >= 0.8) {
+          // Fully filled star
+          return <OrangeStarFilled key={i} size={size} />;
+        } else if (diff >= 0.2) {
+          // Half-filled star for fractional ratings (e.g. 4.5 rating -> 50% half fill, NOT full fill)
+          return <OrangeStarHalf key={i} size={size} percent={50} />;
+        } else {
+          // Empty outline star
+          return <OrangeStarOutline key={i} size={size} />;
+        }
+      })}
     </span>
   );
 };
@@ -705,10 +749,8 @@ export default function ProductPage() {
           <div className={`cr-summary-container ${showReviewForm ? 'cr-summary-container--form-open' : ''}`}>
             {/* Left Column: Stars & Based on X reviews */}
             <div className="cr-summary-left">
-              <div className="cr-summary-stars" aria-label="5 out of 5 stars rating">
-                {Array.from({ length: 5 }).map((_, idx) => (
-                  <OrangeStarFilled key={idx} size={24} />
-                ))}
+              <div className="cr-summary-stars" aria-label={`${product?.rating || 5} out of 5 stars rating`}>
+                <StarRating rating={parseFloat(product?.rating) || 5} size={24} />
               </div>
               <div className="cr-summary-based">
                 Based on {breakdownData.totalReviews} {breakdownData.totalReviews === 1 ? 'review' : 'reviews'}
