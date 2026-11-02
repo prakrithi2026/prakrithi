@@ -201,7 +201,7 @@
 .product-rating-score {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #333;
+  color: #00433D;
   line-height: 1;
 }
 
@@ -378,7 +378,7 @@
   align-items: center;
   gap: 10px;
   font-size: 0.82rem;
-  color: #333;
+  color: #00433D;
   background: #f9f9f9;
   border: 1px solid #f0f0f0;
   border-radius: 8px;
@@ -394,6 +394,7 @@
 }
 
 .trust-item span {
+  color: #00433D;
   font-weight: 500;
   line-height: 1.25;
 }
