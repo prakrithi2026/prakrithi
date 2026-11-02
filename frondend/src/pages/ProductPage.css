@@ -296,9 +296,10 @@
 .product-qty {
   display: flex;
   align-items: center;
-  border: 2px solid #e0e0e0;
+  border: 2px solid #00433D;
   border-radius: 10px;
   overflow: hidden;
+  background: #ffffff;
 }
 
 .product-qty button {
@@ -306,20 +307,24 @@
   height: 48px;
   border: none;
   background: #f5f5f5;
+  color: #00433D;
   font-size: 1.2rem;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background 0.15s, color 0.15s;
   font-weight: 600;
 }
 
-.product-qty button:hover { background: #e8e8e8; }
+.product-qty button:hover {
+  background: #e8f2ef;
+  color: #00433D;
+}
 
 .product-qty span {
   min-width: 44px;
   text-align: center;
   font-size: 1rem;
-  font-weight: 600;
-  color: #333;
+  font-weight: 700;
+  color: #00433D;
 }
 
 .product-add-btn {
