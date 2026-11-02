@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { FiChevronLeft, FiChevronRight, FiImage } from 'react-icons/fi';
+import { FiImage } from 'react-icons/fi';
 import ProductLikeIcon from './ProductLikeIcon';
 import './ProductImageGallery.css';
 
@@ -224,33 +224,9 @@ export default function ProductImageGallery({
           ))}
         </div>
 
-        {/* Navigation Arrows (shown if > 1 image) */}
+        {/* Controls & Indicators (shown if > 1 image) */}
         {total > 1 && (
           <>
-            <button
-              type="button"
-              className="product-gallery__arrow product-gallery__arrow--left"
-              onClick={(e) => {
-                e.stopPropagation();
-                goToPrev();
-              }}
-              aria-label="Previous image"
-            >
-              <FiChevronLeft size={22} />
-            </button>
-
-            <button
-              type="button"
-              className="product-gallery__arrow product-gallery__arrow--right"
-              onClick={(e) => {
-                e.stopPropagation();
-                goToNext();
-              }}
-              aria-label="Next image"
-            >
-              <FiChevronRight size={22} />
-            </button>
-
             {/* Counter pill */}
             <div className="product-gallery__counter">
               <FiImage size={12} style={{ marginRight: '4px' }} />

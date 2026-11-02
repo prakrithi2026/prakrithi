@@ -127,45 +127,6 @@
   opacity: 0.5;
 }
 
-/* ── Navigation Arrows ── */
-.product-gallery__arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(4px);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  color: #00433D;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.4, 1);
-  z-index: 8;
-  opacity: 0.85;
-}
-
-.product-gallery__main:hover .product-gallery__arrow {
-  opacity: 1;
-}
-
-.product-gallery__arrow:hover {
-  background: #ffffff;
-  transform: translateY(-50%) scale(1.08);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
-}
-
-.product-gallery__arrow--left {
-  left: 14px;
-}
-
-.product-gallery__arrow--right {
-  right: 14px;
-}
 
 /* ── Counter Pill ── */
 .product-gallery__counter {
@@ -286,12 +247,6 @@
 
 /* ── Responsive adjustments ── */
 @media (max-width: 768px) {
-  .product-gallery__arrow {
-    width: 36px;
-    height: 36px;
-    opacity: 0.9;
-  }
-
   .product-gallery__thumb {
     flex: 0 0 62px;
     width: 62px;
