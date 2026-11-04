@@ -30,10 +30,12 @@ categories_data = full_data.pop('categories', [
 # 1. Seed / Update Categories
 print("Seeding/updating Categories...")
 for cat in categories_data:
-    Category.objects.update_or_create(
-        category_id=cat["id"],
-        defaults={"label": cat["label"]}
-    )
+    cid = cat.get("category_id") or cat.get("id")
+    if cid:
+        Category.objects.update_or_create(
+            category_id=cid,
+            defaults={"label": cat.get("label", cid)}
+        )
 
 # 2. Seed / Update SiteConfig
 config_obj = SiteConfig.objects.filter(id=1).first()
@@ -115,12 +117,22 @@ for prod in products_data:
         reviews_int = 0
         
     prod_id = prod.get("id")
+    images_val = prod.get("images", [])
+    if not isinstance(images_val, list):
+        images_val = [images_val] if images_val else []
+    image_val = prod.get("image", "")
+    if not image_val and images_val:
+        image_val = images_val[0]
+    if image_val and not images_val:
+        images_val = [image_val]
+
     defaults = {
         "name": prod.get("name", ""),
         "description": prod.get("description", ""),
         "price": price_dec,
         "salePrice": sale_dec,
-        "image": prod.get("image", ""),
+        "image": image_val,
+        "images": images_val,
         "category": category_obj,
         "tags": prod.get("tags", []),
         "variants": prod.get("variants", []),

@@ -361,11 +361,39 @@ export function SiteConfigProvider({ children }) {
     }
   }, [config, isLoading]);
 
-  // Load data from API (Stale-While-Revalidate pattern with single-flight fetch)
+  // Load data from API (Stale-While-Revalidate pattern with concurrent product fast-path)
   useEffect(() => {
+    let isCancelled = false;
+
     async function loadData() {
       try {
+        // Fast-path: Concurrently fetch /products/ so updated product images show up immediately
+        // without waiting for the full monolithic /config/ payload to parse
+        const productsPromise = fetch(`${API_BASE_URL}/products/`).then(async (res) => {
+          if (!res || !res.ok) return null;
+          return res.json().catch(() => null);
+        }).catch(() => null);
+
+        productsPromise.then((fastProducts) => {
+          if (isCancelled || !Array.isArray(fastProducts) || fastProducts.length === 0) return;
+          if (sourceRef.current === 'init' || sourceRef.current === 'storage' || sourceRef.current === 'api') {
+            setConfig((prev) => {
+              const prevSig = (prev.products || []).map((p) => `${p.id}:${p.image || ''}`).join('|');
+              const newSig = fastProducts.map((p) => `${p.id}:${p.image || ''}`).join('|');
+              if (prevSig !== newSig) {
+                return {
+                  ...prev,
+                  products: fastProducts
+                };
+              }
+              return prev;
+            });
+          }
+        });
+
         const configRes = await fetch(`${API_BASE_URL}/config/`).catch(() => null);
+
+        if (isCancelled) return;
 
         // If backend returned 304 Not Modified, cached client data is already up to date
         if (configRes && configRes.status === 304) {
@@ -567,10 +595,15 @@ export function SiteConfigProvider({ children }) {
           sourceRef.current = 'api';
         }
       } finally {
-        setIsLoading(false);
+        if (!isCancelled) {
+          setIsLoading(false);
+        }
       }
     }
     loadData();
+    return () => {
+      isCancelled = true;
+    };
   }, []);
 
   // Track unsaved changes

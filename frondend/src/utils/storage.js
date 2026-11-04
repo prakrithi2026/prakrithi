@@ -6,7 +6,7 @@
 
 import defaultConfig from '../data/defaultConfig';
 
-const LOCAL_CACHE_KEY = 'prakrithi_siteconfig_cache_v17';
+const LOCAL_CACHE_KEY = 'prakrithi_siteconfig_cache_v18';
 const DB_NAME = 'prakrithi_storage';
 const DB_VERSION = 1;
 const STORE_NAME = 'site_config';
@@ -161,25 +161,9 @@ function sanitizeCachedHero(configObj) {
 export function getInitialLocalConfig() {
   if (typeof window === 'undefined' || !window.localStorage) return null;
   try {
-    let cached = localStorage.getItem(LOCAL_CACHE_KEY);
-    if (!cached) {
-      // Migrate from previous cache versions (v16 down to v1) so user never experiences cold cache
-      for (let v = 16; v >= 1; v--) {
-        const prevKey = `prakrithi_siteconfig_cache_v${v}`;
-        const prevData = localStorage.getItem(prevKey);
-        if (prevData) {
-          try {
-            const parsed = JSON.parse(prevData);
-            const sanitized = sanitizeCachedHero(parsed);
-            cached = JSON.stringify(sanitized);
-            localStorage.setItem(LOCAL_CACHE_KEY, cached);
-          } catch {}
-          break;
-        }
-      }
-    }
+    cleanupLegacyStorage();
+    const cached = localStorage.getItem(LOCAL_CACHE_KEY);
     if (cached) {
-      cleanupLegacyStorage();
       const parsed = JSON.parse(cached);
       return sanitizeCachedHero(parsed);
     }

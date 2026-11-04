@@ -15,6 +15,7 @@ build/
 local_settings.py
 db.sqlite3
 media/
+enhanced_uploads/
 staticfiles/
 
 # Environment variables

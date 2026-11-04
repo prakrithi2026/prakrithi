@@ -554,21 +554,24 @@ class SiteConfigView(APIView):
             resp_data['products'] = ProductSerializer(Product.objects.all().order_by('id'), many=True).data
             resp_data['categories'] = CategorySerializer(Category.objects.all(), many=True).data
 
-            # HTTP 304 ETag Support: If client already has this version, return 0-byte 304 in 50ms
-            prod_count = Product.objects.count()
-            cat_count = Category.objects.count()
+            # Calculate a robust ETag based on config updated timestamp, counts, and product image signatures
+            import hashlib
+            prod_count = len(resp_data.get('products', []))
+            cat_count = len(resp_data.get('categories', []))
             updated_ts = int(config.updated_at.timestamp()) if config.updated_at else 0
-            etag = f'W/"{updated_ts}-{prod_count}-{cat_count}"'
+            prod_sig = "-".join(f"{p.get('id')}:{len(p.get('image') or '')}:{(p.get('image') or '')[:15]}" for p in resp_data.get('products', []))
+            sig_hash = hashlib.md5(f"{updated_ts}-{prod_count}-{cat_count}-{prod_sig}".encode()).hexdigest()[:16]
+            etag = f'W/"{sig_hash}"'
             if_none_match = request.headers.get('If-None-Match')
             if if_none_match and if_none_match.strip() == etag:
                 not_modified = Response(status=status.HTTP_304_NOT_MODIFIED)
                 not_modified['ETag'] = etag
-                not_modified['Cache-Control'] = 'public, max-age=15, stale-while-revalidate=120'
+                not_modified['Cache-Control'] = 'no-cache, max-age=0, must-revalidate'
                 return not_modified
 
             response = Response(resp_data)
             response['ETag'] = etag
-            response['Cache-Control'] = 'public, max-age=15, stale-while-revalidate=120'
+            response['Cache-Control'] = 'no-cache, max-age=0, must-revalidate'
             return response
         except Exception as e:
             import traceback
@@ -797,7 +800,18 @@ class CategoryViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         try:
             response = super().list(request, *args, **kwargs)
-            response['Cache-Control'] = 'public, max-age=15, stale-while-revalidate=120'
+            import hashlib
+            prods = response.data if isinstance(response.data, list) else []
+            prod_sig = "-".join(f"{p.get('id')}:{len(p.get('image') or '')}:{(p.get('image') or '')[:15]}" for p in prods)
+            etag = f'W/"{hashlib.md5(prod_sig.encode()).hexdigest()[:16]}"'
+            if_none_match = request.headers.get('If-None-Match')
+            if if_none_match and if_none_match.strip() == etag:
+                not_modified = Response(status=status.HTTP_304_NOT_MODIFIED)
+                not_modified['ETag'] = etag
+                not_modified['Cache-Control'] = 'no-cache, max-age=0, must-revalidate'
+                return not_modified
+            response['ETag'] = etag
+            response['Cache-Control'] = 'no-cache, max-age=0, must-revalidate'
             return response
         except Exception as e:
             return Response([], status=status.HTTP_200_OK)
@@ -809,7 +823,18 @@ class ProductViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         try:
             response = super().list(request, *args, **kwargs)
-            response['Cache-Control'] = 'public, max-age=15, stale-while-revalidate=120'
+            import hashlib
+            prods = response.data if isinstance(response.data, list) else []
+            prod_sig = "-".join(f"{p.get('id')}:{len(p.get('image') or '')}:{(p.get('image') or '')[:15]}" for p in prods)
+            etag = f'W/"{hashlib.md5(prod_sig.encode()).hexdigest()[:16]}"'
+            if_none_match = request.headers.get('If-None-Match')
+            if if_none_match and if_none_match.strip() == etag:
+                not_modified = Response(status=status.HTTP_304_NOT_MODIFIED)
+                not_modified['ETag'] = etag
+                not_modified['Cache-Control'] = 'no-cache, max-age=0, must-revalidate'
+                return not_modified
+            response['ETag'] = etag
+            response['Cache-Control'] = 'no-cache, max-age=0, must-revalidate'
             return response
         except Exception as e:
             return Response([], status=status.HTTP_200_OK)
