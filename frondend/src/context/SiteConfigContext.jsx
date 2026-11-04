@@ -523,16 +523,17 @@ export function SiteConfigProvider({ children }) {
         if (rawProducts && rawProducts.length > 0) {
           finalProducts = rawProducts.map((p) => {
             const def = defaultConfig.products?.find((dp) => dp.id === p.id);
-            const validImage = (p.image !== undefined && p.image !== null && p.image !== '') 
+            // Server data is authoritative: if image is explicitly provided (even empty string ""), respect it!
+            const image = (p.image !== undefined && p.image !== null) 
               ? p.image 
               : (def?.image || '');
-            const validImages = Array.isArray(p.images) && p.images.length > 0
+            const images = Array.isArray(p.images)
               ? p.images
-              : (validImage ? [validImage] : (Array.isArray(def?.images) && def.images.length > 0 ? def.images : []));
+              : (image ? [image] : (Array.isArray(def?.images) ? def.images : []));
             return {
               ...p,
-              image: validImage || (validImages[0] || ''),
-              images: validImages,
+              image: image || (images[0] || ''),
+              images: images,
               description: (p.description !== undefined && p.description !== null) 
                 ? p.description 
                 : (def?.description || ''),
@@ -697,10 +698,8 @@ export function SiteConfigProvider({ children }) {
     }
     if (configToSave.products && Array.isArray(configToSave.products)) {
       configToSave.products = configToSave.products.map((p) => {
-        const images = Array.isArray(p.images) && p.images.length > 0 
-          ? p.images 
-          : (p.image ? [p.image] : []);
-        const primaryImage = images.length > 0 ? images[0] : (p.image || '');
+        const images = Array.isArray(p.images) ? p.images.filter(Boolean) : [];
+        const primaryImage = images.length > 0 ? images[0] : '';
         return {
           ...p,
           images,

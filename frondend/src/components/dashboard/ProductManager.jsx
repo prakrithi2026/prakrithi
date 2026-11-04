@@ -53,7 +53,7 @@ export default function ProductManager() {
     const rawImages = Array.isArray(product.images) && product.images.length > 0 
       ? product.images 
       : (product.image ? [product.image] : []);
-    setEditing({ ...product, images: rawImages });
+    setEditing({ ...product, images: rawImages, image: rawImages[0] || '' });
     setIsNew(false);
   };
 
@@ -65,10 +65,7 @@ export default function ProductManager() {
   const save = async () => {
     if (!editing || !editing.name.trim()) return alert('Product name is required');
     const images = Array.isArray(editing.images) ? editing.images.filter(Boolean) : [];
-    if (images.length === 0 && editing.image) {
-      images.push(editing.image);
-    }
-    const primaryImage = images.length > 0 ? images[0] : (editing.image || '');
+    const primaryImage = images.length > 0 ? images[0] : '';
     const productToSave = {
       ...editing,
       image: primaryImage,

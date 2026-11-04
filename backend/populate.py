@@ -144,6 +144,12 @@ for prod in products_data:
         "couponNote": prod.get("couponNote") or None,
     }
     
+    existing_p = Product.objects.filter(id=prod_id).first()
+    if existing_p:
+        # Preserve whatever image/images the admin currently configured in the database!
+        defaults["image"] = existing_p.image
+        defaults["images"] = existing_p.images
+
     Product.objects.update_or_create(
         id=prod_id,
         defaults=defaults
