@@ -173,10 +173,6 @@
   font-family: 'Jost', sans-serif;
 }
 
-.rating-heart {
-  display: flex;
-  align-items: center;
-}
 
 .rating-count {
   font-size: 12px;
