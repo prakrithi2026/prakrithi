@@ -36,3 +36,5 @@ frondend/dist/
 # OS
 .DS_Store
 Thumbs.db
+
+frondend/src/test_write.css

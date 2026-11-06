@@ -4,6 +4,7 @@ import { compressImage } from '../../utils/imageOptimizer';
 import { useSiteConfig } from '../../context/SiteConfigContext';
 import ImageUploader from './ImageUploader';
 import StoryMediaUploader from './StoryMediaUploader';
+import HomeReviewsSelector from './HomeReviewsSelector';
 import defaultConfig from '../../data/defaultConfig';
 import './SectionManager.css';
 
@@ -708,35 +709,13 @@ export default function SectionManager() {
 
       {/* ── Review Section Settings ── */}
       <div className="dash-panel">
-        <h3 className="dash-panel__title">⭐ Reviews Section Settings</h3>
-        <p className="dash-panel__subtitle">Edit the reviews and ratings display</p>
-
-        <div className="dash-row">
-          <div className="dash-field">
-            <label className="dash-field__label">Google Rating</label>
-            <input className="dash-field__input" type="number" min="0" max="5" step="0.1"
-              value={config.reviewsSection.googleRating}
-              onChange={(e) => updateConfig('reviewsSection.googleRating', Number(e.target.value))} />
-          </div>
-          <div className="dash-field">
-            <label className="dash-field__label">Total Reviews</label>
-            <input className="dash-field__input" type="number" value={config.reviewsSection.totalReviews}
-              onChange={(e) => updateConfig('reviewsSection.totalReviews', Number(e.target.value))} />
-          </div>
-        </div>
-
-        {/* Image upload */}
-        <div style={{ marginTop: '16px' }}>
-          <ImageUploader
-            label="Section Image (optional)"
-            value={config.reviewsSection.image || ''}
-            onChange={(val) => updateConfig('reviewsSection.image', val)}
-            placeholder="https://example.com/reviews.jpg or /images/..."
-            maxWidth={500}
-            maxHeight={500}
-            helperText="Paste SVG code or enter an image URL. If left empty, no image will be displayed."
-          />
-        </div>
+        {/* ── Featured Customer Reviews Selector & Heading for Home Section ── */}
+        <HomeReviewsSelector
+          title={config.reviewsSection?.title || ''}
+          onUpdateTitle={(val) => updateConfig('reviewsSection.title', val)}
+          selectedReviews={config.reviewsSection?.reviews || []}
+          onUpdateSelectedReviews={(reviews) => updateConfig('reviewsSection.reviews', reviews)}
+        />
       </div>
 
       {/* ── Save Section Changes Bottom Bar ── */}
