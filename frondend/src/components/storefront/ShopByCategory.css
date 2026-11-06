@@ -1,5 +1,32 @@
 @import './ShopByProduct.css';
 
+/* Section Title - Matching "Rated 4.9/5 By 1,000+ Happy Customers" font */
+.category-section-title,
+.category-shop-section .section-title {
+  text-align: center;
+  font-family: var(--font-sans, inherit);
+  font-size: 2rem;
+  font-weight: 800;
+  color: #004E38;
+  margin: 0 0 36px 0;
+  letter-spacing: -0.3px;
+  line-height: 1.25;
+  text-transform: none;
+}
+
+@media (max-width: 768px) {
+  .category-section-title,
+  .category-shop-section .section-title {
+    font-size: 1.45rem;
+    margin-bottom: 24px;
+    padding: 0 12px;
+  }
+}
+
+.category-shop-section .products-scroll-wrapper {
+  margin-top: 0;
+}
+
 /* Category Card */
 .category-card {
   position: relative;

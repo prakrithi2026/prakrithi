@@ -232,7 +232,7 @@ export default function ShopByCategory() {
   return (
     <section className="shop-section category-shop-section">
       <div className="section-container">
-        <h2 className="section-title">{sectionTitle}</h2>
+        <h2 className="section-title category-section-title">{sectionTitle}</h2>
 
         <div
           className={`products-scroll-wrapper ${canScroll ? 'can-scroll' : 'no-scroll'}`}
