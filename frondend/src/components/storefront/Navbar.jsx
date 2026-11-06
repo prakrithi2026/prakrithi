@@ -17,6 +17,8 @@ const NAV_ROUTES = {
   sale:     '/shop?tag=on-sale',
   new:      '/shop?tag=new-arrival',
   best:     '/shop?tag=best-seller',
+  categories: '/categories',
+  category:   '/categories',
   account:  '/profile',
 };
 
@@ -30,6 +32,8 @@ const DROPDOWN_ROUTES = {
   'Wishlist':          '/profile?tab=wishlist',
   'Track Order':       '/profile?tab=orders',
   'Contact Us':        '/contact',
+  'Categories':        '/categories',
+  'All Categories':    '/categories',
 };
 
 /**

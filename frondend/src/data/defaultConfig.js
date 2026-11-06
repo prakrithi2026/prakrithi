@@ -359,7 +359,7 @@ const defaultConfig = {
         "category": "blended-spices"
       }
     ],
-    "viewAllLink": "/shop",
+    "viewAllLink": "/categories",
     "viewAllText": "View All →"
   },
   "reviewsSection": {
@@ -405,7 +405,7 @@ const defaultConfig = {
         "category": "blended-spices"
       }
     ],
-    "viewAllLink": "/shop",
+    "viewAllLink": "/categories",
     "viewAllText": "View All →"
   },
   "products": [

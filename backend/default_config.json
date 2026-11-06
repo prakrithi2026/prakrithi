@@ -359,7 +359,7 @@
         "category": "blended-spices"
       }
     ],
-    "viewAllLink": "/shop",
+    "viewAllLink": "/categories",
     "viewAllText": "View All →"
   },
   "reviewsSection": {
@@ -404,7 +404,7 @@
         "category": "blended-spices"
       }
     ],
-    "viewAllLink": "/shop",
+    "viewAllLink": "/categories",
     "viewAllText": "View All →"
   },
   "products": [

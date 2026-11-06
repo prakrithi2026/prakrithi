@@ -203,7 +203,7 @@ export default function ProductManager() {
       ...(config.shopByCategory || {}),
       title: config.shopByCategory?.title || 'Shop By Category',
       viewAllText: config.shopByCategory?.viewAllText || 'View All →',
-      viewAllLink: config.shopByCategory?.viewAllLink || '/shop',
+      viewAllLink: config.shopByCategory?.viewAllLink || '/categories',
       categories: updatedCards,
     };
 
@@ -211,7 +211,7 @@ export default function ProductManager() {
       ...(config.shopByConcern || {}),
       title: config.shopByConcern?.title || 'Shop By Category',
       viewAllText: config.shopByConcern?.viewAllText || 'View All →',
-      viewAllLink: config.shopByConcern?.viewAllLink || '/shop',
+      viewAllLink: config.shopByConcern?.viewAllLink || '/categories',
       categories: updatedCards,
     };
 
@@ -269,14 +269,14 @@ export default function ProductManager() {
         ...(config.shopByCategory || {}),
         title: config.shopByCategory?.title || 'Shop By Category',
         viewAllText: config.shopByCategory?.viewAllText || 'View All →',
-        viewAllLink: config.shopByCategory?.viewAllLink || '/shop',
+        viewAllLink: config.shopByCategory?.viewAllLink || '/categories',
         categories: categoryCards,
       },
       shopByConcern: {
         ...(config.shopByConcern || {}),
         title: config.shopByConcern?.title || 'Shop By Category',
         viewAllText: config.shopByConcern?.viewAllText || 'View All →',
-        viewAllLink: config.shopByConcern?.viewAllLink || '/shop',
+        viewAllLink: config.shopByConcern?.viewAllLink || '/categories',
         categories: categoryCards,
       },
     });

@@ -6,6 +6,7 @@ import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/storefront/ProtectedRoute';
 import HomePage from './pages/HomePage';
 import ShopPage from './pages/ShopPage';
+import CategoriesPage from './pages/CategoriesPage';
 import ProductPage from './pages/ProductPage';
 import ProfilePage from './pages/ProfilePage';
 import ContactPage from './pages/ContactPage';
@@ -37,6 +38,8 @@ function App() {
                 <Route path="/shop"    element={<ShopPage />} />
                 <Route path="/products" element={<Navigate to="/shop" replace />} />
                 <Route path="/product"  element={<Navigate to="/shop" replace />} />
+                <Route path="/categories" element={<CategoriesPage />} />
+                <Route path="/category"   element={<CategoriesPage />} />
                 <Route path="/our-story" element={<OurStoryPage />} />
                 <Route path="/product/:id" element={<ProductPage />} />
                 <Route path="/write-review" element={<WriteReviewPage />} />

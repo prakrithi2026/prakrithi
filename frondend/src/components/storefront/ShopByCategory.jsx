@@ -13,7 +13,9 @@ export default function ShopByCategory() {
 
   const sectionTitle = sectionConfig.title || 'Shop By Category';
   const viewAllText = sectionConfig.viewAllText || 'View All →';
-  const viewAllLink = sectionConfig.viewAllLink || '/shop';
+  const viewAllLink = (sectionConfig.viewAllLink && sectionConfig.viewAllLink !== '/shop')
+    ? sectionConfig.viewAllLink
+    : '/categories';
 
   // Category cards explicitly added by admin, or fallback to defaultConfig
   const rawCategories = (Array.isArray(sectionConfig.categories) && sectionConfig.categories.length > 0)

@@ -404,8 +404,11 @@ export default function SectionManager() {
           <div className="dash-field">
             <label className="dash-field__label">View All Link</label>
             <input className="dash-field__input"
-              value={config.shopByCategory?.viewAllLink || '/shop'}
-              onChange={(e) => updateConfig('shopByCategory.viewAllLink', e.target.value)} />
+              value={config.shopByCategory?.viewAllLink || '/categories'}
+              onChange={(e) => {
+                updateConfig('shopByCategory.viewAllLink', e.target.value);
+                updateConfig('shopByConcern.viewAllLink', e.target.value);
+              }} />
           </div>
         </div>
 
