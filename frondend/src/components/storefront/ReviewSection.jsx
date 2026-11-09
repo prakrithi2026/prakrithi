@@ -7,8 +7,8 @@ function QuoteIcon({ color = 'currentColor' }) {
   return (
     <svg
       className="review-quote-icon"
-      width="23"
-      height="13"
+      width="25"
+      height="14"
       viewBox="0 0 35 20"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -27,8 +27,8 @@ function VerifiedBadge({ color = 'currentColor' }) {
   return (
     <svg
       className="review-verified-badge"
-      width="12"
-      height="12"
+      width="13"
+      height="13"
       viewBox="0 0 16 16"
       fill={color}
       xmlns="http://www.w3.org/2000/svg"
@@ -51,8 +51,8 @@ function StarRating({ count = 5, color = 'currentColor' }) {
         <svg
           key={i}
           className="review-star-icon"
-          width="12"
-          height="12"
+          width="13"
+          height="13"
           viewBox="0 0 24 24"
           fill={color}
           xmlns="http://www.w3.org/2000/svg"
