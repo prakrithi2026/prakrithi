@@ -54,11 +54,11 @@
 
 .review-cards-track {
   display: flex;
-  gap: 14px;
+  gap: 16px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
-  padding: 4px 4px 10px 4px;
+  padding: 4px 4px 12px 4px;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE / Edge */
   cursor: grab;
@@ -78,13 +78,13 @@
 
 /* Review Card */
 .review-card {
-  flex: 0 0 180px;
-  width: 180px;
-  min-width: 175px;
-  max-width: 185px;
-  min-height: 216px;
-  border-radius: 16px;
-  padding: 16px 14px 14px 14px;
+  flex: 0 0 225px;
+  width: 225px;
+  min-width: 215px;
+  max-width: 235px;
+  min-height: 265px;
+  border-radius: 18px;
+  padding: 20px 18px 18px 18px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -153,30 +153,30 @@
 }
 
 .review-quote-wrap {
-  margin-bottom: 6px;
+  margin-bottom: 9px;
   display: flex;
   justify-content: center;
 }
 
 .review-quote-icon {
   display: block;
-  width: 18px;
-  height: 10px;
+  width: 23px;
+  height: 13px;
 }
 
 .review-card-title {
-  font-size: 0.78rem;
+  font-size: 0.90rem;
   font-weight: 700;
-  margin: 0 0 4px 0;
-  line-height: 1.25;
+  margin: 0 0 6px 0;
+  line-height: 1.32;
   text-align: center;
   font-family: var(--font-sans, inherit);
 }
 
 .review-card-text {
-  font-size: 0.70rem;
-  line-height: 1.38;
-  margin: 0 0 6px 0;
+  font-size: 0.80rem;
+  line-height: 1.45;
+  margin: 0 0 10px 0;
   text-align: center;
   font-weight: 400;
   font-family: var(--font-sans, inherit);
@@ -187,14 +187,14 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 2px;
-  margin-bottom: 8px;
+  gap: 3px;
+  margin-bottom: 12px;
 }
 
 .review-star-icon {
   display: block;
-  width: 9px;
-  height: 9px;
+  width: 12px;
+  height: 12px;
 }
 
 /* Bottom Customer Profile Section */
@@ -208,8 +208,8 @@
 }
 
 .review-customer-avatar {
-  width: 26px;
-  height: 26px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
@@ -221,7 +221,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.72rem;
+  font-size: 0.84rem;
   font-weight: 700;
   border-radius: 50%;
 }
@@ -237,8 +237,8 @@
 .review-customer-name-row {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 0.74rem;
+  gap: 5px;
+  font-size: 0.84rem;
   font-weight: 700;
   line-height: 1.2;
 }
@@ -247,22 +247,22 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 95px;
+  max-width: 120px;
 }
 
 .review-verified-badge {
   flex-shrink: 0;
   display: inline-flex;
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
 }
 
 .review-customer-location {
-  font-size: 0.64rem;
+  font-size: 0.72rem;
   font-weight: 500;
   margin-top: 1px;
   white-space: nowrap;
-  max-width: 95px;
+  max-width: 120px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -272,15 +272,15 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 6px;
-  margin-top: 16px;
+  gap: 7px;
+  margin-top: 18px;
 }
 
 .review-dot-btn {
   border: none;
   background: #A3C695;
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   padding: 0;
   cursor: pointer;
@@ -294,9 +294,9 @@
 
 .review-dot-btn--active {
   background: #004E38;
-  width: 18px;
-  height: 6px;
-  border-radius: 3px;
+  width: 20px;
+  height: 7px;
+  border-radius: 4px;
 }
 
 .review-dot-btn--active:hover {
@@ -306,28 +306,28 @@
 /* Responsive Breakpoints */
 @media (max-width: 1024px) {
   .review-card {
-    flex: 0 0 175px;
-    width: 175px;
-    min-width: 170px;
-    max-width: 180px;
-    min-height: 216px;
-    padding: 16px 12px 14px 12px;
+    flex: 0 0 215px;
+    width: 215px;
+    min-width: 205px;
+    max-width: 225px;
+    min-height: 255px;
+    padding: 18px 16px 16px 16px;
   }
 }
 
 @media (max-width: 768px) {
   .review-card {
-    flex: 0 0 175px;
-    width: 175px;
-    min-width: 170px;
-    max-width: 180px;
-    min-height: 216px;
-    padding: 16px 12px 14px 12px;
+    flex: 0 0 210px;
+    width: 210px;
+    min-width: 200px;
+    max-width: 220px;
+    min-height: 250px;
+    padding: 18px 16px 16px 16px;
     border-radius: 16px;
   }
 
   .review-cards-track {
-    gap: 10px;
+    gap: 12px;
     padding: 4px 6px 10px 6px;
   }
 }
