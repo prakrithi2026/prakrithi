@@ -103,9 +103,9 @@
 }
 
 .rm-search-input:focus {
-  border-color: #00433D;
+  border-color: #004E38;
   background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(0, 67, 61, 0.08);
+  box-shadow: 0 0 0 3px rgba(0, 78, 56, 0.08);
 }
 
 .rm-filter-controls {
@@ -128,7 +128,7 @@
 }
 
 .rm-filter-select:focus {
-  border-color: #00433D;
+  border-color: #004E38;
   background: #ffffff;
 }
 
@@ -245,7 +245,7 @@
   display: inline-block;
   font-size: 0.75rem;
   font-weight: 600;
-  color: #00433D;
+  color: #004E38;
   background: #f0f7f4;
   padding: 4px 10px;
   border-radius: 6px;
@@ -276,7 +276,7 @@
   display: inline-block;
   font-size: 0.72rem;
   font-weight: 700;
-  color: #00433D;
+  color: #004E38;
   background: #e6f4ea;
   padding: 2px 8px;
   border-radius: 999px;
@@ -320,7 +320,7 @@
 .rm-reply-display {
   margin-top: 14px;
   background: #f0fdf4;
-  border-left: 4px solid #00433D;
+  border-left: 4px solid #004E38;
   border-radius: 6px 10px 10px 6px;
   padding: 12px 14px;
 }
@@ -336,7 +336,7 @@
 .rm-reply-display__label {
   font-size: 0.76rem;
   font-weight: 800;
-  color: #00433D;
+  color: #004E38;
 }
 
 .rm-reply-display__date {
@@ -365,7 +365,7 @@
   display: block;
   font-size: 0.78rem;
   font-weight: 700;
-  color: #00433D;
+  color: #004E38;
   margin-bottom: 8px;
 }
 
@@ -384,8 +384,8 @@
 }
 
 .rm-reply-editor__textarea:focus {
-  border-color: #00433D;
-  box-shadow: 0 0 0 3px rgba(0, 67, 61, 0.08);
+  border-color: #004E38;
+  box-shadow: 0 0 0 3px rgba(0, 78, 56, 0.08);
 }
 
 .rm-reply-editor__actions {
@@ -410,12 +410,12 @@
 }
 
 .rm-btn--primary {
-  background: #00433D;
+  background: #004E38;
   color: #ffffff;
 }
 
 .rm-btn--primary:hover:not(:disabled) {
-  background: #002d29;
+  background: #003627;
 }
 
 .rm-btn--primary:disabled {
@@ -470,7 +470,7 @@
 
 .rm-action-btn--reply {
   background: #ecfdf5;
-  color: #00433D;
+  color: #004E38;
   border-color: #a7f3d0;
 }
 
@@ -546,7 +546,7 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #00433D;
+  background: #004E38;
   animation: rmDots 1.2s ease-in-out infinite;
 }
 

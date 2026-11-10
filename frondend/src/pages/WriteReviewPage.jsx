@@ -213,7 +213,7 @@ export default function WriteReviewPage() {
   });
 
   const themeStyle = {
-    '--primary': theme.primaryColor || '#00433D',
+    '--primary': theme.primaryColor || '#004E38',
     '--accent': theme.accentColor || '#A0D075',
     fontFamily: theme.fontFamily,
   };

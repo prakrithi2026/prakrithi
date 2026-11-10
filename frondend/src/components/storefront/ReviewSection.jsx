@@ -90,7 +90,7 @@ function CustomerAvatar({ src, name, isDark, darkColor = '#004E38', lightColor =
   }
 
   const initial = name ? name.charAt(0).toUpperCase() : 'P';
-  const bgColor = isDark ? '#0A584F' : '#B8DC8E';
+  const bgColor = isDark ? '#00694B' : '#B8DC8E';
   const textColor = isDark ? '#FFFFFF' : '#004E38';
 
   return (

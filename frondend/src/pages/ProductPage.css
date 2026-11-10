@@ -29,7 +29,7 @@
 }
 
 .product-breadcrumb a {
-  color: #00433D;
+  color: #004E38;
   text-decoration: none;
   font-weight: 500;
 }
@@ -143,7 +143,7 @@
   font-family: 'Jost', sans-serif;
   font-size: 1.9rem;
   font-weight: 700;
-  color: #00433D;
+  color: #004E38;
   line-height: 1.2;
   margin: 0;
 }
@@ -171,13 +171,13 @@
 }
 
 .product-rating-clickable:hover .product-rating-count {
-  color: #00433D;
+  color: #004E38;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
 .product-rating-clickable:focus-visible {
-  outline: 2px solid #00433D;
+  outline: 2px solid #004E38;
   outline-offset: 2px;
 }
 
@@ -201,7 +201,7 @@
 .product-rating-score {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #00433D;
+  color: #004E38;
   line-height: 1;
 }
 
@@ -223,7 +223,7 @@
 .product-price-current {
   font-size: 2rem;
   font-weight: 800;
-  color: #00433D;
+  color: #004E38;
   font-family: 'Jost', sans-serif;
 }
 
@@ -296,7 +296,7 @@
 .product-qty {
   display: flex;
   align-items: center;
-  border: 2px solid #00433D;
+  border: 2px solid #004E38;
   border-radius: 10px;
   overflow: hidden;
   background: #ffffff;
@@ -307,7 +307,7 @@
   height: 48px;
   border: none;
   background: #f5f5f5;
-  color: #00433D;
+  color: #004E38;
   font-size: 1.2rem;
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
@@ -316,7 +316,7 @@
 
 .product-qty button:hover {
   background: #e8f2ef;
-  color: #00433D;
+  color: #004E38;
 }
 
 .product-qty span {
@@ -324,15 +324,15 @@
   text-align: center;
   font-size: 1rem;
   font-weight: 700;
-  color: #00433D;
+  color: #004E38;
 }
 
 .product-add-btn {
   flex: 1;
   padding: 14px 24px;
-  border: 1px solid var(--primary, #00433D);
+  border: 1px solid var(--primary, #004E38);
   border-radius: 12px;
-  background-color: var(--primary, #00433D);
+  background-color: var(--primary, #004E38);
   color: #fff;
   font-size: 1rem;
   font-weight: 700;
@@ -343,30 +343,30 @@
 }
 
 .product-add-btn:hover {
-  background-color: var(--primary, #00433D) !important;
+  background-color: var(--primary, #004E38) !important;
   color: #ffffff !important;
-  border-color: var(--primary, #00433D) !important;
+  border-color: var(--primary, #004E38) !important;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 67, 61, 0.25);
+  box-shadow: 0 6px 20px rgba(0, 78, 56, 0.25);
   filter: brightness(1.08);
 }
 
 .product-add-btn:focus,
 .product-add-btn:active {
-  background-color: var(--primary, #00433D) !important;
+  background-color: var(--primary, #004E38) !important;
   color: #ffffff !important;
-  border-color: var(--primary, #00433D) !important;
+  border-color: var(--primary, #004E38) !important;
   outline: none;
 }
 
 /* Coupon */
 .product-coupon {
   background: linear-gradient(135deg, #f0fff4, #e8f5e9);
-  border: 1.5px dashed #00433D;
+  border: 1.5px dashed #004E38;
   border-radius: 10px;
   padding: 12px 16px;
   font-size: 0.85rem;
-  color: #00433D;
+  color: #004E38;
   font-weight: 600;
 }
 
@@ -383,7 +383,7 @@
   align-items: center;
   gap: 10px;
   font-size: 0.82rem;
-  color: #00433D;
+  color: #004E38;
   background: #f9f9f9;
   border: 1px solid #f0f0f0;
   border-radius: 8px;
@@ -399,7 +399,7 @@
 }
 
 .trust-item span {
-  color: #00433D;
+  color: #004E38;
   font-weight: 500;
   line-height: 1.25;
 }
@@ -414,7 +414,7 @@
   font-family: 'Jost', sans-serif;
   font-size: 1.4rem;
   font-weight: 700;
-  color: #00433D;
+  color: #004E38;
   margin: 0 0 24px;
 }
 
@@ -448,7 +448,7 @@
 .pnf-btn {
   margin-top: 10px;
   padding: 12px 24px;
-  background: #00433D;
+  background: #004E38;
   color: #fff;
   border-radius: 10px;
   text-decoration: none;
@@ -494,7 +494,7 @@
   margin-left: 8px;
   font-size: 0.82rem;
   font-weight: 700;
-  color: #00433D;
+  color: #004E38;
   text-decoration: underline;
 }
 
@@ -519,7 +519,7 @@
 .cr-title {
   font-size: 1.65rem;
   font-weight: 800;
-  color: #00433D;
+  color: #004E38;
   letter-spacing: -0.01em;
   margin: 0;
   line-height: 1.2;
@@ -582,7 +582,7 @@
 .cr-summary-based {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #00433D;
+  color: #004E38;
   line-height: 1.3;
 }
 
@@ -658,7 +658,7 @@
 .cr-bar-percent {
   font-size: 0.85rem;
   font-weight: 700;
-  color: #00433D;
+  color: #004E38;
   width: 38px;
   text-align: left;
   flex-shrink: 0;
@@ -711,8 +711,8 @@
 
 .cr-sort-select:focus {
   outline: none;
-  border-color: #00433D;
-  box-shadow: 0 0 0 2px rgba(0, 67, 61, 0.15);
+  border-color: #004E38;
+  box-shadow: 0 0 0 2px rgba(0, 78, 56, 0.15);
 }
 
 .product-reviews-list-container {
@@ -730,7 +730,7 @@
 .product-reviews-list-title {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #00433D;
+  color: #004E38;
   margin: 0;
 }
 
@@ -745,15 +745,15 @@
   border-radius: 8px;
   padding: 8px 14px;
   font-size: 0.88rem;
-  color: #00433D;
+  color: #004E38;
   margin-top: 10px;
   margin-bottom: 22px;
 }
 
 .cr-filter-clear-btn {
   background: transparent;
-  border: 1px solid #00433D;
-  color: #00433D;
+  border: 1px solid #004E38;
+  color: #004E38;
   border-radius: 4px;
   padding: 3px 8px;
   font-size: 0.78rem;
@@ -763,7 +763,7 @@
 }
 
 .cr-filter-clear-btn:hover {
-  background: #00433D;
+  background: #004E38;
   color: #ffffff;
 }
 
@@ -784,8 +784,8 @@
 
 .product-write-review-btn {
   background: #ffffff;
-  color: #00433D;
-  border: 1.5px solid #00433D;
+  color: #004E38;
+  border: 1.5px solid #004E38;
   border-radius: 6px;
   padding: 7px 18px;
   font-size: 0.85rem;
@@ -801,8 +801,8 @@
 
 .product-write-review-btn:hover {
   background: #f0f7f5;
-  color: #002d29;
-  border-color: #002d29;
+  color: #003627;
+  border-color: #003627;
 }
 
 /* ── Customer Reviews List & Items (Matches Reference Image) ── */
@@ -823,7 +823,7 @@
   height: 44px;
   border-radius: 50%;
   background-color: #d1dce5;
-  color: #00433D;
+  color: #004E38;
   font-size: 1.15rem;
   font-weight: 800;
   display: flex;
@@ -855,13 +855,13 @@
 .cr-review-date {
   font-size: 0.85rem;
   font-weight: 700;
-  color: #00433D;
+  color: #004E38;
 }
 
 .cr-review-author {
   font-size: 0.95rem;
   font-weight: 800;
-  color: #00433D;
+  color: #004E38;
   margin-top: 2px;
   margin-bottom: 2px;
   display: flex;
@@ -881,7 +881,7 @@
 .cr-review-comment {
   font-size: 0.9rem;
   font-weight: 400;
-  color: #00433D;
+  color: #004E38;
   line-height: 1.5;
   margin: 2px 0 0;
 }
@@ -889,7 +889,7 @@
 .cr-review-reply {
   margin-top: 8px;
   background: #f0f7f5;
-  border-left: 3px solid #00433D;
+  border-left: 3px solid #004E38;
   padding: 8px 12px;
   border-radius: 4px;
 }
@@ -897,7 +897,7 @@
 .cr-review-reply-head {
   font-size: 0.75rem;
   font-weight: 800;
-  color: #00433D;
+  color: #004E38;
   margin-bottom: 2px;
 }
 
@@ -942,7 +942,7 @@
   padding: 4px 6px;
   font-size: 0.95rem;
   font-weight: 700;
-  color: #00433D;
+  color: #004E38;
   cursor: pointer;
   transition: opacity 0.15s ease;
   line-height: 1;
@@ -961,7 +961,7 @@
 .cr-page-next {
   font-size: 1.15rem;
   font-weight: 700;
-  color: #00433D;
+  color: #004E38;
   padding: 4px;
   display: inline-flex;
   align-items: center;
@@ -1009,7 +1009,7 @@
 .product-review-form-title {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #00433D;
+  color: #004E38;
   margin: 0 0 16px 0;
 }
 
@@ -1034,7 +1034,7 @@
 .product-review-form__label {
   font-size: 0.85rem;
   font-weight: 700;
-  color: #00433D;
+  color: #004E38;
 }
 
 .product-review-form__input,
@@ -1059,8 +1059,8 @@
 .product-review-form__input:focus,
 .product-review-form__textarea:focus {
   outline: none;
-  border-color: #00433D;
-  box-shadow: 0 0 0 2px rgba(0, 67, 61, 0.12);
+  border-color: #004E38;
+  box-shadow: 0 0 0 2px rgba(0, 78, 56, 0.12);
   background: #ffffff;
 }
 
@@ -1096,7 +1096,7 @@
 .product-review-star-picker__label {
   font-size: 0.85rem;
   font-weight: 600;
-  color: #00433D;
+  color: #004E38;
   margin-left: 6px;
 }
 
@@ -1108,7 +1108,7 @@
 }
 
 .product-review-form__submit {
-  background: #00433D;
+  background: #004E38;
   color: #ffffff;
   border: none;
   padding: 10px 24px;
@@ -1121,7 +1121,7 @@
 }
 
 .product-review-form__submit:hover:not(:disabled) {
-  background: #002d29;
+  background: #003627;
 }
 
 .product-review-form__submit:disabled {
@@ -1179,8 +1179,8 @@
 
 .prf-media-upload-zone:focus-visible {
   outline: none;
-  border-color: #00433D;
-  box-shadow: 0 0 0 2px rgba(0, 67, 61, 0.12);
+  border-color: #004E38;
+  box-shadow: 0 0 0 2px rgba(0, 78, 56, 0.12);
 }
 
 .prf-media-upload-zone:disabled {
@@ -1200,7 +1200,7 @@
   gap: 4px;
   font-size: 0.75rem;
   font-weight: 700;
-  color: #00433D;
+  color: #004E38;
   background: #e6f4ea;
   padding: 3px 10px;
   border-radius: 999px;
@@ -1209,7 +1209,7 @@
 .prf-media-upload-zone__title {
   font-size: 0.92rem;
   font-weight: 700;
-  color: #00433D;
+  color: #004E38;
 }
 
 .prf-media-upload-zone__sub {
@@ -1240,7 +1240,7 @@
 .prf-media-badge {
   font-size: 0.75rem;
   font-weight: 700;
-  color: #00433D;
+  color: #004E38;
   background: #e6f4ea;
   padding: 2px 8px;
   border-radius: 12px;
@@ -1334,7 +1334,7 @@
 }
 
 .cr-review-photo-zoom-btn:hover {
-  background: rgba(0, 67, 61, 0.88);
+  background: rgba(0, 78, 56, 0.88);
 }
 
 .cr-review-video-wrapper {

@@ -52,7 +52,7 @@ export default function CategoriesPage() {
   }, [rawCategories]);
 
   const themeStyle = {
-    '--primary': theme.primaryColor || '#00433D',
+    '--primary': theme.primaryColor || '#004E38',
     '--accent': theme.accentColor || '#C5F1A9',
     fontFamily: theme.fontFamily || "'Jost', sans-serif",
   };
@@ -92,7 +92,7 @@ export default function CategoriesPage() {
               <Link
                 to="/shop"
                 className="categories-reset-btn"
-                style={{ backgroundColor: theme.primaryColor || '#00433D', color: '#fff' }}
+                style={{ backgroundColor: theme.primaryColor || '#004E38', color: '#fff' }}
               >
                 Browse All Products
               </Link>

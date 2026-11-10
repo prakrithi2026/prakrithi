@@ -50,7 +50,7 @@
   font-family: 'Jost', sans-serif;
   font-size: 2rem;
   font-weight: 800;
-  color: #00433D;
+  color: #004E38;
   margin: 0 0 8px;
   letter-spacing: -0.02em;
 }
@@ -131,7 +131,7 @@
 .auth-field input:focus {
   border-color: var(--primary);
   background: #fff;
-  box-shadow: 0 0 0 3px rgba(0, 67, 61,0.08);
+  box-shadow: 0 0 0 3px rgba(0, 78, 56,0.08);
 }
 
 /* Password input wrapper & toggle */
@@ -174,7 +174,7 @@
 }
 
 .auth-password-toggle:focus-visible {
-  outline: 2px solid var(--primary, #00433D);
+  outline: 2px solid var(--primary, #004E38);
   outline-offset: 1px;
 }
 

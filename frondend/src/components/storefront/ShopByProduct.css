@@ -25,13 +25,13 @@
 
 .filter-btn {
   border-radius: 12px;
-  border: 1px solid #00433D;
+  border: 1px solid #004E38;
   background: #fff;
   display: inline-flex;
   padding: 12px 25px;
   justify-content: center;
   align-items: center;
-  color: #00433D;
+  color: #004E38;
   text-align: center;
   font-family: 'Jost', sans-serif;
   font-size: 18px;
@@ -42,14 +42,14 @@
 }
 
 .filter-btn.active {
-  background-color: #00433D;
+  background-color: #004E38;
   color: #fff;
-  border-color: #00433D;
+  border-color: #004E38;
 }
 
 .filter-btn:hover:not(.active) {
   background: var(--accent, #C5F1A9);
-  color: var(--primary, #00433D);
+  color: var(--primary, #004E38);
   border-color: var(--accent, #C5F1A9);
 }
 
@@ -157,12 +157,12 @@
   justify-content: center;
   align-items: center;
   border-radius: 9999px;
-  border: 1px solid #00433D;
+  border: 1px solid #004E38;
   flex-shrink: 0;
 }
 
 .btn-view-all {
-  color: #00433D;
+  color: #004E38;
   text-align: right;
   font-family: 'Jost', sans-serif;
   font-size: 14px;

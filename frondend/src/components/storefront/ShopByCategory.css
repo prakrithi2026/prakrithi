@@ -7,7 +7,7 @@
   font-family: var(--font-sans, inherit);
   font-size: 2rem;
   font-weight: 800;
-  color: var(--primary, #00433D);
+  color: var(--primary, #004E38);
   margin: 0 0 36px 0;
   letter-spacing: -0.3px;
   line-height: 1.25;
@@ -35,7 +35,7 @@
   height: 395px;
   border-radius: 20px;
   overflow: hidden;
-  background-color: var(--primary, #00433D);
+  background-color: var(--primary, #004E38);
   text-decoration: none;
   display: block;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
@@ -54,7 +54,7 @@
   height: 100%;
   position: relative;
   overflow: hidden;
-  background-color: var(--primary, #00433D);
+  background-color: var(--primary, #004E38);
   display: flex;
   align-items: center;
   justify-content: center;

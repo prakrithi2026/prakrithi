@@ -119,7 +119,7 @@
 }
 
 .product-name {
-  color: #00433D;
+  color: #004E38;
   font-family: 'Jost', sans-serif;
   font-size: 16px;
   font-weight: 600;
@@ -138,12 +138,12 @@
 }
 
 .product-name-link:hover .product-name {
-  color: #00433D;
+  color: #004E38;
   text-decoration: underline;
 }
 
 .product-desc {
-  color: #00433D;
+  color: #004E38;
   font-family: 'Jost', sans-serif;
   font-size: 14px;
   margin: 0;
@@ -169,7 +169,7 @@
 .rating-score {
   font-size: 12px;
   font-weight: 600;
-  color: #00433D;
+  color: #004E38;
   font-family: 'Jost', sans-serif;
 }
 
@@ -184,7 +184,7 @@
 .price-row {
   font-size: 15px;
   font-weight: 600;
-  color: #00433D;
+  color: #004E38;
   font-family: 'Jost', sans-serif;
 }
 
@@ -205,9 +205,9 @@
   width: 100%;
   height: 36px;
   border-radius: 8px;
-  background-color: var(--primary, #00433D);
+  background-color: var(--primary, #004E38);
   color: #ffffff;
-  border: 1px solid var(--primary, #00433D);
+  border: 1px solid var(--primary, #004E38);
   margin-top: 6px;
   cursor: pointer;
   font-family: 'Jost', sans-serif;
@@ -217,17 +217,17 @@
 }
 
 .btn-add-cart:hover {
-  background-color: var(--primary, #00433D);
+  background-color: var(--primary, #004E38);
   color: #ffffff;
-  border-color: var(--primary, #00433D);
+  border-color: var(--primary, #004E38);
   opacity: 0.92;
 }
 
 .btn-add-cart:focus,
 .btn-add-cart:active {
-  background-color: var(--primary, #00433D);
+  background-color: var(--primary, #004E38);
   color: #ffffff;
-  border-color: var(--primary, #00433D);
+  border-color: var(--primary, #004E38);
   outline: none;
 }
 

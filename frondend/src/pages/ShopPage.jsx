@@ -98,7 +98,7 @@ export default function ShopPage() {
     'All Products';
 
   const themeStyle = {
-    '--primary': theme.primaryColor || '#00433D',
+    '--primary': theme.primaryColor || '#004E38',
     '--accent':  theme.accentColor  || '#C5F1A9',
     fontFamily:  theme.fontFamily   || "'Jost', sans-serif",
   };
@@ -203,7 +203,7 @@ export default function ShopPage() {
                 <button
                   className="shop-reset-btn"
                   onClick={handleClear}
-                  style={{ backgroundColor: theme.primaryColor || '#00433D', color: '#fff', borderColor: theme.primaryColor || '#00433D' }}
+                  style={{ backgroundColor: theme.primaryColor || '#004E38', color: '#fff', borderColor: theme.primaryColor || '#004E38' }}
                 >
                   Clear Filter
                 </button>
@@ -213,7 +213,7 @@ export default function ShopPage() {
                 {filtered.map(product => (
                   <div key={product.id} className="shop-card">
                     {product.badge && (
-                      <span className="shop-card__badge" style={{ backgroundColor: product.badgeColor || theme.primaryColor || '#00433D', color: product.badgeTextColor || '#fff' }}>
+                      <span className="shop-card__badge" style={{ backgroundColor: product.badgeColor || theme.primaryColor || '#004E38', color: product.badgeTextColor || '#fff' }}>
                         {product.badge}
                       </span>
                     )}

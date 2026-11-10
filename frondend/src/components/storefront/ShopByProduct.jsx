@@ -242,8 +242,8 @@ export default function ShopByProduct() {
                 onClick={() => handleFilterClick(f.id)}
                 style={
                   activeFilter === f.id
-                    ? { backgroundColor: theme.primaryColor || '#00433D', color: '#fff', borderColor: theme.primaryColor || '#00433D' }
-                    : { borderColor: theme.primaryColor || '#00433D', color: theme.primaryColor || '#00433D' }
+                    ? { backgroundColor: theme.primaryColor || '#004E38', color: '#fff', borderColor: theme.primaryColor || '#004E38' }
+                    : { borderColor: theme.primaryColor || '#004E38', color: theme.primaryColor || '#004E38' }
                 }
               >
                 {f.label}
@@ -289,7 +289,7 @@ export default function ShopByProduct() {
               className="scroll-progress-bar"
               style={{
                 width: `${fillWidth}%`,
-                backgroundColor: theme.primaryColor || '#00433D',
+                backgroundColor: theme.primaryColor || '#004E38',
               }}
             />
           </div>

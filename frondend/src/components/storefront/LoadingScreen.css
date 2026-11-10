@@ -42,7 +42,7 @@
   inset: 0;
   border-radius: 50%;
   border: 3px solid transparent;
-  border-top-color: #00433D;
+  border-top-color: #004E38;
   border-right-color: #C5F1A9;
   animation: spin 1.2s linear infinite;
 }
@@ -55,7 +55,7 @@
   font-family: 'Jost', sans-serif;
   font-size: 1.4rem;
   font-weight: 700;
-  color: #00433D;
+  color: #004E38;
   margin: 0;
   letter-spacing: 0.02em;
 }
@@ -77,7 +77,7 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #00433D;
+  background: #004E38;
   animation: dotBounce 1.2s ease-in-out infinite;
 }
 

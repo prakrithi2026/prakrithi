@@ -37,7 +37,7 @@
 }
 
 .press-text {
-  color: #00433D;
+  color: #004E38;
   font-weight: 700;
   opacity: 1;
   font-family: 'Jost', sans-serif;
@@ -50,7 +50,7 @@
 .press-yourstory {
   font-size: 20px;
   letter-spacing: 1.5px;
-  border: 2px solid #00433D;
+  border: 2px solid #004E38;
   padding: 5px 12px;
   opacity: 1;
 }

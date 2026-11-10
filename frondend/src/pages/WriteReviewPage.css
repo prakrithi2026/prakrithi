@@ -20,7 +20,7 @@
 }
 
 .wr-breadcrumb a {
-  color: #00433D;
+  color: #004E38;
   text-decoration: none;
   font-weight: 600;
 }
@@ -31,7 +31,7 @@
 
 /* ── Hero Banner ── */
 .wr-hero {
-  background: #00433D;
+  background: #004E38;
   border-radius: 24px;
   padding: 40px 44px;
   color: #ffffff;
@@ -40,7 +40,7 @@
   justify-content: space-between;
   gap: 32px;
   margin-bottom: 36px;
-  box-shadow: 0 12px 32px rgba(0, 67, 61, 0.14);
+  box-shadow: 0 12px 32px rgba(0, 78, 56, 0.14);
 }
 
 .wr-hero__content {
@@ -77,7 +77,7 @@
 
 .wr-hero__stats-card {
   background: #ffffff;
-  color: #00433D;
+  color: #004E38;
   padding: 24px 32px;
   border-radius: 20px;
   text-align: center;
@@ -89,7 +89,7 @@
 .wr-hero__score {
   font-size: 2.6rem;
   font-weight: 800;
-  color: #00433D;
+  color: #004E38;
   line-height: 1;
 }
 
@@ -126,7 +126,7 @@
 .wr-card-title {
   font-size: 1.35rem;
   font-weight: 800;
-  color: #00433D;
+  color: #004E38;
   margin: 0 0 4px;
 }
 
@@ -210,7 +210,7 @@
 .wr-star-picker__label {
   font-size: 0.88rem;
   font-weight: 700;
-  color: #00433D;
+  color: #004E38;
 }
 
 /* ── Inputs ── */
@@ -233,9 +233,9 @@
 .wr-input:focus,
 .wr-select:focus,
 .wr-textarea:focus {
-  border-color: #00433D;
+  border-color: #004E38;
   background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(0, 67, 61, 0.08);
+  box-shadow: 0 0 0 3px rgba(0, 78, 56, 0.08);
 }
 
 .wr-textarea {
@@ -244,7 +244,7 @@
 }
 
 .wr-submit-btn {
-  background: #00433D;
+  background: #004E38;
   color: #ffffff;
   border: none;
   border-radius: 12px;
@@ -261,9 +261,9 @@
 }
 
 .wr-submit-btn:hover:not(:disabled) {
-  background: #002d29;
+  background: #003627;
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(0, 67, 61, 0.22);
+  box-shadow: 0 6px 18px rgba(0, 78, 56, 0.22);
 }
 
 .wr-submit-btn:disabled {
@@ -273,8 +273,8 @@
 
 .wr-secondary-btn {
   background: #ffffff;
-  color: #00433D;
-  border: 1.5px solid #00433D;
+  color: #004E38;
+  border: 1.5px solid #004E38;
   border-radius: 12px;
   padding: 12px 22px;
   font-size: 0.9rem;
@@ -307,7 +307,7 @@
 .wr-success-box h3 {
   font-size: 1.25rem;
   font-weight: 800;
-  color: #00433D;
+  color: #004E38;
   margin: 0 0 8px;
 }
 
@@ -382,8 +382,8 @@
 
 .wr-sort-select:focus {
   outline: none;
-  border-color: #00433D;
-  box-shadow: 0 0 0 2px rgba(0, 67, 61, 0.15);
+  border-color: #004E38;
+  box-shadow: 0 0 0 2px rgba(0, 78, 56, 0.15);
 }
 
 .wr-filter-pill {
@@ -400,9 +400,9 @@
 
 .wr-filter-pill.active,
 .wr-filter-pill:hover {
-  background: #00433D;
+  background: #004E38;
   color: #ffffff;
-  border-color: #00433D;
+  border-color: #004E38;
 }
 
 .wr-reviews-list {
@@ -442,7 +442,7 @@
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #00433D, #006b5e);
+  background: linear-gradient(135deg, #004E38, #00694B);
   color: #ffffff;
   font-weight: 800;
   font-size: 0.92rem;
@@ -557,7 +557,7 @@
 .wr-review-card__product-tag {
   display: inline-block;
   background: #f4f9f6;
-  color: #00433D;
+  color: #004E38;
   font-size: 0.76rem;
   font-weight: 600;
   padding: 4px 10px;
@@ -566,7 +566,7 @@
 }
 
 .wr-review-card__product-tag a {
-  color: #00433D;
+  color: #004E38;
   font-weight: 700;
   text-decoration: underline;
 }
@@ -590,7 +590,7 @@
 .wr-admin-reply {
   margin-top: 14px;
   background: #f0f7f4;
-  border-left: 4px solid #00433D;
+  border-left: 4px solid #004E38;
   border-radius: 8px 12px 12px 8px;
   padding: 12px 16px;
 }
@@ -607,7 +607,7 @@
 .wr-admin-reply__badge {
   font-size: 0.78rem;
   font-weight: 800;
-  color: #00433D;
+  color: #004E38;
 }
 
 .wr-admin-reply__date {
@@ -673,13 +673,13 @@
 
 .wr-media-upload-zone:hover:not(:disabled) {
   background: #fafafa;
-  border-color: #00433D;
+  border-color: #004E38;
 }
 
 .wr-media-upload-zone:focus-visible {
   outline: none;
-  border-color: #00433D;
-  box-shadow: 0 0 0 2px rgba(0, 67, 61, 0.12);
+  border-color: #004E38;
+  box-shadow: 0 0 0 2px rgba(0, 78, 56, 0.12);
 }
 
 .wr-media-upload-zone:disabled {
@@ -699,7 +699,7 @@
   gap: 4px;
   font-size: 0.75rem;
   font-weight: 700;
-  color: #00433D;
+  color: #004E38;
   background: #e6f4ea;
   padding: 3px 10px;
   border-radius: 999px;
@@ -708,7 +708,7 @@
 .wr-media-upload-zone__title {
   font-size: 0.92rem;
   font-weight: 700;
-  color: #00433D;
+  color: #004E38;
 }
 
 .wr-media-upload-zone__sub {
@@ -739,7 +739,7 @@
 .wr-media-badge {
   font-size: 0.75rem;
   font-weight: 700;
-  color: #00433D;
+  color: #004E38;
   background: #e6f4ea;
   padding: 2px 8px;
   border-radius: 12px;
@@ -832,7 +832,7 @@
 }
 
 .wr-review-photo-zoom-btn:hover {
-  background: rgba(0, 67, 61, 0.88);
+  background: rgba(0, 78, 56, 0.88);
 }
 
 .wr-review-video-wrapper {

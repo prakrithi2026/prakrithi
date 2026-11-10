@@ -31,7 +31,7 @@
 }
 
 .categories-breadcrumb a {
-  color: var(--primary, #00433D);
+  color: var(--primary, #004E38);
   text-decoration: none;
   font-weight: 500;
 }
@@ -60,7 +60,7 @@
   font-family: var(--font-sans, 'Jost', sans-serif);
   font-size: 2rem;
   font-weight: 800;
-  color: var(--primary, #00433D);
+  color: var(--primary, #004E38);
   margin: 0;
   line-height: 1.25;
   letter-spacing: -0.3px;
@@ -73,7 +73,7 @@
 }
 
 .categories-count strong {
-  color: var(--primary, #00433D);
+  color: var(--primary, #004E38);
 }
 
 .categories-all-products-link {
@@ -82,16 +82,16 @@
   gap: 6px;
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--primary, #00433D);
+  color: var(--primary, #004E38);
   text-decoration: none;
   padding: 8px 18px;
-  border: 1.5px solid var(--primary, #00433D);
+  border: 1.5px solid var(--primary, #004E38);
   border-radius: 999px;
   transition: all 0.2s ease;
 }
 
 .categories-all-products-link:hover {
-  background-color: var(--primary, #00433D);
+  background-color: var(--primary, #004E38);
   color: #fff;
 }
 
@@ -108,7 +108,7 @@
   height: 395px;
   border-radius: 20px;
   overflow: hidden;
-  background-color: var(--primary, #00433D);
+  background-color: var(--primary, #004E38);
   text-decoration: none;
   display: flex;
   flex-direction: column;
@@ -130,7 +130,7 @@
   top: 0;
   left: 0;
   overflow: hidden;
-  background-color: var(--primary, #00433D);
+  background-color: var(--primary, #004E38);
 }
 
 .category-page-card__image {
@@ -189,7 +189,7 @@
 .categories-no-results h3 {
   font-family: 'Jost', sans-serif;
   font-size: 1.3rem;
-  color: #00433D;
+  color: #004E38;
   margin: 0 0 6px 0;
 }
 

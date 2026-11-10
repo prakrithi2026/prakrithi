@@ -17,7 +17,7 @@ export default function ProductImageGallery({
   discount = 0,
   isWishlisted = false,
   onWishlistClick,
-  primaryColor = '#00433D'
+  primaryColor = '#004E38'
 }) {
   // Normalize images array
   const rawList = Array.isArray(images) && images.length > 0 

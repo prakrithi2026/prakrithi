@@ -18,7 +18,7 @@
 }
 
 .hrs-icon {
-  color: #00433D;
+  color: #004E38;
 }
 
 .hrs-subtitle {
@@ -56,8 +56,8 @@
 }
 
 .hrs-heading-input:focus {
-  border-color: #00433D;
-  box-shadow: 0 0 0 3px rgba(0, 67, 61, 0.1);
+  border-color: #004E38;
+  box-shadow: 0 0 0 3px rgba(0, 78, 56, 0.1);
 }
 
 .hrs-heading-hint {
@@ -90,13 +90,13 @@
 }
 
 .hrs-btn--primary {
-  background: #00433D;
+  background: #004E38;
   color: #ffffff;
-  box-shadow: 0 2px 6px rgba(0, 67, 61, 0.25);
+  box-shadow: 0 2px 6px rgba(0, 78, 56, 0.25);
 }
 
 .hrs-btn--primary:hover {
-  background: #003630;
+  background: #003627;
   transform: translateY(-1px);
 }
 
@@ -130,7 +130,7 @@
 
 .hrs-btn--icon:hover {
   background: #ffffff;
-  color: #00433D;
+  color: #004E38;
 }
 
 .hrs-btn-icon {
@@ -359,8 +359,8 @@
 }
 
 .hrs-search-input:focus {
-  border-color: #00433D;
-  box-shadow: 0 0 0 2px rgba(0, 67, 61, 0.1);
+  border-color: #004E38;
+  box-shadow: 0 0 0 2px rgba(0, 78, 56, 0.1);
 }
 
 .hrs-search-clear {
@@ -403,7 +403,7 @@
 
 .hrs-tab-btn--active {
   background: #ffffff;
-  color: #00433D;
+  color: #004E38;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
@@ -436,9 +436,9 @@
 }
 
 .hrs-review-card--selected {
-  border-color: #00433D;
+  border-color: #004E38;
   background: #f4fbf7;
-  box-shadow: 0 4px 12px rgba(0, 67, 61, 0.12);
+  box-shadow: 0 4px 12px rgba(0, 78, 56, 0.12);
 }
 
 /* Card Top Row */
@@ -460,7 +460,7 @@
 .hrs-card-checkbox {
   width: 16px;
   height: 16px;
-  accent-color: #00433D;
+  accent-color: #004E38;
   cursor: pointer;
 }
 
@@ -470,7 +470,7 @@
 }
 
 .hrs-text-success {
-  color: #00433D;
+  color: #004E38;
 }
 
 .hrs-rating-pill {
@@ -545,7 +545,7 @@
 .hrs-avatar-letter {
   font-size: 0.85rem;
   font-weight: 700;
-  color: #00433D;
+  color: #004E38;
   background: #BDD681;
   width: 100%;
   height: 100%;

@@ -453,7 +453,7 @@ export default function SectionManager() {
               >
                 {/* Header row: Card number & reorder/delete actions */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontWeight: 600, fontSize: '0.85rem', color: '#00433D' }}>Card #{i + 1}</span>
+                  <span style={{ fontWeight: 600, fontSize: '0.85rem', color: '#004E38' }}>Card #{i + 1}</span>
                   <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
                     <button
                       type="button"
@@ -494,7 +494,7 @@ export default function SectionManager() {
                       width: '64px',
                       height: '88px',
                       borderRadius: '8px',
-                      backgroundColor: '#00433D',
+                      backgroundColor: '#004E38',
                       overflow: 'hidden',
                       display: 'flex',
                       alignItems: 'center',

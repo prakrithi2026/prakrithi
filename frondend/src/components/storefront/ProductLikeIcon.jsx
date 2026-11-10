@@ -1,9 +1,9 @@
 /**
  * ProductLikeIcon component:
- * - Before user liked (unliked): circular white badge with outlined brand green (#00433D) heart
- * - After like (liked): circular white badge with solid brand green (#00433D) heart
+ * - Before user liked (unliked): circular white badge with outlined brand green (#004E38) heart
+ * - After like (liked): circular white badge with solid brand green (#004E38) heart
  */
-export default function ProductLikeIcon({ isLiked = false, size = 24, color = '#00433D', className = '' }) {
+export default function ProductLikeIcon({ isLiked = false, size = 24, color = '#004E38', className = '' }) {
   const combinedClass = `product-like-icon ${className}`.trim();
 
   if (isLiked) {

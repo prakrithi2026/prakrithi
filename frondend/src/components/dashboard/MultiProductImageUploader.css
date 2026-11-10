@@ -43,14 +43,14 @@
 }
 
 .multi-img-card:hover {
-  border-color: #00433D;
-  box-shadow: 0 4px 12px rgba(0, 67, 61, 0.12);
+  border-color: #004E38;
+  box-shadow: 0 4px 12px rgba(0, 78, 56, 0.12);
   transform: translateY(-2px);
 }
 
 .multi-img-card--cover {
-  border-color: #00433D;
-  box-shadow: 0 0 0 2px rgba(0, 67, 61, 0.2);
+  border-color: #004E38;
+  box-shadow: 0 0 0 2px rgba(0, 78, 56, 0.2);
 }
 
 .multi-img-card__thumb {
@@ -75,7 +75,7 @@
   position: absolute;
   top: 6px;
   left: 6px;
-  background: #00433D;
+  background: #004E38;
   color: #ffffff;
   font-size: 0.68rem;
   font-weight: 700;
@@ -190,8 +190,8 @@
 }
 
 .multi-img-add-card:hover {
-  border-color: #00433D;
-  color: #00433D;
+  border-color: #004E38;
+  color: #004E38;
   background: #f4f9f4;
   transform: translateY(-2px);
 }
@@ -228,8 +228,8 @@
 
 .multi-img-tab--active {
   background: #ffffff;
-  color: #00433D;
-  border-bottom: 2px solid #00433D;
+  color: #004E38;
+  border-bottom: 2px solid #004E38;
 }
 
 .multi-img-dropzone {
@@ -250,11 +250,11 @@
 
 .multi-img-dropzone--dragover {
   background: #eef7ee;
-  outline: 2px dashed #00433D;
+  outline: 2px dashed #004E38;
 }
 
 .multi-img-dropzone-icon {
-  color: #00433D;
+  color: #004E38;
 }
 
 .multi-img-dropzone-primary {

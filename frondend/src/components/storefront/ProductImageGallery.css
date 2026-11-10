@@ -169,7 +169,7 @@
   height: 8px;
   border-radius: 9999px;
   border: none;
-  background: rgba(0, 67, 61, 0.28);
+  background: rgba(0, 78, 56, 0.28);
   padding: 0;
   cursor: pointer;
   transition: all 0.25s ease;
@@ -177,8 +177,8 @@
 
 .product-gallery__dot.active {
   width: 22px;
-  background: #00433D;
-  box-shadow: 0 1px 4px rgba(0, 67, 61, 0.4);
+  background: #004E38;
+  box-shadow: 0 1px 4px rgba(0, 78, 56, 0.4);
 }
 
 /* ── Swipe Hint ── */
@@ -246,9 +246,9 @@
 
 .product-gallery__thumb.active {
   opacity: 1;
-  border-color: #00433D;
+  border-color: #004E38;
   transform: scale(1.04);
-  box-shadow: 0 2px 8px rgba(0, 67, 61, 0.25);
+  box-shadow: 0 2px 8px rgba(0, 78, 56, 0.25);
 }
 
 /* ── Responsive adjustments ── */

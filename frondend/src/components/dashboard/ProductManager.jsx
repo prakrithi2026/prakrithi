@@ -428,7 +428,7 @@ export default function ProductManager() {
         {/* ── Shop by Product Section ── */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px', padding: '0 20px' }}>
           <div>
-            <h3 style={{ fontSize: '1.1rem', color: '#00433D', margin: 0 }}>Shop by Product</h3>
+            <h3 style={{ fontSize: '1.1rem', color: '#004E38', margin: 0 }}>Shop by Product</h3>
             <p style={{ margin: '2px 0 0', fontSize: '0.8rem', color: '#64748b' }}>
               Standard products with prices, ratings, and variants.
             </p>
@@ -448,7 +448,7 @@ export default function ProductManager() {
         {/* ── Shop by Category Section (NO PRICES) ── */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '30px', padding: '20px 20px 0', borderTop: '1px solid #eee' }}>
           <div>
-            <h3 style={{ fontSize: '1.1rem', color: '#00433D', margin: 0 }}>Shop by Category</h3>
+            <h3 style={{ fontSize: '1.1rem', color: '#004E38', margin: 0 }}>Shop by Category</h3>
             <p style={{ margin: '2px 0 0', fontSize: '0.8rem', color: '#64748b' }}>
               Category cards with image, title, and link shown on the storefront scroller.
             </p>

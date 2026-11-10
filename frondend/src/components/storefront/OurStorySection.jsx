@@ -88,7 +88,7 @@ export default function OurStorySection() {
         margin: 0
       }}
     >
-      <div className="our-story-card" style={{ backgroundColor: theme.primaryColor || '#00433D' }}>
+      <div className="our-story-card" style={{ backgroundColor: theme.primaryColor || '#004E38' }}>
         
         {/* Left Column: Media (Video or Image) */}
         {hasMedia && (

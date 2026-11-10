@@ -20,8 +20,8 @@ export default function AnnouncementBar() {
 
   if (!announcement.enabled || dismissed) return null;
 
-  const bg = (!announcement.bgColor || announcement.bgColor.toUpperCase() === '#00472A' || announcement.bgColor.toUpperCase() === '#083B2E')
-    ? '#00433D'
+  const bg = (!announcement.bgColor || announcement.bgColor.toUpperCase() === '#00472A' || announcement.bgColor.toUpperCase() === '#083B2E' || announcement.bgColor.toUpperCase() === '#00433D')
+    ? '#004E38'
     : announcement.bgColor;
   const textColor = announcement.textColor || '#FFFFFF';
 

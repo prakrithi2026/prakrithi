@@ -288,15 +288,15 @@ export default function ShopByCategory() {
               className="scroll-progress-bar"
               style={{
                 width: `${fillWidth}%`,
-                backgroundColor: theme.primaryColor || '#00433D',
+                backgroundColor: theme.primaryColor || '#004E38',
               }}
             />
           </div>
-          <div className="view-all-row" style={{ borderColor: theme.primaryColor || '#00433D' }}>
+          <div className="view-all-row" style={{ borderColor: theme.primaryColor || '#004E38' }}>
             <Link
               to={viewAllLink}
               className="btn-view-all"
-              style={{ color: theme.primaryColor || '#00433D' }}
+              style={{ color: theme.primaryColor || '#004E38' }}
             >
               {viewAllText}
             </Link>
