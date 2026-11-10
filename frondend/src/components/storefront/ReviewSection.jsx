@@ -74,7 +74,7 @@ const AVATAR_SEETHA_2 = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2
 const AVATAR_SANTHOSH = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80"><defs><linearGradient id="bg4" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="%23556c82"/><stop offset="100%" stop-color="%232c3f52"/></linearGradient></defs><circle cx="40" cy="40" r="40" fill="url(%23bg4)"/><circle cx="40" cy="37" r="16" fill="%23cf8f60"/><path d="M26 30c0-10 6-13 14-13s14 3 14 13c0 2-2 3-4 3s-3-2-5-2-3 1-5 1-3-1-5-1-4 0-4 1z" fill="%231e1e1e"/><rect x="30" y="32" width="8" height="7" rx="2" fill="none" stroke="%231e1e1e" stroke-width="1.8"/><rect x="42" y="32" width="8" height="7" rx="2" fill="none" stroke="%231e1e1e" stroke-width="1.8"/><line x1="38" y1="35" x2="42" y2="35" stroke="%231e1e1e" stroke-width="1.8"/><circle cx="34" cy="35" r="1.5" fill="%231e1e1e"/><circle cx="46" cy="35" r="1.5" fill="%231e1e1e"/><path d="M37 42c1.5 1.5 4.5 1.5 6 0" stroke="%231e1e1e" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M18 74c3-16 12-21 22-21s19 5 22 21" fill="%2324426b"/></svg>`;
 
 // Customer Avatar with reliable fallback
-function CustomerAvatar({ src, name, isDark, primaryColor = '#00433D', lightColor = '#BDD681' }) {
+function CustomerAvatar({ src, name, isDark, darkColor = '#004E38', lightColor = '#C6E095' }) {
   const [hasError, setHasError] = useState(false);
 
   if (src && !hasError) {
@@ -90,8 +90,8 @@ function CustomerAvatar({ src, name, isDark, primaryColor = '#00433D', lightColo
   }
 
   const initial = name ? name.charAt(0).toUpperCase() : 'P';
-  const bgColor = isDark ? lightColor : primaryColor;
-  const textColor = isDark ? primaryColor : '#FFFFFF';
+  const bgColor = isDark ? '#0A584F' : '#B8DC8E';
+  const textColor = isDark ? '#FFFFFF' : '#004E38';
 
   return (
     <div
@@ -170,9 +170,8 @@ export const DEFAULT_CUSTOMER_REVIEWS = [
 
 export default function ReviewSection() {
   const { config } = useSiteConfig();
-  const theme = config?.theme || {};
-  const primaryColor = theme.primaryColor || '#00433D';
-  const lightColor = config?.press?.bgColor || '#BDD681';
+  const darkColor = '#004E38';
+  const lightColor = '#C6E095';
   const { reviewsSection = {} } = config;
   const {
     title: customTitle = '',
@@ -268,9 +267,9 @@ export default function ReviewSection() {
       <section
         className="review-section"
         style={{
-          '--card-dark-bg': primaryColor,
+          '--card-dark-bg': darkColor,
           '--card-light-bg': lightColor,
-          '--review-primary': primaryColor,
+          '--review-primary': darkColor,
         }}
         aria-label="Customer Reviews and Ratings"
       >
@@ -291,7 +290,7 @@ export default function ReviewSection() {
             {reviewsList.map((review, index) => {
               const isDark = index % 2 === 0;
               const cardClass = isDark ? 'review-card--dark' : 'review-card--light';
-              const iconColor = isDark ? 'white' : primaryColor;
+              const iconColor = isDark ? 'white' : darkColor;
               const reviewTitle = review.title || 'Exceptional Quality!';
               const reviewText = review.text || review.comment || '';
               const reviewName = review.name || review.customer_name || 'Happy Customer';
@@ -307,8 +306,8 @@ export default function ReviewSection() {
                   key={review.id || index}
                   className={`review-card ${cardClass}`}
                   style={{
-                    backgroundColor: isDark ? primaryColor : lightColor,
-                    color: isDark ? '#FFFFFF' : primaryColor,
+                    backgroundColor: isDark ? darkColor : lightColor,
+                    color: isDark ? '#FFFFFF' : darkColor,
                   }}
                 >
                   <div className="review-card-top">
@@ -320,7 +319,7 @@ export default function ReviewSection() {
                     {/* Review Title */}
                     <h3
                       className="review-card-title"
-                      style={{ color: isDark ? '#FFFFFF' : primaryColor }}
+                      style={{ color: isDark ? '#FFFFFF' : darkColor }}
                     >
                       {reviewTitle}
                     </h3>
@@ -328,7 +327,9 @@ export default function ReviewSection() {
                     {/* Review Body */}
                     <p
                       className="review-card-text"
-                      style={{ color: isDark ? 'rgba(255, 255, 255, 0.92)' : primaryColor }}
+                      style={{
+                        color: isDark ? 'rgba(255, 255, 255, 0.92)' : 'rgba(0, 78, 56, 0.92)',
+                      }}
                     >
                       {reviewText}
                     </p>
@@ -343,14 +344,14 @@ export default function ReviewSection() {
                       src={reviewAvatar}
                       name={reviewName}
                       isDark={isDark}
-                      primaryColor={primaryColor}
+                      darkColor={darkColor}
                       lightColor={lightColor}
                     />
                     <div className="review-customer-info">
                       <div className="review-customer-name-row">
                         <span
                           className="review-customer-name"
-                          style={{ color: isDark ? '#FFFFFF' : primaryColor }}
+                          style={{ color: isDark ? '#FFFFFF' : darkColor }}
                         >
                           {reviewName}
                         </span>
@@ -362,8 +363,7 @@ export default function ReviewSection() {
                         <span
                           className="review-customer-location"
                           style={{
-                            color: isDark ? 'rgba(255, 255, 255, 0.78)' : primaryColor,
-                            opacity: isDark ? 1 : 0.78,
+                            color: isDark ? 'rgba(255, 255, 255, 0.78)' : 'rgba(0, 78, 56, 0.78)',
                           }}
                         >
                           {reviewLocation}
@@ -390,7 +390,7 @@ export default function ReviewSection() {
                 activeDot === dotIndex ? 'review-dot-btn--active' : ''
               }`}
               style={{
-                backgroundColor: activeDot === dotIndex ? primaryColor : lightColor,
+                backgroundColor: activeDot === dotIndex ? darkColor : lightColor,
               }}
               onClick={() => scrollToDot(dotIndex)}
             />

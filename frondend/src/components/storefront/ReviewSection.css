@@ -32,7 +32,7 @@
   font-family: var(--font-sans, inherit);
   font-size: 2rem;
   font-weight: 800;
-  color: var(--review-primary, var(--heading, var(--primary, #00433D)));
+  color: #004E38;
   margin: 0 0 36px 0;
   letter-spacing: -0.3px;
   line-height: 1.25;
@@ -102,7 +102,7 @@
 
 /* Dark Green Card Theme */
 .review-card--dark {
-  background-color: var(--card-dark-bg, var(--primary, #00433D));
+  background-color: var(--card-dark-bg, #004E38);
   color: #FFFFFF;
 }
 
@@ -124,26 +124,24 @@
 
 /* Light Green Card Theme */
 .review-card--light {
-  background-color: var(--card-light-bg, #BDD681);
-  color: var(--review-primary, var(--primary, #00433D));
+  background-color: var(--card-light-bg, #C6E095);
+  color: #004E38;
 }
 
 .review-card--light .review-card-title {
-  color: var(--review-primary, var(--primary, #00433D));
+  color: #004E38;
 }
 
 .review-card--light .review-card-text {
-  color: var(--review-primary, var(--primary, #00433D));
-  opacity: 0.92;
+  color: rgba(0, 78, 56, 0.92);
 }
 
 .review-card--light .review-customer-name {
-  color: var(--review-primary, var(--primary, #00433D));
+  color: #004E38;
 }
 
 .review-card--light .review-customer-location {
-  color: var(--review-primary, var(--primary, #00433D));
-  opacity: 0.78;
+  color: rgba(0, 78, 56, 0.78);
 }
 
 /* Top Section of Card */
@@ -282,7 +280,7 @@
 
 .review-dot-btn {
   border: none;
-  background: var(--card-light-bg, #BDD681);
+  background: var(--card-light-bg, #C6E095);
   width: 7px;
   height: 7px;
   border-radius: 50%;
@@ -297,14 +295,14 @@
 }
 
 .review-dot-btn--active {
-  background: var(--card-dark-bg, var(--primary, #00433D));
+  background: var(--card-dark-bg, #004E38);
   width: 20px;
   height: 7px;
   border-radius: 4px;
 }
 
 .review-dot-btn--active:hover {
-  filter: brightness(0.85);
+  background: #003627;
 }
 
 /* Responsive Breakpoints */

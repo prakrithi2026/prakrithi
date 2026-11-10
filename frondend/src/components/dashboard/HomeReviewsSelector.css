@@ -229,9 +229,9 @@
 }
 
 .hrs-selected-chip--dark {
-  background: #00433D;
+  background: #004E38;
   color: #ffffff;
-  border-color: #002d28;
+  border-color: #003627;
 }
 
 .hrs-selected-chip--dark .hrs-selected-chip-badge {
@@ -248,22 +248,22 @@
 }
 
 .hrs-selected-chip--light {
-  background: #BDD681;
-  color: #00433D;
-  border-color: #a3bf68;
+  background: #C6E095;
+  color: #004E38;
+  border-color: #a9cf6d;
 }
 
 .hrs-selected-chip--light .hrs-selected-chip-badge {
-  background: #00433D;
+  background: #004E38;
   color: #ffffff;
 }
 
 .hrs-selected-chip--light .hrs-chip-btn {
-  color: #00433D;
+  color: #004E38;
 }
 
 .hrs-selected-chip--light .hrs-chip-btn:hover {
-  background: rgba(0, 67, 61, 0.15);
+  background: rgba(0, 78, 56, 0.15);
 }
 
 .hrs-selected-chip-badge {
