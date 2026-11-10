@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { FaWhatsapp } from 'react-icons/fa';
 import { useSiteConfig } from '../context/SiteConfigContext';
 import AnnouncementBar from '../components/storefront/AnnouncementBar';
 import Navbar from '../components/storefront/Navbar';
@@ -14,6 +13,7 @@ import OurStorySection from '../components/storefront/OurStorySection';
 import Footer from '../components/storefront/Footer';
 import CartModal from '../components/storefront/CartModal';
 import CustomSection from '../components/storefront/CustomSection';
+import WhatsAppButton from '../components/storefront/WhatsAppButton';
 
 const coreSectionComponents = {
   shopByProduct: ShopByProduct,
@@ -84,11 +84,7 @@ export default function HomePage() {
       <CartModal />
 
       {/* Floating WhatsApp button */}
-      {!isPreviewMode && (
-        <a href="https://wa.me/" target="_blank" rel="noopener noreferrer" className="whatsapp-float-link">
-          <FaWhatsapp size={28} />
-        </a>
-      )}
+      {!isPreviewMode && <WhatsAppButton />}
     </div>
   );
 }
