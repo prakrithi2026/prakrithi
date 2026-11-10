@@ -7,7 +7,7 @@
   font-family: var(--font-sans, inherit);
   font-size: 2rem;
   font-weight: 800;
-  color: #004E38;
+  color: var(--primary, #00433D);
   margin: 0 0 36px 0;
   letter-spacing: -0.3px;
   line-height: 1.25;

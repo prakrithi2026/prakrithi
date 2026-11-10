@@ -76,7 +76,7 @@ export default function OurStorySection() {
   const founderName = ourStory.founderName || 'Anjana KA';
   const founderTitle = ourStory.founderTitle || 'Founder Prakrithi India';
 
-  const pressBgColor = config.press?.bgColor || '#C5F1A9';
+  const pressBgColor = config.press?.bgColor || '#BDD681';
   const pageBgColor = theme.backgroundColor || '#fdfdfd';
 
   return (

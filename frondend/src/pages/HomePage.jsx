@@ -41,6 +41,7 @@ export default function HomePage() {
     '--brand-green': theme.primaryColor,
     '--dark-green': theme.primaryColor,
     '--accent': theme.accentColor,
+    '--press-bg': config.press?.bgColor || '#BDD681',
     '--bg': theme.backgroundColor,
     '--text': theme.textColor,
     '--heading': theme.headingColor,

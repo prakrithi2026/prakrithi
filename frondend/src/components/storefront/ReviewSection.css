@@ -32,7 +32,7 @@
   font-family: var(--font-sans, inherit);
   font-size: 2rem;
   font-weight: 800;
-  color: #004E38;
+  color: var(--review-primary, var(--heading, var(--primary, #00433D)));
   margin: 0 0 36px 0;
   letter-spacing: -0.3px;
   line-height: 1.25;
@@ -102,7 +102,7 @@
 
 /* Dark Green Card Theme */
 .review-card--dark {
-  background-color: #004E38;
+  background-color: var(--card-dark-bg, var(--primary, #00433D));
   color: #FFFFFF;
 }
 
@@ -122,26 +122,28 @@
   color: rgba(255, 255, 255, 0.78);
 }
 
-/* Light Pistachio Green Card Theme */
+/* Light Green Card Theme */
 .review-card--light {
-  background-color: #C6E095;
-  color: #004E38;
+  background-color: var(--card-light-bg, #BDD681);
+  color: var(--review-primary, var(--primary, #00433D));
 }
 
 .review-card--light .review-card-title {
-  color: #004E38;
+  color: var(--review-primary, var(--primary, #00433D));
 }
 
 .review-card--light .review-card-text {
-  color: rgba(0, 78, 56, 0.92);
+  color: var(--review-primary, var(--primary, #00433D));
+  opacity: 0.92;
 }
 
 .review-card--light .review-customer-name {
-  color: #004E38;
+  color: var(--review-primary, var(--primary, #00433D));
 }
 
 .review-card--light .review-customer-location {
-  color: rgba(0, 78, 56, 0.78);
+  color: var(--review-primary, var(--primary, #00433D));
+  opacity: 0.78;
 }
 
 /* Top Section of Card */
@@ -280,7 +282,7 @@
 
 .review-dot-btn {
   border: none;
-  background: #A3C695;
+  background: var(--card-light-bg, #BDD681);
   width: 7px;
   height: 7px;
   border-radius: 50%;
@@ -291,18 +293,18 @@
 }
 
 .review-dot-btn:hover {
-  background: #739f63;
+  filter: brightness(0.9);
 }
 
 .review-dot-btn--active {
-  background: #004E38;
+  background: var(--card-dark-bg, var(--primary, #00433D));
   width: 20px;
   height: 7px;
   border-radius: 4px;
 }
 
 .review-dot-btn--active:hover {
-  background: #003627;
+  filter: brightness(0.85);
 }
 
 /* Responsive Breakpoints */

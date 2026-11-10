@@ -18,7 +18,7 @@
 }
 
 .hrs-icon {
-  color: #004E38;
+  color: #00433D;
 }
 
 .hrs-subtitle {
@@ -56,8 +56,8 @@
 }
 
 .hrs-heading-input:focus {
-  border-color: #004E38;
-  box-shadow: 0 0 0 3px rgba(0, 78, 56, 0.1);
+  border-color: #00433D;
+  box-shadow: 0 0 0 3px rgba(0, 67, 61, 0.1);
 }
 
 .hrs-heading-hint {
@@ -90,13 +90,13 @@
 }
 
 .hrs-btn--primary {
-  background: #004E38;
+  background: #00433D;
   color: #ffffff;
-  box-shadow: 0 2px 6px rgba(0, 78, 56, 0.25);
+  box-shadow: 0 2px 6px rgba(0, 67, 61, 0.25);
 }
 
 .hrs-btn--primary:hover {
-  background: #003828;
+  background: #003630;
   transform: translateY(-1px);
 }
 
@@ -130,7 +130,7 @@
 
 .hrs-btn--icon:hover {
   background: #ffffff;
-  color: #004E38;
+  color: #00433D;
 }
 
 .hrs-btn-icon {
@@ -229,9 +229,9 @@
 }
 
 .hrs-selected-chip--dark {
-  background: #004E38;
+  background: #00433D;
   color: #ffffff;
-  border-color: #003627;
+  border-color: #002d28;
 }
 
 .hrs-selected-chip--dark .hrs-selected-chip-badge {
@@ -248,22 +248,22 @@
 }
 
 .hrs-selected-chip--light {
-  background: #E5F3D4;
-  color: #004E38;
-  border-color: #CBE7A5;
+  background: #BDD681;
+  color: #00433D;
+  border-color: #a3bf68;
 }
 
 .hrs-selected-chip--light .hrs-selected-chip-badge {
-  background: #004E38;
+  background: #00433D;
   color: #ffffff;
 }
 
 .hrs-selected-chip--light .hrs-chip-btn {
-  color: #004E38;
+  color: #00433D;
 }
 
 .hrs-selected-chip--light .hrs-chip-btn:hover {
-  background: rgba(0, 78, 56, 0.15);
+  background: rgba(0, 67, 61, 0.15);
 }
 
 .hrs-selected-chip-badge {
@@ -359,8 +359,8 @@
 }
 
 .hrs-search-input:focus {
-  border-color: #004E38;
-  box-shadow: 0 0 0 2px rgba(0, 78, 56, 0.1);
+  border-color: #00433D;
+  box-shadow: 0 0 0 2px rgba(0, 67, 61, 0.1);
 }
 
 .hrs-search-clear {
@@ -403,7 +403,7 @@
 
 .hrs-tab-btn--active {
   background: #ffffff;
-  color: #004E38;
+  color: #00433D;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
@@ -436,9 +436,9 @@
 }
 
 .hrs-review-card--selected {
-  border-color: #004E38;
+  border-color: #00433D;
   background: #f4fbf7;
-  box-shadow: 0 4px 12px rgba(0, 78, 56, 0.12);
+  box-shadow: 0 4px 12px rgba(0, 67, 61, 0.12);
 }
 
 /* Card Top Row */
@@ -460,7 +460,7 @@
 .hrs-card-checkbox {
   width: 16px;
   height: 16px;
-  accent-color: #004E38;
+  accent-color: #00433D;
   cursor: pointer;
 }
 
@@ -470,7 +470,7 @@
 }
 
 .hrs-text-success {
-  color: #004E38;
+  color: #00433D;
 }
 
 .hrs-rating-pill {
@@ -545,8 +545,8 @@
 .hrs-avatar-letter {
   font-size: 0.85rem;
   font-weight: 700;
-  color: #004E38;
-  background: #CBE7A5;
+  color: #00433D;
+  background: #BDD681;
   width: 100%;
   height: 100%;
   display: flex;
