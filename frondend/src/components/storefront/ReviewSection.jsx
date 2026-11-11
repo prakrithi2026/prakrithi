@@ -182,6 +182,8 @@ export default function ReviewSection() {
 
   const trackRef = useRef(null);
   const [activeDot, setActiveDot] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const resumeTimeoutRef = useRef(null);
 
   // Mouse drag support state
   const isDraggingRef = useRef(false);
@@ -235,10 +237,52 @@ export default function ReviewSection() {
     setActiveDot(dotIndex);
   };
 
+  // Set up automatic scrolling interval matching HeroSection (5 seconds interval, pause on hover/interaction)
+  useEffect(() => {
+    if (isPaused || reviewsList.length < 2) return;
+
+    const interval = setInterval(() => {
+      const el = trackRef.current;
+      if (!el || isDraggingRef.current) return;
+
+      const maxScroll = el.scrollWidth - el.clientWidth;
+      if (maxScroll <= 5) return;
+
+      setActiveDot((prevDot) => {
+        const nextDot = (prevDot + 1) % 3;
+        const targetLeft = (nextDot / 2) * maxScroll;
+        el.scrollTo({ left: targetLeft, behavior: 'smooth' });
+        return nextDot;
+      });
+    }, 5000); // 5 seconds interval matching hero banner
+
+    return () => clearInterval(interval);
+  }, [isPaused, reviewsList.length]);
+
+  // Touch handlers for mobile/tablet pause & resume
+  const handleTouchStart = () => {
+    setIsPaused(true);
+    if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current);
+  };
+
+  const handleTouchEnd = () => {
+    if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current);
+    resumeTimeoutRef.current = setTimeout(() => {
+      setIsPaused(false);
+    }, 3000);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current);
+    };
+  }, []);
+
   // Mouse drag handlers for smooth desktop carousel dragging
   const handleMouseDown = (e) => {
     const el = trackRef.current;
     if (!el) return;
+    setIsPaused(true);
     isDraggingRef.current = true;
     startXRef.current = e.pageX - el.offsetLeft;
     scrollLeftRef.current = el.scrollLeft;
@@ -272,6 +316,10 @@ export default function ReviewSection() {
           '--review-primary': darkColor,
         }}
         aria-label="Customer Reviews and Ratings"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
       >
         {/* Header Title */}
         <h2 className="review-section-title">{displayTitle}</h2>
@@ -377,7 +425,7 @@ export default function ReviewSection() {
           </div>
         </div>
 
-        {/* 3-Dot Pagination Indicator */}
+        {/* Pagination Dots matching Hero Banner */}
         <div className="review-dots-container" role="tablist" aria-label="Review Carousel Navigation">
           {[0, 1, 2].map((dotIndex) => (
             <button
@@ -389,9 +437,6 @@ export default function ReviewSection() {
               className={`review-dot-btn ${
                 activeDot === dotIndex ? 'review-dot-btn--active' : ''
               }`}
-              style={{
-                backgroundColor: activeDot === dotIndex ? darkColor : lightColor,
-              }}
               onClick={() => scrollToDot(dotIndex)}
             />
           ))}
