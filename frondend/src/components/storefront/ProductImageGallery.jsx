@@ -184,9 +184,6 @@ export default function ProductImageGallery({
                 {badge}
               </span>
             )}
-            {discount > 0 && (
-              <span className="product-discount-badge">-{discount}% OFF</span>
-            )}
           </div>
 
           {onWishlistClick && (
