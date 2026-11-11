@@ -44,6 +44,14 @@ function normalizeColors(cfg) {
         if (item.badge === '10% OFF') {
           item.badge = '10% OFF*';
         }
+        if (item.id === 'sale' || (item.badge && item.badge.includes('10% OFF'))) {
+          if (!item.badgeColor || item.badgeColor.toUpperCase() === '#C5F1A9' || item.badgeColor.toUpperCase() === '#00472A' || item.badgeColor.toUpperCase() === '#00433D') {
+            item.badgeColor = '#004E38';
+          }
+          if (!item.badgeTextColor || item.badgeTextColor.toUpperCase() === '#004E38' || item.badgeTextColor.toUpperCase() === '#012B28' || item.badgeTextColor.toUpperCase() === '#00472A' || item.badgeTextColor.toUpperCase() === '#00433D') {
+            item.badgeTextColor = '#FFFFFF';
+          }
+        }
         if (item.badgeTextColor && (item.badgeTextColor.toUpperCase() === '#012B28' || item.badgeTextColor.toUpperCase() === '#00472A' || item.badgeTextColor.toUpperCase() === '#00433D')) {
           item.badgeTextColor = '#004E38';
         }
@@ -68,6 +76,16 @@ function normalizeColors(cfg) {
     if (cfg.theme.headingColor && (cfg.theme.headingColor.toUpperCase() === '#012B28' || cfg.theme.headingColor.toUpperCase() === '#00472A' || cfg.theme.headingColor.toUpperCase() === '#00433D')) {
       cfg.theme.headingColor = '#004E38';
     }
+  }
+  if (Array.isArray(cfg.products)) {
+    cfg.products.forEach(p => {
+      if (p.badgeColor && (p.badgeColor.toUpperCase() === '#C5F1A9' || p.badgeColor.toUpperCase() === '#00472A' || p.badgeColor.toUpperCase() === '#00433D')) {
+        p.badgeColor = '#004E38';
+      }
+      if (p.badgeTextColor && (p.badgeTextColor.toUpperCase() === '#004E38' || p.badgeTextColor.toUpperCase() === '#012B28' || p.badgeTextColor.toUpperCase() === '#00472A' || p.badgeTextColor.toUpperCase() === '#00433D')) {
+        p.badgeTextColor = '#FFFFFF';
+      }
+    });
   }
   if (cfg.press && Array.isArray(cfg.press.logos) && Array.isArray(defaultConfig.press?.logos)) {
     cfg.press.logos = cfg.press.logos.map((logo, i) => {

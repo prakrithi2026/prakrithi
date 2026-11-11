@@ -192,8 +192,8 @@
                             "label": "Sale On",
                             "href": "#",
                             "badge": "10% OFF*",
-                            "badgeColor": "#C5F1A9",
-                            "badgeTextColor": "#004E38"
+                            "badgeColor": "#004E38",
+                            "badgeTextColor": "#FFFFFF"
                         },
                         {
                             "id": "new",
@@ -594,8 +594,8 @@
             ],
             "variants": [],
             "badge": "Sale 10% Off",
-            "badgeColor": "#C5F1A9",
-            "badgeTextColor": "#004E38",
+            "badgeColor": "#004E38",
+            "badgeTextColor": "#FFFFFF",
             "rating": "4.9",
             "reviews": 28,
             "couponNote": "*Best Price \u00e2\u201a\u00b9180 with coupon"
@@ -692,8 +692,8 @@
             ],
             "variants": [],
             "badge": "Sale",
-            "badgeColor": "#C5F1A9",
-            "badgeTextColor": "#004E38",
+            "badgeColor": "#004E38",
+            "badgeTextColor": "#FFFFFF",
             "rating": "4.8",
             "reviews": 30,
             "couponNote": null
@@ -770,7 +770,7 @@
             ],
             "variants": [],
             "badge": null,
-            "badgeColor": "#C5F1A9",
+            "badgeColor": "#004E38",
             "badgeTextColor": "#004E38",
             "rating": "4.7",
             "reviews": 56,

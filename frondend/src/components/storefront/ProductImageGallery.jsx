@@ -177,8 +177,8 @@ export default function ProductImageGallery({
               <span
                 className="product-badge"
                 style={{
-                  backgroundColor: badgeColor || primaryColor,
-                  color: badgeTextColor || '#ffffff'
+                  backgroundColor: (badgeColor && badgeColor !== '#C5F1A9') ? badgeColor : primaryColor,
+                  color: (badgeTextColor && badgeTextColor !== '#004E38') ? badgeTextColor : '#ffffff'
                 }}
               >
                 {badge}

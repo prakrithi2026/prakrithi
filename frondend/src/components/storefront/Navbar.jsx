@@ -238,12 +238,17 @@ export default function Navbar() {
                   {item.badge && (() => {
                     const badgeText = item.badge === '10% OFF' ? '10% OFF*' : item.badge;
                     const isTrending = badgeText.includes('⚡') || badgeText.toLowerCase().includes('trending') || item.id === 'new';
+                    const isSale = item.id === 'sale' || badgeText.includes('10% OFF');
+                    const defaultBg = (isTrending || isSale) ? '#004E38' : '#C5F1A9';
+                    const defaultTextColor = (isTrending || isSale) ? '#FFFFFF' : '#004E38';
+                    const badgeBg = isSale && item.badgeColor === '#C5F1A9' ? '#004E38' : (item.badgeColor || defaultBg);
+                    const badgeTextColor = isSale && item.badgeTextColor === '#004E38' ? '#FFFFFF' : (item.badgeTextColor || defaultTextColor);
                     return (
                       <span
                         className={`badge-label ${isTrending ? 'badge-label--trending' : ''}`}
                         style={{
-                          backgroundColor: item.badgeColor    || '#C5F1A9',
-                          color:           item.badgeTextColor || '#004E38',
+                          backgroundColor: badgeBg,
+                          color:           badgeTextColor,
                         }}
                       >
                         {badgeText.includes('⚡') ? (

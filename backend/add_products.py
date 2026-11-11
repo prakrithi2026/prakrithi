@@ -23,8 +23,8 @@ new_products = [
         "category": spices_cat,
         "tags": ["organic", "best-seller"],
         "badge": "Sale",
-        "badgeColor": "#C5F1A9",
-        "badgeTextColor": "#004E38",
+        "badgeColor": "#004E38",
+        "badgeTextColor": "#FFFFFF",
         "rating": Decimal("4.8"),
         "reviews": 45,
         "couponNote": "*Extra 10% off on checkout"

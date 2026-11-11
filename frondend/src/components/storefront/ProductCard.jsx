@@ -67,8 +67,8 @@ export default function ProductCard({ product }) {
         <span
           className="card-badge"
           style={{
-            backgroundColor: product.badgeColor || '#004E38',
-            color: product.badgeTextColor || '#fff',
+            backgroundColor: (product.badgeColor && product.badgeColor !== '#C5F1A9') ? product.badgeColor : '#004E38',
+            color: (product.badgeTextColor && product.badgeTextColor !== '#004E38') ? product.badgeTextColor : '#fff',
           }}
         >
           {product.badge}
