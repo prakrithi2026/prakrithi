@@ -194,8 +194,8 @@
 }
 
 .star-rating .star { font-size: 1.1rem; }
-.star.full { color: #ff9800; }
-.star.half { color: #ff9800; }
+.star.full { color: #004E38; }
+.star.half { color: #004E38; }
 .star.empty { color: #e5e7eb; }
 
 .product-rating-score {
@@ -651,7 +651,7 @@
 
 .cr-bar-fill {
   height: 100%;
-  background: #ff9800;
+  background: #004E38;
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 

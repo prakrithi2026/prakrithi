@@ -195,8 +195,9 @@
 
 .review-star-icon {
   display: block;
-  width: 13px;
-  height: 13px;
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
 }
 
 /* Bottom Customer Profile Section */

@@ -94,7 +94,7 @@
 }
 
 .wr-hero__stars {
-  color: #FF9900;
+  color: #004E38;
   font-size: 1.35rem;
   letter-spacing: 2px;
   margin: 6px 0;
@@ -200,7 +200,7 @@
 }
 
 .wr-star-btn.active {
-  color: #FF9900;
+  color: #004E38;
 }
 
 .wr-star-btn:hover {
@@ -544,7 +544,7 @@
 }
 
 .wr-review-card__stars {
-  color: #FF9900;
+  color: #004E38;
   font-size: 1.05rem;
   letter-spacing: 1px;
   flex-shrink: 0;

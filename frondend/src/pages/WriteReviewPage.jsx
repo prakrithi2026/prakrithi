@@ -6,6 +6,7 @@ import Navbar from '../components/storefront/Navbar';
 import Footer from '../components/storefront/Footer';
 import CartModal from '../components/storefront/CartModal';
 import AnnouncementBar from '../components/storefront/AnnouncementBar';
+import { OrangeStarFilled, OrangeStarOutline } from '../components/storefront/StarIcon';
 import { fetchReviews, createReview, deleteReviewById, isOwnReview, processReviewMedia } from '../utils/reviewsApi';
 import './WriteReviewPage.css';
 
@@ -280,12 +281,16 @@ export default function WriteReviewPage() {
                         <button
                           key={star}
                           type="button"
-                          className={`wr-star-btn ${star <= activeStarDisplay ? 'active' : ''}`}
+                          className="wr-star-btn"
                           onMouseEnter={() => setHoverRating(star)}
                           onClick={() => setForm((prev) => ({ ...prev, rating: star }))}
                           aria-label={`Rate ${star} out of 5 stars`}
                         >
-                          ★
+                          {star <= activeStarDisplay ? (
+                            <OrangeStarFilled size={24} />
+                          ) : (
+                            <OrangeStarOutline size={24} />
+                          )}
                         </button>
                       ))}
                     </div>
@@ -558,10 +563,13 @@ export default function WriteReviewPage() {
 
                         <div className="wr-review-card__top-right">
                           <div className="wr-review-card__stars" aria-label={`${rev.rating} out of 5 stars`}>
-                            {'★'.repeat(Math.max(1, Math.min(5, Number(rev.rating) || 5)))}
-                            <span className="wr-review-card__stars-empty">
-                              {'★'.repeat(5 - Math.max(1, Math.min(5, Number(rev.rating) || 5)))}
-                            </span>
+                            {Array.from({ length: 5 }).map((_, sIdx) =>
+                              sIdx < (Number(rev.rating) || 5) ? (
+                                <OrangeStarFilled key={sIdx} size={15} />
+                              ) : (
+                                <OrangeStarOutline key={sIdx} size={15} />
+                              )
+                            )}
                           </div>
 
                           {canDeleteOwn && (

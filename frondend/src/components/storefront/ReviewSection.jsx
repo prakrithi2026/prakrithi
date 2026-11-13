@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useSiteConfig } from '../../context/SiteConfigContext';
+import { OrangeStarFilled, OrangeStarOutline } from './StarIcon';
 import './ReviewSection.css';
 
 // SVG Double Quote Icon (exact user-provided SVG)
@@ -43,23 +44,18 @@ function VerifiedBadge({ color = 'currentColor' }) {
   );
 }
 
-// 5-Star Rating
-function StarRating({ count = 5, color = 'currentColor' }) {
+// 5-Star Rating (matching Brand Green #004E38 on light cards / white on dark cards)
+function StarRating({ count = 5, size = 15, color = '#004E38' }) {
+  const ratingNum = Math.max(0, Math.min(5, Math.round(Number(count) || 5)));
   return (
     <div className="review-card-stars" aria-label={`${count} out of 5 stars`}>
-      {[...Array(count)].map((_, i) => (
-        <svg
-          key={i}
-          className="review-star-icon"
-          width="13"
-          height="13"
-          viewBox="0 0 24 24"
-          fill={color}
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-        </svg>
-      ))}
+      {Array.from({ length: 5 }).map((_, i) =>
+        i < ratingNum ? (
+          <OrangeStarFilled key={i} size={size} color={color} className="review-star-icon" />
+        ) : (
+          <OrangeStarOutline key={i} size={size} color={color} className="review-star-icon" />
+        )
+      )}
     </div>
   );
 }
@@ -74,7 +70,7 @@ const AVATAR_SEETHA_2 = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2
 const AVATAR_SANTHOSH = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80"><defs><linearGradient id="bg4" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="%23556c82"/><stop offset="100%" stop-color="%232c3f52"/></linearGradient></defs><circle cx="40" cy="40" r="40" fill="url(%23bg4)"/><circle cx="40" cy="37" r="16" fill="%23cf8f60"/><path d="M26 30c0-10 6-13 14-13s14 3 14 13c0 2-2 3-4 3s-3-2-5-2-3 1-5 1-3-1-5-1-4 0-4 1z" fill="%231e1e1e"/><rect x="30" y="32" width="8" height="7" rx="2" fill="none" stroke="%231e1e1e" stroke-width="1.8"/><rect x="42" y="32" width="8" height="7" rx="2" fill="none" stroke="%231e1e1e" stroke-width="1.8"/><line x1="38" y1="35" x2="42" y2="35" stroke="%231e1e1e" stroke-width="1.8"/><circle cx="34" cy="35" r="1.5" fill="%231e1e1e"/><circle cx="46" cy="35" r="1.5" fill="%231e1e1e"/><path d="M37 42c1.5 1.5 4.5 1.5 6 0" stroke="%231e1e1e" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M18 74c3-16 12-21 22-21s19 5 22 21" fill="%2324426b"/></svg>`;
 
 // Customer Avatar with reliable fallback
-function CustomerAvatar({ src, name, isDark, darkColor = '#004E38', lightColor = '#C6E095' }) {
+function CustomerAvatar({ src, name, isDark }) {
   const [hasError, setHasError] = useState(false);
 
   if (src && !hasError) {
@@ -383,7 +379,7 @@ export default function ReviewSection() {
                     </p>
 
                     {/* Star Rating */}
-                    <StarRating count={reviewRating} color={iconColor} />
+                    <StarRating count={reviewRating} size={15} color={iconColor} />
                   </div>
 
                   {/* Customer Information Bottom Row */}
@@ -392,8 +388,6 @@ export default function ReviewSection() {
                       src={reviewAvatar}
                       name={reviewName}
                       isDark={isDark}
-                      darkColor={darkColor}
-                      lightColor={lightColor}
                     />
                     <div className="review-customer-info">
                       <div className="review-customer-name-row">

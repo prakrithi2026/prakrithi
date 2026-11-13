@@ -9,6 +9,7 @@ import Footer from '../components/storefront/Footer';
 import CartModal from '../components/storefront/CartModal';
 import AnnouncementBar from '../components/storefront/AnnouncementBar';
 import ProductLikeIcon from '../components/storefront/ProductLikeIcon';
+import { OrangeStarFilled } from '../components/storefront/StarIcon';
 import API_BASE_URL from '../utils/api';
 import './ProfilePage.css';
 
@@ -87,7 +88,7 @@ function WishlistTab({ primaryColor }) {
               {/* Rating */}
               {product.rating && (
                 <div className="wish-card__rating">
-                  <span className="wish-card__stars">{'★'.repeat(Math.round(product.rating))}</span>
+                  <OrangeStarFilled size={13} />
                   <span className="wish-card__rating-val">{product.rating}</span>
                   {product.reviews && <span className="wish-card__reviews">({product.reviews})</span>}
                 </div>

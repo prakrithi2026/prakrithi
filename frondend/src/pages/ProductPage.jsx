@@ -11,6 +11,7 @@ import AnnouncementBar from '../components/storefront/AnnouncementBar';
 import ProductCard from '../components/storefront/ProductCard';
 import ProductImageGallery from '../components/storefront/ProductImageGallery';
 import ProductLikeIcon from '../components/storefront/ProductLikeIcon';
+import { OrangeStarFilled, OrangeStarOutline, OrangeStarHalf } from '../components/storefront/StarIcon';
 import { fetchReviews, createReview, deleteReviewById, isOwnReview, processReviewMedia } from '../utils/reviewsApi';
 import './ProductPage.css';
 
@@ -21,77 +22,6 @@ const RATING_LABELS = {
   4: 'Very Good',
   5: 'Excellent',
 };
-
-// Orange Filled Star SVG (#ff9800 matches reference images)
-const OrangeStarFilled = ({ size = 16, className = '' }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="#ff9800"
-    stroke="#ff9800"
-    strokeWidth="1"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={`review-orange-star filled ${className}`}
-    aria-hidden="true"
-  >
-    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-  </svg>
-);
-
-// Orange Outlined Star SVG (matches reference image unfilled rows)
-const OrangeStarOutline = ({ size = 16, className = '' }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="#ff9800"
-    strokeWidth="1.8"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={`review-orange-star outline ${className}`}
-    aria-hidden="true"
-  >
-    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-  </svg>
-);
-
-// Orange Half / Partial Star (clean outline base with 50% filled overlay)
-const OrangeStarHalf = ({ size = 16, className = '', percent = 50 }) => (
-  <span
-    className={`review-orange-star half ${className}`}
-    style={{
-      position: 'relative',
-      display: 'inline-flex',
-      alignItems: 'center',
-      justifyContent: 'flex-start',
-      width: `${size}px`,
-      height: `${size}px`,
-      lineHeight: 1,
-      flexShrink: 0,
-    }}
-    aria-hidden="true"
-  >
-    <OrangeStarOutline size={size} />
-    <span
-      className="star-half-clip"
-      style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: `${percent}%`,
-        height: '100%',
-        overflow: 'hidden',
-        display: 'inline-flex',
-        alignItems: 'center',
-      }}
-    >
-      <OrangeStarFilled size={size} />
-    </span>
-  </span>
-);
 
 // Trust Badge SVGs
 const NaturalTrustIcon = ({ size = 20, className = '' }) => (

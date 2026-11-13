@@ -1,18 +1,16 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useSiteConfig } from '../../context/SiteConfigContext';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
 import { useAuth } from '../../context/AuthContext';
 import ProductLikeIcon from './ProductLikeIcon';
+import { OrangeStarFilled } from './StarIcon';
 import './ProductCard.css';
 
 export default function ProductCard({ product }) {
-  const { config } = useSiteConfig();
   const { addToCart } = useCart();
   const { toggleWishlist, isWishlisted } = useWishlist();
   const { isLoggedIn } = useAuth();
-  const { theme } = config;
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -49,7 +47,7 @@ export default function ProductCard({ product }) {
     setActiveImgIndex(0); // Return to primary cover image
   };
 
-  const requireAuth = (action) => {
+  const requireAuth = () => {
     if (!isLoggedIn) {
       const redirect = encodeURIComponent(location.pathname + location.search);
       navigate(`/login?redirect=${redirect}`);
@@ -121,9 +119,7 @@ export default function ProductCard({ product }) {
           {/* Rating */}
           <div className="rating">
             <span className="rating-star">
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="#004E38">
-                <path d="M6 0l1.76 3.56L12 4.12 8.88 7.08l.74 4.32L6 9.28 2.38 11.4l.74-4.32L0 4.12l4.24-.56z"/>
-              </svg>
+              <OrangeStarFilled size={14} />
             </span>
             <span className="rating-score">{product.rating}</span>
             <span className="rating-count">({product.reviews})</span>

@@ -8,6 +8,7 @@ import Footer from '../components/storefront/Footer';
 import CartModal from '../components/storefront/CartModal';
 import AnnouncementBar from '../components/storefront/AnnouncementBar';
 import ProductLikeIcon from '../components/storefront/ProductLikeIcon';
+import { OrangeStarFilled } from '../components/storefront/StarIcon';
 import './ShopPage.css';
 
 const SORT_OPTIONS = [
@@ -237,7 +238,7 @@ export default function ShopPage() {
                       <Link to={`/product/${product.id}`} className="shop-card__name">{product.name}</Link>
                       <p className="shop-card__desc">{product.description}</p>
                       <div className="shop-card__rating">
-                        <span>{'★'.repeat(Math.round(product.rating || 5))}</span>
+                        <OrangeStarFilled size={13} />
                         <span className="shop-card__rating-score">{product.rating}</span>
                         <span className="shop-card__reviews">({product.reviews})</span>
                       </div>
