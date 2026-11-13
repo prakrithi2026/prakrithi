@@ -195,8 +195,8 @@
     flex-direction: column;
     min-height: auto;
     height: auto;
-    padding: 24px 16px;
-    gap: 20px;
+    padding: 22px 16px;
+    gap: 16px;
     text-align: center;
     background: #004E38;
   }
@@ -217,25 +217,25 @@
   .delivery-steps {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 18px 12px;
+    gap: 16px 10px;
     justify-items: center;
     align-items: center;
     justify-content: center;
     width: 100%;
-    max-width: 360px;
+    max-width: 320px;
     margin: 0 auto;
   }
 
   .step-icon {
-    width: clamp(60px, 18vw, 76px);
-    height: clamp(60px, 18vw, 76px);
+    width: clamp(52px, 14vw, 62px);
+    height: clamp(52px, 14vw, 62px);
   }
 
   .step-icon-img {
     width: 100%;
     height: 100%;
-    max-width: 76px;
-    max-height: 76px;
+    max-width: 62px;
+    max-height: 62px;
     object-fit: contain;
   }
 
@@ -254,12 +254,17 @@
 
 @media (max-width: 480px) {
   .delivery-steps {
-    gap: 16px 8px;
-    max-width: 320px;
+    gap: 14px 8px;
+    max-width: 290px;
   }
 
   .step-icon {
-    width: clamp(56px, 17vw, 68px);
-    height: clamp(56px, 17vw, 68px);
+    width: clamp(48px, 13.5vw, 56px);
+    height: clamp(48px, 13.5vw, 56px);
+  }
+
+  .step-icon-img {
+    max-width: 56px;
+    max-height: 56px;
   }
 }
