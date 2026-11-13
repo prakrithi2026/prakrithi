@@ -215,29 +215,51 @@
   }
 
   .delivery-steps {
-    flex-wrap: wrap;
-    gap: 14px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px 12px;
+    justify-items: center;
+    align-items: center;
     justify-content: center;
-    margin-left: 0;
+    width: 100%;
+    max-width: 360px;
+    margin: 0 auto;
   }
 
   .step-icon {
-    width: 68px;
-    height: 68px;
+    width: clamp(60px, 18vw, 76px);
+    height: clamp(60px, 18vw, 76px);
   }
 
   .step-icon-img {
-    width: 68px;
-    height: 68px;
-    max-width: 68px;
-    max-height: 68px;
+    width: 100%;
+    height: 100%;
+    max-width: 76px;
+    max-height: 76px;
+    object-fit: contain;
   }
 
   .delivery-step {
-    min-width: 68px;
+    width: 100%;
+    min-width: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .step-arrow {
     display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .delivery-steps {
+    gap: 16px 8px;
+    max-width: 320px;
+  }
+
+  .step-icon {
+    width: clamp(56px, 17vw, 68px);
+    height: clamp(56px, 17vw, 68px);
   }
 }
