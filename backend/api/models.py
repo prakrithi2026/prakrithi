@@ -1,5 +1,5 @@
 from django.db import models
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import User
 from django.utils import timezone
 
@@ -97,6 +97,8 @@ class Order(models.Model):
     payment_method = models.CharField(max_length=50, default='cod')
     
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    offer_code = models.CharField(max_length=50, blank=True, null=True)
+    discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -149,3 +151,64 @@ class Review(models.Model):
 
     def __str__(self):
         return f"Review by {self.customer_name} ({self.rating}★)"
+
+
+class OfferCode(models.Model):
+    code = models.CharField(max_length=50, unique=True)
+    title = models.CharField(max_length=255, blank=True, default='')
+    description = models.TextField(blank=True, default='')
+    discount_percentage = models.PositiveIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(100)],
+        help_text="Percentage discount to apply (1-100)"
+    )
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='offer_codes',
+        help_text="Optional: restrict offer to this specific product. If empty, applies store-wide."
+    )
+    products = models.ManyToManyField(
+        Product,
+        blank=True,
+        related_name='offer_codes_set',
+        help_text="Optional: restrict offer to multiple specific products. If empty, applies store-wide."
+    )
+    min_order_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.code} ({self.discount_percentage}%)"
+
+    def get_target_product_ids(self):
+        ids = list(self.products.values_list('id', flat=True))
+        if not ids and self.product_id:
+            ids = [self.product_id]
+        return ids
+
+    def is_used_by(self, email):
+        if not email:
+            return False
+        return self.usages.filter(user_email__iexact=email.strip()).exists()
+
+
+class OfferUsage(models.Model):
+    offer = models.ForeignKey(OfferCode, on_delete=models.CASCADE, related_name='usages')
+    user_email = models.EmailField()
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='offer_usages')
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True, blank=True, related_name='offer_usages')
+    discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    used_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-used_at']
+        unique_together = ('offer', 'user_email')
+
+    def __str__(self):
+        return f"{self.user_email} used {self.offer.code} (-₹{self.discount_amount})"

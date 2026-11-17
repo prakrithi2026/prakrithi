@@ -210,7 +210,7 @@ export default function ProductImageGallery({
           }}
         >
           {rawList.map((imgSrc, i) => (
-            <div key={`${i}-${imgSrc.substring(0, 30)}`} className="product-gallery__slide">
+            <div key={`slide-${i}-${typeof imgSrc === 'string' ? imgSrc.substring(0, 30) : i}`} className="product-gallery__slide">
               <img
                 src={imgSrc}
                 alt={`${product?.name || 'Product'} - image ${i + 1}`}

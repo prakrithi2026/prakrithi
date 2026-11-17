@@ -233,6 +233,13 @@ function OrdersTab({ primaryColor }) {
                         </div>
                       )}
 
+                      {order.offer_code && (
+                        <div className="order-card__total" style={{ color: '#16a34a', fontWeight: '600', fontSize: '0.88rem', borderTop: 'none', paddingTop: 0, marginTop: '4px' }}>
+                          <span>🏷️ Offer Applied ({order.offer_code})</span>
+                          <span>-₹{parseFloat(order.discount_amount || 0).toLocaleString('en-IN')}</span>
+                        </div>
+                      )}
+
                       <div className="order-card__total">
                         <span>Total Paid</span>
                         <span>₹{parseFloat(order.total_amount).toLocaleString('en-IN')}</span>

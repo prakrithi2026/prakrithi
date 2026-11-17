@@ -14,8 +14,11 @@ from django.core.mail import send_mail
 from datetime import timedelta
 import traceback
 import razorpay
-from .models import SiteConfig, Category, Product, Order, PasswordResetCode, Review
-from .serializers import SiteConfigSerializer, CategorySerializer, ProductSerializer, OrderSerializer, ReviewSerializer
+from .models import SiteConfig, Category, Product, Order, PasswordResetCode, Review, OfferCode, OfferUsage
+from .serializers import (
+    SiteConfigSerializer, CategorySerializer, ProductSerializer,
+    OrderSerializer, ReviewSerializer, OfferCodeSerializer, OfferUsageSerializer
+)
 
 
 
@@ -844,10 +847,44 @@ class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
 
     def create(self, request, *args, **kwargs):
+        offer_code_str = request.data.get('offer_code')
+        customer_email = request.data.get('customer_email', '').strip()
+        offer_obj = None
+
+        if offer_code_str:
+            offer_obj = OfferCode.objects.filter(code__iexact=str(offer_code_str).strip(), is_active=True).first()
+            if not offer_obj:
+                return Response(
+                    {'detail': f'Offer code "{offer_code_str}" is invalid or inactive.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            if customer_email:
+                if OfferUsage.objects.filter(offer=offer_obj, user_email__iexact=customer_email).exists():
+                    return Response(
+                        {'detail': f'You have already used offer code "{offer_obj.code}". Each offer code can only be used once per user.'},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+
         # 1. Save your internal Order first
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         order = serializer.save()
+
+        # If offer code was applied, record the usage
+        if offer_obj and customer_email:
+            try:
+                user_obj = User.objects.filter(email__iexact=customer_email).first()
+                OfferUsage.objects.get_or_create(
+                    offer=offer_obj,
+                    user_email=customer_email,
+                    defaults={
+                        'user': user_obj,
+                        'order': order,
+                        'discount_amount': order.discount_amount or 0
+                    }
+                )
+            except Exception as e:
+                print(f"Error creating OfferUsage: {e}")
 
         # Check if Razorpay is needed
         payment_method = request.data.get('payment_method', 'cod')
@@ -984,4 +1021,155 @@ class ReviewViewSet(viewsets.ModelViewSet):
         review.save(update_fields=['admin_reply', 'replied_at'])
         serializer = self.get_serializer(review)
         return Response(serializer.data)
+
+
+class OfferCodeViewSet(viewsets.ModelViewSet):
+    queryset = OfferCode.objects.all().order_by('-created_at')
+    serializer_class = OfferCodeSerializer
+
+    def get_queryset(self):
+        qs = OfferCode.objects.all().order_by('-created_at')
+        active_only = self.request.query_params.get('active')
+        if active_only and active_only.lower() in ['true', '1', 'yes']:
+            qs = qs.filter(is_active=True)
+        return qs
+
+    @action(detail=False, methods=['get'])
+    def active(self, request):
+        """
+        GET /api/offers/active/?email=user@example.com
+        Returns active offer cards for the storefront.
+        If email is provided, adds 'already_used: true/false' for each code.
+        """
+        email = request.query_params.get('email', '').strip()
+        offers = OfferCode.objects.filter(is_active=True).order_by('-created_at')
+        serializer = self.get_serializer(offers, many=True)
+        data = serializer.data
+
+        if email:
+            used_offer_ids = set(
+                OfferUsage.objects.filter(
+                    user_email__iexact=email
+                ).values_list('offer_id', flat=True)
+            )
+            for item in data:
+                item['already_used'] = item['id'] in used_offer_ids
+        else:
+            for item in data:
+                item['already_used'] = False
+
+        return Response(data)
+
+    @action(detail=False, methods=['post'])
+    def validate(self, request):
+        """
+        POST /api/offers/validate/
+        Body: {
+            "code": "SAVE20",
+            "email": "user@example.com",
+            "items": [{"product": 1, "price": 500, "quantity": 1}],
+            "subtotal": 500.00
+        }
+        """
+        code = request.data.get('code', '').strip().upper()
+        email = request.data.get('email', '').strip()
+        items = request.data.get('items', [])
+        subtotal = float(request.data.get('subtotal', 0) or 0)
+
+        if not code:
+            return Response(
+                {'valid': False, 'message': 'Please enter an offer code.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        offer = OfferCode.objects.filter(code__iexact=code).first()
+        if not offer:
+            return Response(
+                {'valid': False, 'message': f'Offer code "{code}" does not exist.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if not offer.is_active:
+            return Response(
+                {'valid': False, 'message': f'Offer code "{offer.code}" is no longer active.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Single-use check per user email
+        if email:
+            already_used = OfferUsage.objects.filter(
+                offer=offer,
+                user_email__iexact=email
+            ).exists()
+            if already_used:
+                return Response(
+                    {
+                        'valid': False,
+                        'message': f'You have already used offer code "{offer.code}". Each offer code can only be used once per user.'
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+        # Check minimum order amount
+        if offer.min_order_amount and subtotal < float(offer.min_order_amount):
+            return Response(
+                {
+                    'valid': False,
+                    'message': f'Offer code "{offer.code}" requires a minimum order of ₹{float(offer.min_order_amount):.2f}.'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Check product restriction & calculate discount
+        pct = float(offer.discount_percentage)
+        discount_amount = 0.0
+        target_product_ids = offer.get_target_product_ids()
+
+        if target_product_ids:
+            # Code applies to specific products
+            target_id_strs = [str(pid) for pid in target_product_ids]
+            matching_items = [
+                i for i in items
+                if str(i.get('product') or i.get('id') or '') in target_id_strs
+            ]
+            if not matching_items:
+                product_names_list = list(offer.products.values_list('name', flat=True))
+                if not product_names_list and offer.product:
+                    product_names_list = [offer.product.name]
+                product_names_str = ", ".join(product_names_list) if product_names_list else "selected products"
+                return Response(
+                    {
+                        'valid': False,
+                        'message': f'Offer code "{offer.code}" is only applicable to: {product_names_str}.'
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            eligible_total = sum(
+                float(i.get('price', 0)) * int(i.get('quantity', 1))
+                for i in matching_items
+            )
+            discount_amount = round(eligible_total * (pct / 100.0), 2)
+        else:
+            # Store-wide discount on all products
+            discount_amount = round(subtotal * (pct / 100.0), 2)
+
+        product_names_list = list(offer.products.values_list('name', flat=True))
+        if not product_names_list and offer.product:
+            product_names_list = [offer.product.name]
+        product_name_display = ", ".join(product_names_list) if product_names_list else 'All Products'
+
+        return Response({
+            'valid': True,
+            'code': offer.code,
+            'title': offer.title,
+            'description': offer.description,
+            'discount_percentage': offer.discount_percentage,
+            'discount_amount': discount_amount,
+            'product_id': offer.product.id if offer.product else (target_product_ids[0] if len(target_product_ids) == 1 else None),
+            'product_ids': target_product_ids,
+            'product_name': product_name_display,
+            'message': f'🎉 Code {offer.code} applied! {offer.discount_percentage}% discount (Save ₹{discount_amount:.2f})'
+        })
+
 

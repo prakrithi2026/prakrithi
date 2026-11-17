@@ -12,7 +12,9 @@ import ProductCard from '../components/storefront/ProductCard';
 import ProductImageGallery from '../components/storefront/ProductImageGallery';
 import ProductLikeIcon from '../components/storefront/ProductLikeIcon';
 import { OrangeStarFilled, OrangeStarOutline, OrangeStarHalf } from '../components/storefront/StarIcon';
+import LoadingScreen from '../components/storefront/LoadingScreen';
 import { fetchReviews, createReview, deleteReviewById, isOwnReview, processReviewMedia } from '../utils/reviewsApi';
+import API_BASE_URL from '../utils/api';
 import './ProductPage.css';
 
 const RATING_LABELS = {
@@ -367,9 +369,16 @@ const StarRating = ({ rating = 0, max = 5, size = 16 }) => {
 
 export default function ProductPage() {
   const { id } = useParams();
-  const { config } = useSiteConfig();
+  const { config, isLoading } = useSiteConfig();
   const products = Array.isArray(config.products) ? config.products : [];
   const theme = config.theme || {};
+
+  const product = products.find(p => String(p.id) === String(id));
+  const productId = product?.id;
+  const related = products
+    .filter(p => p.category === product?.category && p.id !== product?.id)
+    .slice(0, 4);
+
   const { addToCart } = useCart();
   const { toggleWishlist, isWishlisted } = useWishlist();
   const { user, isLoggedIn } = useAuth();
@@ -403,6 +412,43 @@ export default function ProductPage() {
   const [sortOrder, setSortOrder] = useState('recent');
   const [selectedStarFilter, setSelectedStarFilter] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [productOffers, setProductOffers] = useState([]);
+  const [copiedOfferCode, setCopiedOfferCode] = useState(null);
+
+  useEffect(() => {
+    if (!productId) return;
+
+    const customerEmail = user?.email || (() => {
+      try { return localStorage.getItem('prakrithi_last_email') || ''; } catch { return ''; }
+    })();
+
+    const localUsedCodes = (() => {
+      try {
+        const raw = localStorage.getItem('prakrithi_used_codes');
+        return raw ? JSON.parse(raw).map(c => String(c).toUpperCase()) : [];
+      } catch { return []; }
+    })();
+
+    const emailParam = customerEmail ? `?email=${encodeURIComponent(customerEmail.trim())}` : '';
+    fetch(`${API_BASE_URL}/offers/active/${emailParam}`)
+      .then(r => r.ok ? r.json() : [])
+      .then(offers => {
+        if (!Array.isArray(offers)) return;
+        const matching = offers.filter(o => {
+          // If the user already used this code in any product, do not show it!
+          if (o.already_used) return false;
+          if (o.code && localUsedCodes.includes(o.code.toUpperCase())) return false;
+
+          const targetIds = (o.product_ids && o.product_ids.length > 0)
+            ? o.product_ids.map(String)
+            : (o.product ? [String(o.product)] : []);
+          if (targetIds.length === 0) return true; // store-wide applies to all
+          return targetIds.includes(String(productId));
+        });
+        setProductOffers(matching);
+      })
+      .catch(() => {});
+  }, [productId, user?.email]);
 
   useEffect(() => {
     if (user) {
@@ -425,11 +471,6 @@ export default function ProductPage() {
       }
     }
   };
-
-  const product = products.find(p => String(p.id) === String(id));
-  const related = products
-    .filter(p => p.category === product?.category && p.id !== product?.id)
-    .slice(0, 4);
 
   const loadProductReviews = useCallback(async () => {
     if (!id) return;
@@ -558,6 +599,16 @@ export default function ProductPage() {
   }, [location.hash]);
 
   if (!product) {
+    if (isLoading) {
+      return (
+        <div className="product-page storefront">
+          <AnnouncementBar />
+          <Navbar />
+          <LoadingScreen />
+          <Footer />
+        </div>
+      );
+    }
     return (
       <div className="product-page storefront">
         <AnnouncementBar />
@@ -753,6 +804,44 @@ export default function ProductPage() {
             {/* Coupon note */}
             {product.couponNote && (
               <div className="product-coupon">{product.couponNote}</div>
+            )}
+
+            {/* Active Offer Cards for this product */}
+            {productOffers.length > 0 && (
+              <div className="product-offers-container" style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {productOffers.map((o) => (
+                  <div key={o.id} className="product-coupon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}>
+                    <div>
+                      <span style={{ fontWeight: 700 }}>🏷️ {o.discount_percentage}% OFF</span>
+                      {o.title ? ` - ${o.title}` : ` on ${o.product ? 'this product' : 'your order'}`}
+                      <div style={{ fontSize: '0.78rem', color: '#15803d', fontWeight: 500, marginTop: '2px' }}>
+                        Use code <strong style={{ letterSpacing: '0.5px' }}>{o.code}</strong> at checkout (1-time use)
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(o.code);
+                        setCopiedOfferCode(o.code);
+                        setTimeout(() => setCopiedOfferCode(null), 2000);
+                      }}
+                      style={{
+                        backgroundColor: '#004E38',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        padding: '6px 12px',
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      {copiedOfferCode === o.code ? '✓ Copied' : 'Copy Code'}
+                    </button>
+                  </div>
+                ))}
+              </div>
             )}
 
             {/* Trust badges */}

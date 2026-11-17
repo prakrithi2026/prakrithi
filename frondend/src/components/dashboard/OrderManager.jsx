@@ -96,6 +96,7 @@ function printOrderPDF(order, products) {
       <!-- Total -->
       <div style="display:flex;justify-content:flex-end">
         <div style="background:#004E38;color:#fff;border-radius:10px;padding:14px 24px;min-width:200px;text-align:right">
+          ${order.offer_code ? `<div style="font-size:12px;opacity:0.9;margin-bottom:4px">Offer Applied: <strong>${order.offer_code}</strong> (-₹${parseFloat(order.discount_amount || 0).toFixed(2)})</div>` : ''}
           <div style="font-size:11px;opacity:0.8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Total Amount</div>
           <div style="font-size:24px;font-weight:800">₹${parseFloat(order.total_amount).toFixed(2)}</div>
         </div>
@@ -408,6 +409,11 @@ export default function OrderManager() {
                     <div>
                       <div className="om-card__section-label">Total</div>
                       <div className="om-card__total-amount">₹{parseFloat(order.total_amount).toFixed(2)}</div>
+                      {order.offer_code && (
+                        <div style={{ fontSize: '0.78rem', color: '#16a34a', fontWeight: '600', marginTop: '2px' }}>
+                          🏷️ {order.offer_code} (-₹{parseFloat(order.discount_amount || 0).toFixed(2)})
+                        </div>
+                      )}
                       <div className="om-card__payment-method">
                         {{
                           cod: '💵 Cash on Delivery',

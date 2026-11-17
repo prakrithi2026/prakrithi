@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import SiteConfig, Category, Product, Order, OrderItem, Review
+from .models import SiteConfig, Category, Product, Order, OrderItem, Review, OfferCode, OfferUsage
 
 
 class OrderItemInline(admin.TabularInline):
@@ -45,6 +45,22 @@ class ReviewAdmin(admin.ModelAdmin):
     list_filter = ('rating', 'created_at')
     search_fields = ('customer_name', 'customer_email', 'comment', 'admin_reply')
     readonly_fields = ('created_at', 'replied_at')
+
+
+@admin.register(OfferCode)
+class OfferCodeAdmin(admin.ModelAdmin):
+    list_display = ('code', 'discount_percentage', 'product', 'min_order_amount', 'is_active', 'created_at')
+    list_filter = ('is_active', 'created_at')
+    search_fields = ('code', 'title', 'description')
+    readonly_fields = ('created_at', 'updated_at')
+
+
+@admin.register(OfferUsage)
+class OfferUsageAdmin(admin.ModelAdmin):
+    list_display = ('offer', 'user_email', 'order', 'discount_amount', 'used_at')
+    list_filter = ('used_at',)
+    search_fields = ('user_email', 'offer__code')
+    readonly_fields = ('used_at',)
 
 
 admin.site.site_header = 'Prakrithi Naturals Admin'

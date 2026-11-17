@@ -4,12 +4,13 @@ import {
   FiDroplet, FiNavigation, FiImage, FiBox, FiLayout, FiFileText,
   FiArrowLeft, FiRefreshCw, FiExternalLink, FiMonitor, FiSmartphone,
   FiTablet, FiChevronLeft, FiChevronRight, FiChevronDown, FiEye, FiSave, FiCheck, FiShoppingCart,
-  FiLogOut, FiColumns, FiMaximize2, FiStar
+  FiLogOut, FiColumns, FiMaximize2, FiStar, FiTag
 } from 'react-icons/fi';
 import { useSiteConfig } from '../../context/SiteConfigContext';
 import NavbarEditor from './NavbarEditor';
 import HeroEditor from './HeroEditor';
 import ProductManager from './ProductManager';
+import OfferManager from './OfferManager';
 import SectionManager from './SectionManager';
 import FooterEditor from './FooterEditor';
 import OrderManager from './OrderManager';
@@ -31,6 +32,7 @@ const menuGroups = [
     title: 'Store',
     items: [
       { id: 'products', icon: FiBox, label: 'Products', desc: 'Product catalog' },
+      { id: 'offers', icon: FiTag, label: 'Offer Codes', desc: 'Discounts & promo codes' },
       { id: 'orders', icon: FiShoppingCart, label: 'Manage Orders', desc: 'View & manage' },
       { id: 'reviews', icon: FiStar, label: 'Customer Reviews', desc: 'See, reply & delete' },
     ]
@@ -41,6 +43,7 @@ const editorComponents = {
   navbar: NavbarEditor,
   hero: HeroEditor,
   products: ProductManager,
+  offers: OfferManager,
   orders: OrderManager,
   reviews: ReviewManager,
   sections: SectionManager,
