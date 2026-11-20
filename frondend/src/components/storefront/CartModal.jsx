@@ -75,6 +75,11 @@ export default function CartModal() {
                 )}
                 <div className="cart-item-details">
                   <h4 className="cart-item-title">{item.name}</h4>
+                  {item.selectedVariant && (
+                    <div className="cart-item-variant" style={{ fontSize: '0.8rem', color: '#666', marginBottom: '2px' }}>
+                      Size / Variant: {item.selectedVariant}
+                    </div>
+                  )}
                   {item.ordered && (
                     <div style={{ color: theme.primaryColor, fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '4px' }}>
                       ✓ You ordered this product

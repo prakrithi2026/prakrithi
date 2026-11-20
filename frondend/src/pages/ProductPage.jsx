@@ -379,7 +379,7 @@ export default function ProductPage() {
     .filter(p => p.category === product?.category && p.id !== product?.id)
     .slice(0, 4);
 
-  const { addToCart } = useCart();
+  const { addToCart, buyNow } = useCart();
   const { toggleWishlist, isWishlisted } = useWishlist();
   const { user, isLoggedIn } = useAuth();
   const navigate = useNavigate();
@@ -636,9 +636,20 @@ export default function ProductPage() {
       navigate(`/login?redirect=${redirect}`);
       return;
     }
-    for (let i = 0; i < quantity; i++) addToCart(product);
+    const productToAdd = selectedVariant ? { ...product, selectedVariant } : product;
+    addToCart(productToAdd, quantity);
     setAddedFlash(true);
     setTimeout(() => setAddedFlash(false), 2000);
+  };
+
+  const handleBuyNow = () => {
+    const productToAdd = selectedVariant ? { ...product, selectedVariant } : product;
+    buyNow(productToAdd, quantity, selectedVariant);
+    if (!isLoggedIn) {
+      navigate('/login?redirect=%2Fpayment');
+      return;
+    }
+    navigate('/payment');
   };
 
   const handleWishlist = () => {
@@ -785,20 +796,46 @@ export default function ProductPage() {
               </div>
             )}
 
-            {/* Quantity + Add to Cart */}
-            <div className="product-actions">
-              <div className="product-qty">
-                <button onClick={() => setQuantity(q => Math.max(1, q - 1))}>−</button>
-                <span>{quantity}</span>
-                <button onClick={() => setQuantity(q => q + 1)}>+</button>
+            {/* Quantity + Actions (Add to Cart & Buy Now) */}
+            <div className="product-actions-container">
+              <div className="product-qty-row">
+                <span className="product-qty-label">Quantity:</span>
+                <div className="product-qty">
+                  <button
+                    type="button"
+                    onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                    aria-label="Decrease quantity"
+                  >
+                    −
+                  </button>
+                  <span>{quantity}</span>
+                  <button
+                    type="button"
+                    onClick={() => setQuantity(q => q + 1)}
+                    aria-label="Increase quantity"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
-              <button
-                className="product-add-btn"
-                style={addedFlash ? { opacity: 0.92 } : {}}
-                onClick={handleAddToCart}
-              >
-                {addedFlash ? '✓ Added to Cart!' : `Add ${quantity > 1 ? `${quantity} × ` : ''}to Cart`}
-              </button>
+
+              <div className="product-action-buttons">
+                <button
+                  type="button"
+                  className="product-add-btn"
+                  style={addedFlash ? { opacity: 0.92 } : {}}
+                  onClick={handleAddToCart}
+                >
+                  {addedFlash ? '✓ Added to Cart!' : 'Add to Cart'}
+                </button>
+                <button
+                  type="button"
+                  className="product-buy-now-btn"
+                  onClick={handleBuyNow}
+                >
+                  Buy Now
+                </button>
+              </div>
             </div>
 
             {/* Coupon note */}

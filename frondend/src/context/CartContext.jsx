@@ -27,19 +27,43 @@ export function CartProvider({ children }) {
     }
   }, [cart]);
 
-  const addToCart = (product, qty = 1) => {
+  const addToCart = (product, qty = 1, openDrawer = true) => {
     setCart(prev => {
       const existing = prev.find(item => sameId(item.id, product.id));
       if (existing) {
         return prev.map(item =>
           sameId(item.id, product.id)
-            ? { ...item, quantity: item.quantity + qty }
+            ? { ...item, quantity: item.quantity + qty, selected: true, ...(product.selectedVariant ? { selectedVariant: product.selectedVariant } : {}) }
             : item
         );
       }
       return [...prev, { ...product, quantity: qty, selected: true }];
     });
-    setIsCartOpen(true);
+    if (openDrawer) {
+      setIsCartOpen(true);
+    }
+  };
+
+  const buyNow = (product, qty = 1, variant = null) => {
+    const itemToAdd = {
+      ...product,
+      ...(variant ? { selectedVariant: variant } : {})
+    };
+    setCart(prev => {
+      const existing = prev.find(item => sameId(item.id, itemToAdd.id));
+      if (existing) {
+        return prev.map(item =>
+          sameId(item.id, itemToAdd.id)
+            ? { ...item, quantity: item.quantity + qty, selected: true, ...(variant ? { selectedVariant: variant } : {}) }
+            : { ...item, selected: false }
+        );
+      }
+      return [
+        ...prev.map(item => ({ ...item, selected: false })),
+        { ...itemToAdd, quantity: qty, selected: true }
+      ];
+    });
+    setIsCartOpen(false);
   };
 
   const removeFromCart = (productId) => {
@@ -98,6 +122,7 @@ export function CartProvider({ children }) {
     <CartContext.Provider value={{
       cart,
       addToCart,
+      buyNow,
       removeFromCart,
       removeSelectedFromCart,
       updateQuantity,
