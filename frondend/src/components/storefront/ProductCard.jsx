@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
 import { useAuth } from '../../context/AuthContext';
 import ProductLikeIcon from './ProductLikeIcon';
@@ -8,7 +7,6 @@ import { OrangeStarFilled } from './StarIcon';
 import './ProductCard.css';
 
 export default function ProductCard({ product }) {
-  const { addToCart } = useCart();
   const { toggleWishlist, isWishlisted } = useWishlist();
   const { isLoggedIn } = useAuth();
   const navigate = useNavigate();
@@ -136,12 +134,16 @@ export default function ProductCard({ product }) {
             )}
           </div>
 
-          {/* Add to Cart */}
+          {/* Select Options */}
           <button
+            type="button"
             className="btn-add-cart"
-            onClick={() => { if (requireAuth()) addToCart(product); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/product/${product.id}`);
+            }}
           >
-            Add to cart
+            Select Options
           </button>
 
           {/* Coupon Note */}
