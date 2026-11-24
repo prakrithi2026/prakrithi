@@ -7,6 +7,21 @@ const CART_STORAGE_KEY = 'prakrithi_cart';
 // Always compare IDs as strings to handle API (number) vs localStorage (string) mismatch
 const sameId = (a, b) => String(a) === String(b);
 
+// Compare items considering both product ID and selected variant
+const sameItem = (a, b) =>
+  sameId(a.id, b.id) &&
+  String(a.selectedVariant || '') === String(b.selectedVariant || '');
+
+const matchesKeyOrId = (item, idOrKey, variant = undefined) => {
+  if (variant !== undefined) {
+    return sameId(item.id, idOrKey) && String(item.selectedVariant || '') === String(variant || '');
+  }
+  if (item.cartItemId && String(item.cartItemId) === String(idOrKey)) {
+    return true;
+  }
+  return sameId(item.id, idOrKey);
+};
+
 export function CartProvider({ children }) {
   const [cart, setCart] = useState(() => {
     try {
@@ -28,16 +43,27 @@ export function CartProvider({ children }) {
   }, [cart]);
 
   const addToCart = (product, qty = 1, openDrawer = true) => {
+    const variantLabel = typeof product.selectedVariant === 'object'
+      ? (product.selectedVariant?.label || product.selectedVariant?.weight || '')
+      : (product.selectedVariant || '');
+    
+    const cartItemId = `${product.id}__${variantLabel || 'def'}`;
+    const productToAdd = {
+      ...product,
+      selectedVariant: variantLabel || null,
+      cartItemId,
+    };
+
     setCart(prev => {
-      const existing = prev.find(item => sameId(item.id, product.id));
+      const existing = prev.find(item => sameItem(item, productToAdd));
       if (existing) {
         return prev.map(item =>
-          sameId(item.id, product.id)
-            ? { ...item, quantity: item.quantity + qty, selected: true, ...(product.selectedVariant ? { selectedVariant: product.selectedVariant } : {}) }
+          sameItem(item, productToAdd)
+            ? { ...item, quantity: item.quantity + qty, selected: true }
             : item
         );
       }
-      return [...prev, { ...product, quantity: qty, selected: true }];
+      return [...prev, { ...productToAdd, quantity: qty, selected: true }];
     });
     if (openDrawer) {
       setIsCartOpen(true);
@@ -45,16 +71,23 @@ export function CartProvider({ children }) {
   };
 
   const buyNow = (product, qty = 1, variant = null) => {
+    const variantLabel = typeof variant === 'object'
+      ? (variant?.label || variant?.weight || '')
+      : (variant || (typeof product.selectedVariant === 'object' ? (product.selectedVariant?.label || product.selectedVariant?.weight || '') : (product.selectedVariant || '')));
+    
+    const cartItemId = `${product.id}__${variantLabel || 'def'}`;
     const itemToAdd = {
       ...product,
-      ...(variant ? { selectedVariant: variant } : {})
+      selectedVariant: variantLabel || null,
+      cartItemId,
     };
+
     setCart(prev => {
-      const existing = prev.find(item => sameId(item.id, itemToAdd.id));
+      const existing = prev.find(item => sameItem(item, itemToAdd));
       if (existing) {
         return prev.map(item =>
-          sameId(item.id, itemToAdd.id)
-            ? { ...item, quantity: item.quantity + qty, selected: true, ...(variant ? { selectedVariant: variant } : {}) }
+          sameItem(item, itemToAdd)
+            ? { ...item, quantity: item.quantity + qty, selected: true }
             : { ...item, selected: false }
         );
       }
@@ -66,18 +99,18 @@ export function CartProvider({ children }) {
     setIsCartOpen(false);
   };
 
-  const removeFromCart = (productId) => {
-    setCart(prev => prev.filter(item => !sameId(item.id, productId)));
+  const removeFromCart = (productId, variant = undefined) => {
+    setCart(prev => prev.filter(item => !matchesKeyOrId(item, productId, variant)));
   };
 
-  const updateQuantity = (productId, quantity) => {
+  const updateQuantity = (productId, quantity, variant = undefined) => {
     if (quantity <= 0) {
-      removeFromCart(productId);
+      removeFromCart(productId, variant);
       return;
     }
     setCart(prev =>
       prev.map(item =>
-        sameId(item.id, productId) ? { ...item, quantity } : item
+        matchesKeyOrId(item, productId, variant) ? { ...item, quantity } : item
       )
     );
   };
@@ -91,9 +124,11 @@ export function CartProvider({ children }) {
     setCart(prev => prev.map(item => item.selected !== false ? { ...item, ordered: true } : item));
   };
 
-  const toggleItemSelection = (productId) => {
+  const toggleItemSelection = (productId, variant = undefined) => {
     setCart(prev => prev.map(item =>
-      sameId(item.id, productId) ? { ...item, selected: item.selected === false ? true : false } : item
+      matchesKeyOrId(item, productId, variant)
+        ? { ...item, selected: item.selected === false ? true : false }
+        : item
     ));
   };
 

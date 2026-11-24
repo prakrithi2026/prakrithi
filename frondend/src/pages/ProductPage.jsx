@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useSiteConfig } from '../context/SiteConfigContext';
 import { useCart } from '../context/CartContext';
@@ -14,6 +14,7 @@ import ProductLikeIcon from '../components/storefront/ProductLikeIcon';
 import { OrangeStarFilled, OrangeStarOutline, OrangeStarHalf } from '../components/storefront/StarIcon';
 import LoadingScreen from '../components/storefront/LoadingScreen';
 import { fetchReviews, createReview, deleteReviewById, isOwnReview, processReviewMedia } from '../utils/reviewsApi';
+import { sortVariantsByWeight } from '../utils/weightSort';
 import API_BASE_URL from '../utils/api';
 import './ProductPage.css';
 
@@ -586,9 +587,66 @@ export default function ProductPage() {
 
     if (product) {
       document.title = `${product.name} — Prakrithi Naturals`;
-      if (product.variants?.length > 0) setSelectedVariant(product.variants[0]);
     }
   }, [id, product]);
+
+  const variantsKey = JSON.stringify(product?.variants || []);
+  const normalizedVariants = useMemo(() => {
+    if (!product || !Array.isArray(product.variants) || product.variants.length === 0) {
+      return [];
+    }
+    const rawMapped = product.variants.map((v, idx) => {
+      if (typeof v === 'string') {
+        const clean = v.trim();
+        return {
+          id: `var-${idx}-${clean}`,
+          label: clean,
+          weight: clean,
+          price: product.price ? parseFloat(product.price) : null,
+          salePrice: product.salePrice ? parseFloat(product.salePrice) : null,
+          isDefault: idx === 0,
+        };
+      }
+      if (typeof v === 'object' && v !== null) {
+        const label = (v.label || v.weight || v.name || '').trim();
+        if (!label) return null;
+        const regPrice = v.price !== null && v.price !== undefined && v.price !== ''
+          ? parseFloat(v.price)
+          : (product.price ? parseFloat(product.price) : null);
+        const slPrice = v.salePrice !== null && v.salePrice !== undefined && v.salePrice !== ''
+          ? parseFloat(v.salePrice)
+          : null;
+        return {
+          id: v.id || `var-${idx}-${label}`,
+          label,
+          weight: label,
+          price: regPrice,
+          salePrice: slPrice,
+          attribute: v.attribute || product.variantAttribute || 'WEIGHT',
+          isDefault: Boolean(v.isDefault),
+        };
+      }
+      return null;
+    }).filter(Boolean);
+
+    // Automatically sort variants in orderly weight sequence (e.g. 50g, 200g, 300g)
+    return sortVariantsByWeight(rawMapped);
+  }, [variantsKey, product?.price, product?.salePrice, product?.variantAttribute]);
+
+  // Set default selection when product or variants change
+  useEffect(() => {
+    if (normalizedVariants.length > 0) {
+      setSelectedVariant((prev) => {
+        if (prev) {
+          const match = normalizedVariants.find((v) => v.id === prev.id || v.label === prev.label);
+          if (match) return match;
+        }
+        return normalizedVariants.find((v) => v.isDefault) || normalizedVariants[0];
+      });
+    } else {
+      setSelectedVariant(null);
+    }
+  }, [id, variantsKey]);
 
   useEffect(() => {
     if (location.hash === '#reviews' || location.hash === '#product-reviews') {
@@ -624,11 +682,44 @@ export default function ProductPage() {
     );
   }
 
-  const displayPrice = parseFloat(product.salePrice || product.price);
-  const originalPrice = parseFloat(product.price);
-  const discount = product.salePrice
+  const baseRegPrice = parseFloat(product.price || 0);
+  const baseSalePrice = product.salePrice !== null && product.salePrice !== undefined && product.salePrice !== ''
+    ? parseFloat(product.salePrice)
+    : null;
+
+  let originalPrice = baseRegPrice;
+  let displayPrice = baseSalePrice !== null && !isNaN(baseSalePrice) ? baseSalePrice : baseRegPrice;
+  let hasDiscount = baseSalePrice !== null && !isNaN(baseSalePrice) && baseSalePrice < baseRegPrice;
+
+  if (selectedVariant) {
+    const varReg = selectedVariant.price !== null && !isNaN(selectedVariant.price)
+      ? parseFloat(selectedVariant.price)
+      : baseRegPrice;
+    const varSale = selectedVariant.salePrice !== null && !isNaN(selectedVariant.salePrice) && selectedVariant.salePrice !== ''
+      ? parseFloat(selectedVariant.salePrice)
+      : null;
+
+    originalPrice = varReg;
+    if (varSale !== null && varSale < varReg) {
+      displayPrice = varSale;
+      hasDiscount = true;
+    } else {
+      displayPrice = varSale !== null ? varSale : varReg;
+      hasDiscount = false;
+    }
+  }
+
+  const discount = hasDiscount && originalPrice > 0
     ? Math.round(((originalPrice - displayPrice) / originalPrice) * 100)
     : 0;
+
+  const attributeName = (selectedVariant?.attribute || normalizedVariants[0]?.attribute || product.variantAttribute || 'WEIGHT').toUpperCase();
+
+  const formatCurrency = (val) => {
+    const num = parseFloat(val);
+    if (isNaN(num)) return '0.00';
+    return num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
 
   const handleAddToCart = () => {
     if (!isLoggedIn) {
@@ -636,15 +727,37 @@ export default function ProductPage() {
       navigate(`/login?redirect=${redirect}`);
       return;
     }
-    const productToAdd = selectedVariant ? { ...product, selectedVariant } : product;
+    if (normalizedVariants.length > 0 && !selectedVariant) {
+      alert(`Please select a ${attributeName.toLowerCase()} option before adding to cart.`);
+      return;
+    }
+    const variantLabel = selectedVariant?.label || null;
+    const productToAdd = {
+      ...product,
+      price: originalPrice,
+      salePrice: hasDiscount ? displayPrice : null,
+      selectedVariant: variantLabel,
+      variantPrice: displayPrice,
+    };
     addToCart(productToAdd, quantity);
     setAddedFlash(true);
     setTimeout(() => setAddedFlash(false), 2000);
   };
 
   const handleBuyNow = () => {
-    const productToAdd = selectedVariant ? { ...product, selectedVariant } : product;
-    buyNow(productToAdd, quantity, selectedVariant);
+    if (normalizedVariants.length > 0 && !selectedVariant) {
+      alert(`Please select a ${attributeName.toLowerCase()} option before proceeding.`);
+      return;
+    }
+    const variantLabel = selectedVariant?.label || null;
+    const productToAdd = {
+      ...product,
+      price: originalPrice,
+      salePrice: hasDiscount ? displayPrice : null,
+      selectedVariant: variantLabel,
+      variantPrice: displayPrice,
+    };
+    buyNow(productToAdd, quantity, variantLabel);
     if (!isLoggedIn) {
       navigate('/login?redirect=%2Fpayment');
       return;
@@ -753,72 +866,70 @@ export default function ProductPage() {
                 className="product-rating-clickable"
                 onClick={scrollToReviews}
                 title="Click to view customer reviews"
-                aria-label={`Rated ${product.rating} out of 5 stars from ${totalReviewCount} reviews. Click to see reviews.`}
+                aria-label={`Rated ${product.rating} out of 5 stars from ${totalReviewCount} customer reviews. Click to see reviews.`}
               >
-                <StarRating rating={parseFloat(product.rating) || 0} />
-                <span className="product-rating-score">{product.rating}</span>
-                <span className="product-rating-count">({totalReviewCount} reviews)</span>
+                <StarRating rating={parseFloat(product.rating) || 0} size={18} />
+                <span className="product-rating-count">({totalReviewCount} customer reviews)</span>
               </button>
             </div>
 
-            {/* Price */}
-            <div className="product-price-block">
-              <span className="product-price-current">₹{displayPrice.toLocaleString('en-IN')}</span>
-              {product.salePrice && (
-                <>
-                  <span className="product-price-original">₹{originalPrice.toLocaleString('en-IN')}</span>
-                  <span className="product-price-save">Save ₹{(originalPrice - displayPrice).toLocaleString('en-IN')}</span>
-                </>
-              )}
-            </div>
-
-            {/* Description */}
+            {/* Description / Bullet Highlights */}
             {product.description && (
               <p className="product-description">{product.description}</p>
             )}
 
-            {/* Variants */}
-            {product.variants?.length > 0 && (
-              <div className="product-variants">
-                <label className="product-variants__label">Size / Variant</label>
-                <div className="product-variants__options">
-                  {product.variants.map((v, i) => (
-                    <button
-                      key={i}
-                      className={`product-variant-btn ${selectedVariant === v ? 'active' : ''}`}
-                      style={selectedVariant === v ? { borderColor: theme.primaryColor, backgroundColor: theme.primaryColor, color: '#fff' } : { borderColor: '#ddd' }}
-                      onClick={() => setSelectedVariant(v)}
-                    >
-                      {v}
-                    </button>
-                  ))}
+            {/* Product Quantity / Weight Variation Selector (matches reference) */}
+            {normalizedVariants.length > 0 && (
+              <div className="product-weight-selector-block">
+                <div className="product-weight-heading-row">
+                  <span className="product-weight-heading">{attributeName}:</span>
+                  {selectedVariant ? (
+                    <span className="product-weight-selected-label">{selectedVariant.label}</span>
+                  ) : (
+                    <span className="product-weight-prompt">Choose an option</span>
+                  )}
+                </div>
+
+                <div className="product-weight-boxes">
+                  {normalizedVariants.map((v) => {
+                    const isSelected = selectedVariant && (
+                      selectedVariant.id === v.id ||
+                      selectedVariant.label === v.label ||
+                      selectedVariant.weight === v.weight
+                    );
+                    return (
+                      <button
+                        key={v.id}
+                        type="button"
+                        className={`product-weight-box ${isSelected ? 'active' : ''}`}
+                        onClick={() => setSelectedVariant(v)}
+                        aria-pressed={isSelected}
+                        title={`Select ${v.label}`}
+                      >
+                        {v.label}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
 
-            {/* Quantity + Actions (Add to Cart & Buy Now) */}
-            <div className="product-actions-container">
-              <div className="product-qty-row">
-                <span className="product-qty-label">Quantity:</span>
-                <div className="product-qty">
-                  <button
-                    type="button"
-                    onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                    aria-label="Decrease quantity"
-                  >
-                    −
-                  </button>
-                  <span>{quantity}</span>
-                  <button
-                    type="button"
-                    onClick={() => setQuantity(q => q + 1)}
-                    aria-label="Increase quantity"
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
+            {/* Price matching reference image: original strikethrough, active price, taxes note */}
+            <div className="product-price-block">
+              {hasDiscount && (
+                <span className="product-price-original">₹{formatCurrency(originalPrice)}</span>
+              )}
+              <span className="product-price-current">₹{formatCurrency(displayPrice)}</span>
+              <span className="product-tax-note">(Inclusive of all taxes).</span>
+              {hasDiscount && originalPrice > displayPrice && (
+                <span className="product-price-save">
+                  Save ₹{formatCurrency(originalPrice - displayPrice)}
+                </span>
+              )}
+            </div>
 
+            {/* Actions (Add to Cart & Buy Now) */}
+            <div className="product-actions-container">
               <div className="product-action-buttons">
                 <button
                   type="button"
@@ -840,7 +951,9 @@ export default function ProductPage() {
 
             {/* Coupon note */}
             {product.couponNote && (
-              <div className="product-coupon">{product.couponNote}</div>
+              <div className="product-coupon">
+                {product.couponNote.replace(/â‚¹|â\u0082\u00B9/g, '\u20B9').replace(/â/g, '\u20B9')}
+              </div>
             )}
 
             {/* Active Offer Cards for this product */}

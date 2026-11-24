@@ -41,6 +41,23 @@
     <!-- High-Priority Preload for First Hero Banner (Instant LCP) -->
     <link rel="preload" as="image" href="/banners/banner-desktop-1.webp" media="(min-width: 769px)" fetchpriority="high" type="image/webp" />
     <link rel="preload" as="image" href="/banners/banner-mobile-1.webp" media="(max-width: 768px)" fetchpriority="high" type="image/webp" />
+    <script>
+      window.addEventListener('error', function(e) {
+        try {
+          var root = document.getElementById('root');
+          if (root && (!root.children || root.children.length === 0)) {
+            var banner = document.getElementById('prakrithi-fatal-err');
+            if (!banner) {
+              banner = document.createElement('div');
+              banner.id = 'prakrithi-fatal-err';
+              banner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#fee2e2;color:#991b1b;padding:20px;z-index:999999;font-family:monospace;border-bottom:3px solid #ef4444;white-space:pre-wrap;box-shadow:0 4px 12px rgba(0,0,0,0.15);';
+              document.body.prepend(banner);
+            }
+            banner.textContent = 'Storefront Error: ' + (e.error ? (e.error.stack || e.error.message) : e.message);
+          }
+        } catch (_) {}
+      });
+    </script>
   </head>
   <body>
     <div id="root"></div>

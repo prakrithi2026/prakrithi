@@ -149,7 +149,9 @@ export default function ProductCard({ product }) {
           {/* Coupon Note */}
           <div className="coupon-container">
             {product.couponNote && (
-              <p className="coupon-note">{product.couponNote}</p>
+              <p className="coupon-note">
+                {product.couponNote.replace(/â‚¹|â\u0082\u00B9/g, '\u20B9').replace(/â/g, '\u20B9')}
+              </p>
             )}
           </div>
         </div>

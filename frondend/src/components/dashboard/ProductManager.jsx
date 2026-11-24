@@ -1,9 +1,13 @@
 import { useState } from 'react';
-import { FiPlus, FiEdit2, FiTrash2, FiX, FiSave, FiRefreshCw, FiCheck } from 'react-icons/fi';
+import { FiPlus, FiEdit2, FiTrash2, FiX, FiSave, FiRefreshCw, FiCheck, FiArrowUp, FiArrowDown } from 'react-icons/fi';
 import { useSiteConfig } from '../../context/SiteConfigContext';
 import ProductImageUploader from './ProductImageUploader';
 import MultiProductImageUploader from './MultiProductImageUploader';
+import { sortVariantsByWeight } from '../../utils/weightSort';
 import './ProductManager.css';
+
+const PRESET_WEIGHTS = ['50gm', '100gm', '200gm', '250gm', '500gm', '1kg', '100ml', '250ml', '500ml', '1L', 'Pack of 2'];
+const ATTRIBUTE_PRESETS = ['WEIGHT', 'QUANTITY', 'PACK', 'SIZE', 'VOLUME'];
 
 const emptyProduct = {
   name: '',
@@ -18,6 +22,7 @@ const emptyProduct = {
   badgeColor: '#D32F2F',
   rating: 4.0,
   reviews: 0,
+  variantAttribute: 'WEIGHT',
   variants: [],
 };
 
@@ -34,6 +39,10 @@ export default function ProductManager() {
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
+  // Variations helper state
+  const [customVariant, setCustomVariant] = useState({ label: '', price: '', salePrice: '' });
+  const [previewSelectedVariant, setPreviewSelectedVariant] = useState(null);
+
   // Category card modal state (Only Image, Title, Link to category - NO PRICES)
   const [editingCategory, setEditingCategory] = useState(null);
   const [editingCategoryIndex, setEditingCategoryIndex] = useState(null);
@@ -43,9 +52,52 @@ export default function ProductManager() {
     ? config.shopByCategory.categories
     : (Array.isArray(config.shopByConcern?.categories) ? config.shopByConcern.categories : []);
 
+  const normalizeVariantList = (rawList, basePrice, baseSalePrice) => {
+    if (!Array.isArray(rawList)) return [];
+    let foundDefault = false;
+    const result = rawList.map((v, idx) => {
+      if (typeof v === 'string') {
+        const clean = v.trim();
+        if (!clean) return null;
+        const isDef = !foundDefault && idx === 0;
+        if (isDef) foundDefault = true;
+        return {
+          id: `var-${idx}-${clean}`,
+          label: clean,
+          weight: clean,
+          price: basePrice || '',
+          salePrice: baseSalePrice || '',
+          isDefault: isDef,
+        };
+      }
+      if (typeof v === 'object' && v !== null) {
+        const label = (v.label || v.weight || v.name || '').trim();
+        if (!label) return null;
+        const isDef = Boolean(v.isDefault);
+        if (isDef) foundDefault = true;
+        return {
+          id: v.id || `var-${idx}-${label}`,
+          label,
+          weight: label,
+          price: v.price !== undefined && v.price !== null ? v.price : '',
+          salePrice: v.salePrice !== undefined && v.salePrice !== null ? v.salePrice : '',
+          isDefault: isDef,
+        };
+      }
+      return null;
+    }).filter(Boolean);
+
+    if (result.length > 0 && !foundDefault) {
+      result[0].isDefault = true;
+    }
+    return sortVariantsByWeight(result);
+  };
+
   // ── Product Handlers ──
   const openNew = () => {
     setEditing({ ...emptyProduct, images: [] });
+    setCustomVariant({ label: '', price: '', salePrice: '' });
+    setPreviewSelectedVariant(null);
     setIsNew(true);
   };
 
@@ -53,12 +105,22 @@ export default function ProductManager() {
     const rawImages = Array.isArray(product.images) && product.images.length > 0 
       ? product.images 
       : (product.image ? [product.image] : []);
-    setEditing({ ...product, images: rawImages, image: rawImages[0] || '' });
+    const normalizedVars = normalizeVariantList(product.variants, product.price, product.salePrice);
+    setEditing({
+      ...product,
+      variantAttribute: product.variantAttribute || 'WEIGHT',
+      variants: normalizedVars,
+      images: rawImages,
+      image: rawImages[0] || ''
+    });
+    setCustomVariant({ label: '', price: '', salePrice: '' });
+    setPreviewSelectedVariant(normalizedVars.find(v => v.isDefault) || normalizedVars[0] || null);
     setIsNew(false);
   };
 
   const close = () => {
     setEditing(null);
+    setPreviewSelectedVariant(null);
     setIsNew(false);
   };
 
@@ -66,8 +128,28 @@ export default function ProductManager() {
     if (!editing || !editing.name.trim()) return alert('Product name is required');
     const images = Array.isArray(editing.images) ? editing.images.filter(Boolean) : [];
     const primaryImage = images.length > 0 ? images[0] : '';
+
+    // Clean and validate variants
+    const cleanVariants = (editing.variants || []).map((v, idx) => {
+      const label = (v.label || v.weight || '').trim();
+      if (!label) return null;
+      const p = v.price !== '' && v.price !== null && v.price !== undefined ? parseFloat(v.price) : null;
+      const sp = v.salePrice !== '' && v.salePrice !== null && v.salePrice !== undefined ? parseFloat(v.salePrice) : null;
+      return {
+        id: `var-${idx}-${label}`,
+        label,
+        weight: label,
+        price: p !== null && !isNaN(p) ? p : null,
+        salePrice: sp !== null && !isNaN(sp) ? sp : null,
+        attribute: (editing.variantAttribute || 'WEIGHT').trim().toUpperCase(),
+        isDefault: Boolean(v.isDefault),
+      };
+    }).filter(Boolean);
+
     const productToSave = {
       ...editing,
+      variantAttribute: (editing.variantAttribute || 'WEIGHT').trim().toUpperCase(),
+      variants: cleanVariants,
       image: primaryImage,
       images: images,
     };
@@ -115,12 +197,72 @@ export default function ProductManager() {
     });
   };
 
-  const addVariant = () => {
+  // Toggle preset variant: if already selected, UNSELECT (remove) it; if not, add it & sort orderly by weight
+  const toggleVariantPreset = (presetLabel) => {
+    setEditing((prev) => {
+      if (!prev) return prev;
+      const current = prev.variants || [];
+      const cleanLabel = presetLabel.trim();
+      const existingIndex = current.findIndex(
+        (v) => (v.label || v.weight || '').trim().toLowerCase() === cleanLabel.toLowerCase()
+      );
+
+      let nextVariants;
+      if (existingIndex >= 0) {
+        // UNSELECT / REMOVE
+        nextVariants = current.filter((_, idx) => idx !== existingIndex);
+      } else {
+        // ADD
+        const newVar = {
+          id: `var-${Date.now()}-${cleanLabel}`,
+          label: cleanLabel,
+          weight: cleanLabel,
+          price: prev.price || '',
+          salePrice: prev.salePrice || '',
+          isDefault: current.length === 0,
+        };
+        nextVariants = [...current, newVar];
+      }
+
+      // Automatically sort orderly by weight (e.g. 50g, 200g, 300g)
+      const sorted = sortVariantsByWeight(nextVariants);
+      return {
+        ...prev,
+        variants: sorted,
+      };
+    });
+  };
+
+  const addCustomVariant = () => {
+    const label = (customVariant.label || '').trim();
+    if (!label) return;
+    setEditing((prev) => {
+      if (!prev) return prev;
+      const current = prev.variants || [];
+      const newVar = {
+        id: `var-${Date.now()}-${label}`,
+        label,
+        weight: label,
+        price: customVariant.price !== '' ? customVariant.price : (prev.price || ''),
+        salePrice: customVariant.salePrice !== '' ? customVariant.salePrice : '',
+        isDefault: current.length === 0,
+      };
+      // Automatically sort orderly by weight
+      const sorted = sortVariantsByWeight([...current, newVar]);
+      return {
+        ...prev,
+        variants: sorted,
+      };
+    });
+    setCustomVariant({ label: '', price: '', salePrice: '' });
+  };
+
+  const sortEditingVariants = () => {
     setEditing((prev) => {
       if (!prev) return prev;
       return {
         ...prev,
-        variants: [...(prev.variants || []), { color: '#8B4513', label: '' }],
+        variants: sortVariantsByWeight(prev.variants || []),
       };
     });
   };
@@ -130,6 +272,32 @@ export default function ProductManager() {
       if (!prev) return prev;
       const variants = [...(prev.variants || [])];
       variants[i] = { ...variants[i], [field]: value };
+      if (field === 'label') variants[i].weight = value;
+      return { ...prev, variants };
+    });
+  };
+
+  const setDefaultVariant = (index) => {
+    setEditing((prev) => {
+      if (!prev) return prev;
+      const variants = (prev.variants || []).map((v, i) => ({
+        ...v,
+        isDefault: i === index,
+      }));
+      return { ...prev, variants };
+    });
+    setPreviewSelectedVariant(editing?.variants?.[index] || null);
+  };
+
+  const moveVariant = (index, direction) => {
+    setEditing((prev) => {
+      if (!prev) return prev;
+      const variants = [...(prev.variants || [])];
+      const targetIndex = index + direction;
+      if (targetIndex < 0 || targetIndex >= variants.length) return prev;
+      const temp = variants[index];
+      variants[index] = variants[targetIndex];
+      variants[targetIndex] = temp;
       return { ...prev, variants };
     });
   };
@@ -137,10 +305,11 @@ export default function ProductManager() {
   const removeVariant = (i) => {
     setEditing((prev) => {
       if (!prev) return prev;
-      return {
-        ...prev,
-        variants: (prev.variants || []).filter((_, idx) => idx !== i),
-      };
+      const filtered = (prev.variants || []).filter((_, idx) => idx !== i);
+      if (filtered.length > 0 && !filtered.some(v => v.isDefault)) {
+        filtered[0].isDefault = true;
+      }
+      return { ...prev, variants: filtered };
     });
   };
 
@@ -323,6 +492,11 @@ export default function ProductManager() {
         <div className="pm-item__meta">
           <span className="pm-item__category">{p.category}</span>
           {p.badge && <span className="pm-item__badge" style={{ background: p.badgeColor }}>{p.badge}</span>}
+          {Array.isArray(p.variants) && p.variants.length > 0 && (
+            <span className="pm-item__variant-badge" title="Quantity / Weight variations configured">
+              ⚖️ {p.variants.length} options ({p.variants.map(v => typeof v === 'object' ? (v.label || v.weight) : v).filter(Boolean).slice(0, 3).join(', ')}{p.variants.length > 3 ? '...' : ''})
+            </span>
+          )}
         </div>
       </div>
       <div className="pm-item__price">
@@ -634,26 +808,271 @@ export default function ProductManager() {
                 </div>
               </div>
 
-              {/* Variants */}
-              <div className="dash-field">
-                <label className="dash-field__label">Variants</label>
-                {(editing.variants || []).map((v, i) => (
-                  <div key={i} className="pm-variant-row">
-                    <input type="color" value={v.color} onChange={(e) => updateVariant(i, 'color', e.target.value)} />
+              {/* ── Product Quantity / Weight Variations Manager ── */}
+              <div className="pm-variants-panel">
+                <div className="pm-variants-panel__header">
+                  <div>
+                    <h4 className="pm-variants-panel__title">⚖️ Quantity / Weight Variations</h4>
+                    <p className="pm-variants-panel__sub">
+                      Configure weight or quantity options (e.g. 250gm, 50gm, 100gm, 500gm) and their custom prices. Controlled directly from here!
+                    </p>
+                  </div>
+                </div>
+
+                {/* Attribute Name Selector */}
+                <div className="dash-field" style={{ marginBottom: '14px' }}>
+                  <label className="dash-field__label">Variation Attribute Heading</label>
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
                     <input
                       className="dash-field__input"
-                      value={v.label}
-                      onChange={(e) => updateVariant(i, 'label', e.target.value)}
-                      placeholder="e.g. 100g"
+                      style={{ maxWidth: '170px' }}
+                      value={editing.variantAttribute || 'WEIGHT'}
+                      onChange={(e) => setEditing(prev => ({ ...prev, variantAttribute: e.target.value.toUpperCase() }))}
+                      placeholder="e.g. WEIGHT"
                     />
-                    <button className="pm-action-btn pm-action-btn--delete" onClick={() => removeVariant(i)}>
-                      <FiX size={14} />
-                    </button>
+                    <div className="pm-attribute-pills">
+                      {ATTRIBUTE_PRESETS.map((attr) => (
+                        <button
+                          key={attr}
+                          type="button"
+                          className={`pm-attr-pill ${(editing.variantAttribute || 'WEIGHT') === attr ? 'active' : ''}`}
+                          onClick={() => setEditing(prev => ({ ...prev, variantAttribute: attr }))}
+                        >
+                          {attr}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                ))}
-                <button className="dash-btn dash-btn--ghost" onClick={addVariant} style={{ marginTop: '8px', fontSize: '0.8rem' }}>
-                  <FiPlus size={14} style={{ marginRight: '4px' }} /> Add Variant
-                </button>
+                </div>
+
+                {/* Quick Presets */}
+                <div className="dash-field" style={{ marginBottom: '14px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                    <label className="dash-field__label" style={{ margin: 0 }}>Quick Add / Toggle Weights (Click to Select or Unselect)</label>
+                    <span style={{ fontSize: '0.75rem', color: '#004E38', fontWeight: 600 }}>Auto-ordered by weight</span>
+                  </div>
+                  <div className="pm-preset-weights">
+                    {PRESET_WEIGHTS.map((preset) => {
+                      const alreadyHas = (editing.variants || []).some(v => (v.label || v.weight || '').toLowerCase() === preset.toLowerCase());
+                      return (
+                        <button
+                          key={preset}
+                          type="button"
+                          className={`pm-preset-btn ${alreadyHas ? 'added' : ''}`}
+                          onClick={() => toggleVariantPreset(preset)}
+                          title={alreadyHas ? `Click to unselect / remove ${preset}` : `Click to select / add ${preset}`}
+                        >
+                          {alreadyHas ? `✓ ${preset}` : `+ ${preset}`}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Custom Add Row */}
+                <div className="pm-add-variant-bar">
+                  <div className="pm-add-variant-col">
+                    <label className="pm-mini-label">Weight / Option Label</label>
+                    <input
+                      className="dash-field__input"
+                      placeholder="e.g. 750gm, 2L, Pack of 3"
+                      value={customVariant.label}
+                      onChange={(e) => setCustomVariant(prev => ({ ...prev, label: e.target.value }))}
+                      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addCustomVariant(); } }}
+                    />
+                  </div>
+                  <div className="pm-add-variant-col">
+                    <label className="pm-mini-label">Regular Price ₹ (MRP)</label>
+                    <input
+                      className="dash-field__input"
+                      type="number"
+                      placeholder={editing.price ? `Default ₹${editing.price}` : '₹650'}
+                      value={customVariant.price}
+                      onChange={(e) => setCustomVariant(prev => ({ ...prev, price: e.target.value }))}
+                    />
+                  </div>
+                  <div className="pm-add-variant-col">
+                    <label className="pm-mini-label">Sale / Offer Price ₹</label>
+                    <input
+                      className="dash-field__input"
+                      type="number"
+                      placeholder={editing.salePrice ? `Default ₹${editing.salePrice}` : '₹580'}
+                      value={customVariant.salePrice}
+                      onChange={(e) => setCustomVariant(prev => ({ ...prev, salePrice: e.target.value }))}
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    className="dash-btn dash-btn--primary pm-add-variant-btn"
+                    onClick={addCustomVariant}
+                  >
+                    <FiPlus size={16} style={{ marginRight: '4px' }} />
+                    Add Option
+                  </button>
+                </div>
+
+                {/* Configured Variants List */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <label className="dash-field__label" style={{ margin: 0 }}>
+                    Configured Variations ({editing.variants?.length || 0})
+                  </label>
+                  {(editing.variants || []).length > 1 && (
+                    <button
+                      type="button"
+                      className="dash-btn"
+                      style={{ fontSize: '0.78rem', padding: '4px 10px', display: 'inline-flex', alignItems: 'center', gap: '4px', borderColor: '#004E38', color: '#004E38' }}
+                      onClick={sortEditingVariants}
+                      title="Sort all variations in ascending numerical weight order (e.g. 50g, 200g, 300g)"
+                    >
+                      ⇅ Sort Orderly by Weight
+                    </button>
+                  )}
+                </div>
+                <div className="pm-variant-table-container">
+                  {(editing.variants || []).length > 0 ? (
+                    <table className="pm-variant-table">
+                      <thead>
+                        <tr>
+                          <th style={{ width: '60px', textAlign: 'center' }}>Order</th>
+                          <th>Option / Weight</th>
+                          <th style={{ width: '130px' }}>Regular Price (₹)</th>
+                          <th style={{ width: '130px' }}>Sale Price (₹)</th>
+                          <th style={{ width: '90px', textAlign: 'center' }}>Default</th>
+                          <th style={{ width: '50px', textAlign: 'center' }}>Remove</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {editing.variants.map((v, i) => (
+                          <tr key={v.id || i} className={v.isDefault ? 'is-default-row' : ''}>
+                            <td style={{ textAlign: 'center' }}>
+                              <div className="pm-order-btns">
+                                <button
+                                  type="button"
+                                  disabled={i === 0}
+                                  className="pm-order-btn"
+                                  onClick={() => moveVariant(i, -1)}
+                                  title="Move Up"
+                                >
+                                  ▲
+                                </button>
+                                <button
+                                  type="button"
+                                  disabled={i === editing.variants.length - 1}
+                                  className="pm-order-btn"
+                                  onClick={() => moveVariant(i, 1)}
+                                  title="Move Down"
+                                >
+                                  ▼
+                                </button>
+                              </div>
+                            </td>
+                            <td>
+                              <input
+                                className="dash-field__input pm-table-input"
+                                value={v.label}
+                                onChange={(e) => updateVariant(i, 'label', e.target.value)}
+                                placeholder="e.g. 100gm"
+                              />
+                            </td>
+                            <td>
+                              <input
+                                className="dash-field__input pm-table-input"
+                                type="number"
+                                value={v.price}
+                                onChange={(e) => updateVariant(i, 'price', e.target.value)}
+                                placeholder={editing.price || '0'}
+                              />
+                            </td>
+                            <td>
+                              <input
+                                className="dash-field__input pm-table-input"
+                                type="number"
+                                value={v.salePrice}
+                                onChange={(e) => updateVariant(i, 'salePrice', e.target.value)}
+                                placeholder={editing.salePrice || 'None'}
+                              />
+                            </td>
+                            <td style={{ textAlign: 'center' }}>
+                              <button
+                                type="button"
+                                className={`pm-default-btn ${v.isDefault ? 'active' : ''}`}
+                                onClick={() => setDefaultVariant(i)}
+                                title={v.isDefault ? 'Currently selected by default' : 'Click to make this the default option'}
+                              >
+                                {v.isDefault ? '⭐ Default' : 'Set'}
+                              </button>
+                            </td>
+                            <td style={{ textAlign: 'center' }}>
+                              <button
+                                type="button"
+                                className="pm-action-btn pm-action-btn--delete"
+                                onClick={() => removeVariant(i)}
+                                title="Delete this option"
+                              >
+                                <FiX size={16} />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  ) : (
+                    <div className="pm-no-variants">
+                      <p>No quantity / weight options added yet. Click any quick preset above (e.g. <strong>+ 100gm</strong>, <strong>+ 250gm</strong>) to add!</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Storefront Live Preview matching reference image */}
+                {(editing.variants || []).length > 0 && (
+                  <div className="pm-storefront-preview-card">
+                    <div className="pm-preview-badge">Storefront Live Preview</div>
+                    <div className="pm-preview-content">
+                      <div className="product-weight-heading-row">
+                        <span className="product-weight-heading">{(editing.variantAttribute || 'WEIGHT')}:</span>
+                        <span className="product-weight-selected-label">
+                          {previewSelectedVariant ? previewSelectedVariant.label : (editing.variants.find(v => v.isDefault)?.label || editing.variants[0]?.label)}
+                        </span>
+                      </div>
+                      <div className="product-weight-boxes" style={{ margin: '8px 0' }}>
+                        {editing.variants.map((v, i) => {
+                          const currentActive = previewSelectedVariant
+                            ? previewSelectedVariant.id === v.id
+                            : (v.isDefault || i === 0);
+                          return (
+                            <div
+                              key={v.id || i}
+                              className={`product-weight-box ${currentActive ? 'active' : ''}`}
+                              onClick={() => setPreviewSelectedVariant(v)}
+                              style={{ cursor: 'pointer' }}
+                            >
+                              {v.label}
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <div className="product-price-block" style={{ margin: '8px 0 0' }}>
+                        {(() => {
+                          const cur = previewSelectedVariant || editing.variants.find(v => v.isDefault) || editing.variants[0];
+                          const reg = cur?.price !== '' && cur?.price !== null && cur?.price !== undefined
+                            ? parseFloat(cur.price)
+                            : parseFloat(editing.price || 0);
+                          const sl = cur?.salePrice !== '' && cur?.salePrice !== null && cur?.salePrice !== undefined
+                            ? parseFloat(cur.salePrice)
+                            : (cur?.price ? null : (editing.salePrice ? parseFloat(editing.salePrice) : null));
+                          const isDisc = sl !== null && !isNaN(sl) && sl < reg;
+                          return (
+                            <>
+                              {isDisc && <span className="product-price-original">₹{reg.toFixed(2)}</span>}
+                              <span className="product-price-current">₹{(isDisc ? sl : (sl || reg)).toFixed(2)}</span>
+                              <span className="product-tax-note">(Inclusive of all taxes).</span>
+                            </>
+                          );
+                        })()}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
             <div className="pm-modal__footer">

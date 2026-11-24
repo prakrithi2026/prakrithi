@@ -13,7 +13,7 @@ const formatPrice = (price) => {
 export default function CartModal() {
   const { cart, isCartOpen, toggleCart, updateQuantity, removeFromCart, cartTotal, toggleItemSelection, toggleAllSelection, clearCart } = useCart();
   const { config } = useSiteConfig();
-  const { theme } = config;
+  const theme = config?.theme || {};
   const { isLoggedIn } = useAuth();
   const navigate = useNavigate();
 
@@ -58,48 +58,51 @@ export default function CartModal() {
               <span>Add some products to get started</span>
             </div>
           ) : (
-            cart.map((item) => (
-              <div key={item.id} className={`cart-item ${item.selected === false ? 'unselected' : ''}`}>
-                <input
-                  type="checkbox"
-                  className="cart-item-checkbox"
-                  checked={item.selected !== false}
-                  onChange={() => toggleItemSelection(item.id)}
-                />
-                {item.image ? (
-                  <img src={item.image} alt={item.name} className="cart-item-image" />
-                ) : (
-                  <div className="cart-item-image cart-item-image--placeholder">
-                    🌿
-                  </div>
-                )}
-                <div className="cart-item-details">
-                  <h4 className="cart-item-title">{item.name}</h4>
-                  {item.selectedVariant && (
-                    <div className="cart-item-variant" style={{ fontSize: '0.8rem', color: '#666', marginBottom: '2px' }}>
-                      Size / Variant: {item.selectedVariant}
+            cart.map((item) => {
+              const itemKey = item.cartItemId || `${item.id}__${item.selectedVariant || 'def'}`;
+              return (
+                <div key={itemKey} className={`cart-item ${item.selected === false ? 'unselected' : ''}`}>
+                  <input
+                    type="checkbox"
+                    className="cart-item-checkbox"
+                    checked={item.selected !== false}
+                    onChange={() => toggleItemSelection(item.id, item.selectedVariant)}
+                  />
+                  {item.image ? (
+                    <img src={item.image} alt={item.name} className="cart-item-image" />
+                  ) : (
+                    <div className="cart-item-image cart-item-image--placeholder">
+                      🌿
                     </div>
                   )}
-                  {item.ordered && (
-                    <div style={{ color: theme.primaryColor, fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '4px' }}>
-                      ✓ You ordered this product
+                  <div className="cart-item-details">
+                    <h4 className="cart-item-title">{item.name}</h4>
+                    {item.selectedVariant && (
+                      <div className="cart-item-variant" style={{ fontSize: '0.8rem', color: '#666', marginBottom: '2px' }}>
+                        Weight / Quantity: {item.selectedVariant}
+                      </div>
+                    )}
+                    {item.ordered && (
+                      <div style={{ color: theme?.primaryColor || '#004E38', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '4px' }}>
+                        ✓ You ordered this product
+                      </div>
+                    )}
+                    <div className="cart-item-price">
+                      ₹{formatPrice(item.salePrice || item.price)}
+                      {item.salePrice && <span className="cart-item-original">₹{formatPrice(item.price)}</span>}
                     </div>
-                  )}
-                  <div className="cart-item-price">
-                    ₹{formatPrice(item.salePrice || item.price)}
-                    {item.salePrice && <span className="cart-item-original">₹{formatPrice(item.price)}</span>}
-                  </div>
-                  <div className="cart-item-actions">
-                    <div className="qty-controls">
-                      <button className="qty-btn" onClick={() => updateQuantity(item.id, item.quantity - 1)}>−</button>
-                      <span className="qty-value">{item.quantity}</span>
-                      <button className="qty-btn" onClick={() => updateQuantity(item.id, item.quantity + 1)}>+</button>
+                    <div className="cart-item-actions">
+                      <div className="qty-controls">
+                        <button className="qty-btn" onClick={() => updateQuantity(item.id, item.quantity - 1, item.selectedVariant)}>−</button>
+                        <span className="qty-value">{item.quantity}</span>
+                        <button className="qty-btn" onClick={() => updateQuantity(item.id, item.quantity + 1, item.selectedVariant)}>+</button>
+                      </div>
+                      <button className="remove-btn" onClick={() => removeFromCart(item.id, item.selectedVariant)}>Remove</button>
                     </div>
-                    <button className="remove-btn" onClick={() => removeFromCart(item.id)}>Remove</button>
                   </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
 

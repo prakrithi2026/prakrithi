@@ -422,7 +422,13 @@ const defaultConfig = {
       "tags": [
         "new-arrival"
       ],
-      "variants": [],
+      "variantAttribute": "WEIGHT",
+      "variants": [
+        { "id": "var-1-50gm", "label": "50gm", "weight": "50gm", "price": 180, "salePrice": 150, "isDefault": false },
+        { "id": "var-2-100gm", "label": "100gm", "weight": "100gm", "price": 350, "salePrice": 300, "isDefault": true },
+        { "id": "var-0-250gm", "label": "250gm", "weight": "250gm", "price": 650, "salePrice": 580, "isDefault": false },
+        { "id": "var-3-500gm", "label": "500gm", "weight": "500gm", "price": 1200, "salePrice": 1050, "isDefault": false }
+      ],
       "badge": "New",
       "badgeColor": "#004E38",
       "badgeTextColor": null,
@@ -450,7 +456,7 @@ const defaultConfig = {
       "badgeTextColor": "#FFFFFF",
       "rating": "4.9",
       "reviews": 28,
-      "couponNote": "*Best Price â‚¹180 with coupon",
+      "couponNote": "*Best Price ₹180 with coupon",
       "category": "spices"
     },
     {

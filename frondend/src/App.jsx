@@ -22,17 +22,20 @@ import RefundPolicyPage from './pages/RefundPolicyPage';
 import WriteReviewPage from './pages/WriteReviewPage';
 import DashboardLayout from './components/dashboard/DashboardLayout';
 import ScrollToTop from './components/ScrollToTop';
+import ErrorBoundary from './components/ErrorBoundary';
 import './App.css';
 
 function App() {
   return (
-    <SiteConfigProvider>
-      <AuthProvider>
-        <CartProvider>
-          <WishlistProvider>
-            <BrowserRouter>
-              <ScrollToTop />
-              <Routes>
+    <ErrorBoundary>
+      <SiteConfigProvider>
+        <AuthProvider>
+          <CartProvider>
+            <WishlistProvider>
+              <BrowserRouter>
+                <ScrollToTop />
+                <ErrorBoundary>
+                  <Routes>
                 {/* Storefront — public */}
                 <Route path="/"        element={<HomePage />} />
                 <Route path="/shop"    element={<ShopPage />} />
@@ -69,11 +72,13 @@ function App() {
                 {/* 404 */}
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
-            </BrowserRouter>
-          </WishlistProvider>
-        </CartProvider>
-      </AuthProvider>
-    </SiteConfigProvider>
+            </ErrorBoundary>
+          </BrowserRouter>
+        </WishlistProvider>
+      </CartProvider>
+    </AuthProvider>
+  </SiteConfigProvider>
+</ErrorBoundary>
   );
 }
 
