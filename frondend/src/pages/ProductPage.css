@@ -564,8 +564,8 @@
 
 /* Coupon */
 .product-coupon {
-  background: linear-gradient(135deg, #f0fff4, #e8f5e9);
-  border: 1px solid #86efac;
+  background: #F6FFE6;
+  border: 1px solid #004E38;
   border-radius: 10px;
   padding: 12px 16px;
   font-size: 0.85rem;
@@ -718,6 +718,7 @@
 }
 
 .cr-title {
+  font-family: 'Jost', sans-serif;
   font-size: 1.65rem;
   font-weight: 800;
   color: #004E38;
@@ -729,7 +730,7 @@
 /* Reference Image Layout */
 .cr-summary-container {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   gap: 0;
   padding-bottom: 4px;
 }
@@ -781,6 +782,7 @@
 }
 
 .cr-summary-based {
+  font-family: 'Jost', sans-serif;
   font-size: 0.95rem;
   font-weight: 700;
   color: #004E38;
@@ -791,7 +793,7 @@
 .cr-summary-divider {
   width: 1px;
   background-color: #e5e7eb;
-  height: 98px;
+  align-self: stretch;
   margin: 0 32px;
   flex-shrink: 0;
 }
@@ -874,7 +876,7 @@
 }
 
 .cr-sort-dropdown-wrap {
-  margin-top: 4px;
+  margin-top: auto;
 }
 
 .cr-sort-select {
@@ -1060,6 +1062,7 @@
 }
 
 .cr-review-author {
+  font-family: 'Jost', sans-serif;
   font-size: 0.95rem;
   font-weight: 800;
   color: #004E38;

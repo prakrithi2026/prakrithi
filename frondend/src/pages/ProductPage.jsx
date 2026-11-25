@@ -26,6 +26,15 @@ const RATING_LABELS = {
   5: 'Excellent',
 };
 
+const REVIEW_AVATAR_COLORS = [
+  '#E3B5F8',
+  '#F6C8B0',
+  '#B8C9F8',
+  '#BDE6CF',
+  '#F7BBD0',
+  '#F5DFA0',
+];
+
 // Trust Badge SVGs
 const NaturalTrustIcon = ({ size = 20, className = '' }) => (
   <svg
@@ -964,7 +973,7 @@ export default function ProductPage() {
                     <div>
                       <span style={{ fontWeight: 700 }}>🏷️ {o.discount_percentage}% OFF</span>
                       {o.title ? ` - ${o.title}` : ` on ${o.product ? 'this product' : 'your order'}`}
-                      <div style={{ fontSize: '0.78rem', color: '#15803d', fontWeight: 500, marginTop: '2px' }}>
+                      <div style={{ fontSize: '0.78rem', color: '#004E38', fontWeight: 500, marginTop: '2px' }}>
                         Use code <strong style={{ letterSpacing: '0.5px' }}>{o.code}</strong> at checkout (1-time use)
                       </div>
                     </div>
@@ -1335,11 +1344,15 @@ export default function ProductPage() {
                 const stars = Math.max(1, Math.min(5, Number(rev.rating) || 5));
                 const canDelete = isOwnReview(rev, user);
                 const firstLetter = (rev.customer_name || 'R').trim().charAt(0).toUpperCase();
+                const avatarBg =
+                  REVIEW_AVATAR_COLORS[
+                    ((currentPage - 1) * REVIEWS_PER_PAGE + idx) % REVIEW_AVATAR_COLORS.length
+                  ];
 
                 return (
                   <div key={rev.id || idx} className="cr-review-row">
                     {/* Left: Avatar Circle */}
-                    <div className="cr-review-avatar">
+                    <div className="cr-review-avatar" style={{ backgroundColor: avatarBg }}>
                       {firstLetter}
                     </div>
 
