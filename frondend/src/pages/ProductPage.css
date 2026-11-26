@@ -247,11 +247,11 @@
 .product-price-save {
   font-size: 0.82rem;
   font-weight: 700;
-  color: #059669;
-  background: #ecfdf5;
+  color: #004E38;
+  background: #F6FFE6;
   padding: 3px 10px;
   border-radius: 20px;
-  border: 1px solid #a7f3d0;
+  border: 1px solid #004E38;
 }
 
 /* Description */
@@ -287,8 +287,8 @@
 .product-weight-selected-label {
   font-weight: 700;
   color: #004E38;
-  background: #ecfdf5;
-  border: 1px solid #a7f3d0;
+  background: #F6FFE6;
+  border: 1px solid #004E38;
   border-radius: 9999px;
   padding: 2px 12px;
   font-size: 0.85rem;
@@ -1028,7 +1028,7 @@
   background-color: #d1dce5;
   color: #004E38;
   font-size: 1.15rem;
-  font-weight: 800;
+  font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
